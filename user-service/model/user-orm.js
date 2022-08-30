@@ -1,4 +1,4 @@
-import { createUser } from './repository.js';
+import { createUser, findUser } from './repository.js';
 
 //need to separate orm functions from repository to decouple business logic from persistence
 export async function ormCreateUser(username, password) {
@@ -8,6 +8,16 @@ export async function ormCreateUser(username, password) {
         return true;
     } catch (err) {
         console.log('ERROR: Could not create new user');
+        return { err };
+    }
+}
+
+export async function ormFindUser(username) {
+    try {
+        const user = await findUser(username)
+        return user;
+    } catch (err) {
+        console.log("ERROR: Database error");
         return { err };
     }
 }
