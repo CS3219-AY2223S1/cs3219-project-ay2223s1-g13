@@ -19,3 +19,7 @@ export async function validateUsername(username) {
   return UserModel.findOne({ username })
 }
 
+export async function findUser(username) {
+  return UserModel.findOne({ username })
+}
+
