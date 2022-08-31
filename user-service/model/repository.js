@@ -5,7 +5,7 @@ import 'dotenv/config'
 import mongoose from 'mongoose';
 
 let mongoDB = process.env.ENV == "PROD" ? process.env.DB_CLOUD_URI : process.env.DB_LOCAL_URI;
-
+console.log(mongoDB);
 mongoose.connect(mongoDB, { useNewUrlParser: true , useUnifiedTopology: true});
 
 let db = mongoose.connection;

@@ -13,7 +13,7 @@ const router = express.Router()
 // Controller will contain all the User-defined Routes
 router.get('/', (_, res) => res.send('Hello World from user-service'))
 router.post('/', createUser)
-router.post('/', loginUser)
+router.post('/login', loginUser)
 
 app.use('/api/user', router).all((_, res) => {
     res.setHeader('content-type', 'application/json')

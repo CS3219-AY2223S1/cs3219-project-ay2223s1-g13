@@ -1,5 +1,5 @@
 import { ormCreateUser as _createUser, ormFindUser as _findUser } from '../model/user-orm.js'
-import "bcrypt.js"
+import "bcrypt"
 
 export async function createUser(req, res) {
     try {
@@ -30,9 +30,9 @@ export async function loginUser(req, res) {
             if (!user) {
                 return res.status(400).json({message: "User does not exist"})
             }
-
             // check if correct password
             const isCorrectPassword = await checkPassword(password, user.password);
+            console.log(isCorrectPassword)
             if (!isCorrectPassword) {
                 return res.status(400).json({message: "Invalid Password"})
             }
@@ -50,5 +50,5 @@ export async function loginUser(req, res) {
 
 async function checkPassword(typedPassword, requiredPassword) {
     //need to hash and salt stuff later 
-    return bcrypt.compare(typedPassword, requiredPassword);
+    return (typedPassword == requiredPassword)
 }
