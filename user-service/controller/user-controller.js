@@ -1,5 +1,7 @@
 import { ormCreateUser as _createUser, ormFindUser as _findUser } from '../model/user-orm.js'
 import "bcrypt"
+import jwt from 'jsonwebtoken';
+// const { sign, verify } = jwt;
 
 export async function createUser(req, res) {
     try {
@@ -40,18 +42,19 @@ export async function loginUser(req, res) {
             }
             // check if correct password
             const isCorrectPassword = await checkPassword(password, user.password);
-            console.log(isCorrectPassword)
             if (!isCorrectPassword) {
                 return res.status(400).json({ message: "Invalid Password" })
             }
 
-            return res.status(200).json({ message: `Logged in user ${username} succesfully` });
+            const payload = { user: { name: username }}
+            const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET)
+            return res.status(200).json({ accessToken: accessToken, message: `Logged in user ${username} succesfully` });
             // all good to go
         } else {
             return res.status(400).json({ message: 'Username and/or Password are missing!' });
         }
     } catch (err) {
-        return res.status(500).json({ message: "Server error when logging in!" })
+        return res.status(500).json({ message: "Server error when logging in!"})
     }
 }
 
@@ -59,4 +62,19 @@ export async function loginUser(req, res) {
 async function checkPassword(typedPassword, requiredPassword) {
     //need to hash and salt stuff later 
     return (typedPassword == requiredPassword)
+}
+
+// This is an middleware to authenticate user actions
+function authenticateToken(req, res, next) {
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1]
+    if(token == null ) {
+        return res.status(401).json({message: "No token provided"})
+    }
+
+    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
+        if(err) return res.status(403).json({message: "Invalid Token"})
+        req.user = payload.user
+        next()
+    })
 }
