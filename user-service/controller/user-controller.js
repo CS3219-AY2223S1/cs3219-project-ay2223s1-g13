@@ -1,4 +1,4 @@
-import { ormCreateUser as _createUser, ormFindUser as _findUser, ormDeleteUser as _deleteUser  } from '../model/user-orm.js'
+import { ormCreateUser as _createUser, ormFindUser as _findUser, ormDeleteUser as _deleteUser, ormChangePassword as _changePassword } from '../model/user-orm.js'
 import "bcrypt"
 import jwt from 'jsonwebtoken';
 
@@ -6,7 +6,7 @@ export async function createUser(req, res) {
     try {
         const { username, password } = req.body;
         if (username && password) {
-            const existingUser = await _validateUsername(username);
+            const existingUser = await _findUser(username);
 
             //check if database have existing username
             if (existingUser) {
@@ -44,7 +44,7 @@ export async function loginUser(req, res) {
                 return res.status(400).json({ message: "Invalid Password" })
             }
 
-            const payload = { user: { name: username }}
+            const payload = { user: { name: username } }
             const accessToken = jwt.sign(payload, process.env.ACCESS_TOKEN_SECRET)
             return res.status(200).json({ accessToken: accessToken, message: `Logged in user ${username} succesfully` });
             // all good to go
@@ -52,7 +52,7 @@ export async function loginUser(req, res) {
             return res.status(400).json({ message: 'Username and/or Password are missing!' });
         }
     } catch (err) {
-        return res.status(500).json({ message: "Server error when logging in!"})
+        return res.status(500).json({ message: "Server error when logging in!" })
     }
 }
 
@@ -62,16 +62,50 @@ async function checkPassword(typedPassword, requiredPassword) {
     return (typedPassword == requiredPassword)
 }
 
+export async function changePassword(req, res) {
+    try {
+        const { username, oldPassword, newPassword } = req.body;
+        if (username && oldPassword && newPassword) {
+            const user = await _findUser(username);
+
+            // check if username exists
+            if (!user) {
+                return res.status(400).json({ message: "User does not exist" })
+            }
+
+            // check if correct current password entered
+            const isCorrectPassword = await checkPassword(oldPassword, user.password);
+            if (!isCorrectPassword) {
+                return res.status(400).json({ message: "Invalid password" })
+            }
+
+            // update old password to new password
+            const resp = await _changePassword(username, newPassword);
+            if (resp.err) {
+                return res.status(400).json({ message: 'Could not update password!' })
+            } else {
+                console.log(`Successfully updated password for user ${username}!`)
+                return res.status(201).json({ message: `Successfully updated password for user ${username}!` })
+            }
+
+        } else {
+            return res.status(400).json({ message: 'Username and/or Old Password and/or New Password are missing!' });
+        }
+    } catch (err) {
+        return res.status(500).json({ message: "Server error when updating password!" })
+    }
+}
+
 // This is an middleware to authenticate user actions
 function authenticateToken(req, res, next) {
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1]
-    if(token == null ) {
-        return res.status(401).json({message: "No token provided"})
+    if (token == null) {
+        return res.status(401).json({ message: "No token provided" })
     }
 
     jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
-        if(err) return res.status(403).json({message: "Invalid Token"})
+        if (err) return res.status(403).json({ message: "Invalid Token" })
         req.user = payload.user
         next()
     })
