@@ -17,17 +17,9 @@ router.post('/login', loginUser)
 router.post('/change_password', changePassword)
 router.delete('/', deleteUser)
 
+app.use('/api/login', loginUser)
+
 app.use('/api/user', router).all((_, res) => {
-    res.setHeader('content-type', 'application/json')
-    res.setHeader('Access-Control-Allow-Origin', '*')
-})
-
-const router_getUser = express.Router() 
-
-router_getUser.get('/', (_, res) => res.send('Hello World from user-service'))
-router_getUser.post('/', createUser)
-
-app.use('/api/login', router_getUser).all((_, res) => {
     res.setHeader('content-type', 'application/json')
     res.setHeader('Access-Control-Allow-Origin', '*')
 })

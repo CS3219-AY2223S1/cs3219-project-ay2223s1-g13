@@ -12,7 +12,7 @@ import {
 import {useState} from "react";
 import axios from "axios";
 import {URL_LOGIN_SVC, URL_USER_SVC} from "../configs";
-import {STATUS_CODE_CONFLICT, STATUS_CODE_CREATED} from "../constants";
+import {STATUS_CODE_CONFLICT, STATUS_CODE_CREATED, STATUS_BAD_REQUEST, STATUS_OK} from "../constants";
 import {Link} from "react-router-dom";
 
 
@@ -22,22 +22,18 @@ function LoginPage() {
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [dialogTitle, setDialogTitle] = useState("")
     const [dialogMsg, setDialogMsg] = useState("")
-    const [isSignupSuccess, setIsSignupSuccess] = useState(false)
-
 
     const handleLogin = async () => {
-        setIsSignupSuccess(false)
         const res = await axios.post(URL_LOGIN_SVC, { username, password })
             .catch((err) => {
-                if (err.response.status === STATUS_CODE_CONFLICT) {
-                    setErrorDialog('This username already exists')
+                if (err.response.status === STATUS_BAD_REQUEST) {
+                    setErrorDialog('Login failed')
                 } else {
-                    setErrorDialog('Please try again later')
+                    setErrorDialog('Something went wrong.. .Please try again later')
                 }
             })
-        if (res && res.status === STATUS_CODE_CREATED) {
-            setSuccessDialog('Account successfully created')
-            setIsSignupSuccess(true)
+        if (res && res.status === STATUS_OK) {
+            setSuccessDialog('User can be logged in')
         }
     }
 
@@ -87,10 +83,7 @@ function LoginPage() {
                     <DialogContentText>{dialogMsg}</DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    {isSignupSuccess
-                        ? <Button component={Link} to="/login">Login</Button>
-                        : <Button onClick={closeDialog}>Done</Button>
-                    }
+                    <Button component={Link} onClick={closeDialog} to="/login">Ok</Button>
                 </DialogActions>
             </Dialog>
         </Box>
