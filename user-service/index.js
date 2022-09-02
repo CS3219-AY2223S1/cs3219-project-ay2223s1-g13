@@ -22,4 +22,14 @@ app.use('/api/user', router).all((_, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*')
 })
 
+const router_getUser = express.Router() 
+
+router_getUser.get('/', (_, res) => res.send('Hello World from user-service'))
+router_getUser.post('/', createUser)
+
+app.use('/api/login', router_getUser).all((_, res) => {
+    res.setHeader('content-type', 'application/json')
+    res.setHeader('Access-Control-Allow-Origin', '*')
+})
+
 app.listen(8000, () => console.log('user-service listening on port 8000'));
