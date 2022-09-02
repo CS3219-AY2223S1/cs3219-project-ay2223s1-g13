@@ -23,3 +23,12 @@ export async function findUser(username) {
   return UserModel.findOne({ username })
 }
 
+export async function changePassword(username, newPassword) {
+  return UserModel.updateOne({
+    username: username
+  }, {
+    $set: {
+      password: newPassword
+    }
+  })
+}
