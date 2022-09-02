@@ -1,4 +1,4 @@
-import { createUser, findUser, changePassword } from './repository.js';
+import { createUser, findUser, deleteUser, changePassword } from './repository.js';
 
 //need to separate orm functions from repository to decouple business logic from persistence
 export async function ormCreateUser(username, password) {
@@ -34,3 +34,12 @@ export async function ormChangePassword(username, newPassword) {
     }
 }
 
+export async function ormDeleteUser(username) {
+  try {
+      await deleteUser(username);
+      return true;
+  } catch (err) {
+      console.log('ERROR: Could not delete user');
+      return { err };
+  }
+}

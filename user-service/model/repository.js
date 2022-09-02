@@ -15,12 +15,13 @@ export async function createUser(params) {
   return new UserModel(params)
 }
 
-export async function validateUsername(username) {
+export async function findUser(username) {
   return UserModel.findOne({ username })
 }
 
-export async function findUser(username) {
-  return UserModel.findOne({ username })
+
+export async function deleteUser(username) {
+  return UserModel.find({username: username}).remove().exec()
 }
 
 export async function changePassword(username, newPassword) {
