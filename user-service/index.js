@@ -17,8 +17,6 @@ router.post('/login', loginUser)
 router.post('/change_password', changePassword)
 router.delete('/', deleteUser)
 
-app.use('/api/login', loginUser)
-
 app.use('/api/user', router).all((_, res) => {
     res.setHeader('content-type', 'application/json')
     res.setHeader('Access-Control-Allow-Origin', '*')
