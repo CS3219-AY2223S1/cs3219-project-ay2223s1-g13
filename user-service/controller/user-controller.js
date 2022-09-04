@@ -13,7 +13,8 @@ export async function createUser(req, res) {
                 return res.status(409).json({ message: 'Existing username!' });
             }
 
-            const resp = await _createUser(username, password);
+            const hash = await hashPassword(password);
+            const resp = await _createUser(username, hash);
             console.log(resp);
             if (resp.err) {
                 return res.status(400).json({ message: 'Could not create a new user!' });
@@ -58,8 +59,19 @@ export async function loginUser(req, res) {
 
 
 async function checkPassword(typedPassword, requiredPassword) {
-    //need to hash and salt stuff later 
-    return (typedPassword == requiredPassword)
+    //compare 2 passwords
+    bcrypt.compare(typedPassword, requiredPassword, function (result) {
+        return result;
+    })
+}
+
+async function hashPassword(password) {
+    const saltRounds = 10;
+    bcrypt.genSalt(saltRounds, function (salt) {
+        bcrypt.hash(password, salt, function (hash) {
+            return hash;
+        });
+    })
 }
 
 export async function changePassword(req, res) {
@@ -79,8 +91,9 @@ export async function changePassword(req, res) {
                 return res.status(400).json({ message: "Invalid password" })
             }
 
+            const hash = await hashPassword(newPassword);
             // update old password to new password
-            const resp = await _changePassword(username, newPassword);
+            const resp = await _changePassword(username, hash);
             if (resp.err) {
                 return res.status(400).json({ message: 'Could not update password!' })
             } else {
@@ -112,22 +125,22 @@ function authenticateToken(req, res, next) {
 }
 
 export async function deleteUser(req, res) {
-  try {
-    const { username } = req.body;
-    if (username) {
-        const resp = await _deleteUser(username);
-        console.log(resp);
-        if (resp.err) {
-            return res.status(400).json({message: 'Could not delete the user!'});
+    try {
+        const { username } = req.body;
+        if (username) {
+            const resp = await _deleteUser(username);
+            console.log(resp);
+            if (resp.err) {
+                return res.status(400).json({ message: 'Could not delete the user!' });
+            } else {
+                console.log(`User ${username} is deleted successfully!`)
+                return res.status(201).json({ message: `Deleted user ${username} successfully!` });
+            }
         } else {
-            console.log(`User ${username} is deleted successfully!`)
-            return res.status(201).json({message: `Deleted user ${username} successfully!`});
+            return res.status(400).json({ message: 'Username use missing!' });
         }
-    } else {
-        return res.status(400).json({message: 'Username use missing!'});
+    } catch (err) {
+        return res.status(500).json({ message: 'Database failure when deleting the user!' })
     }
-  } catch (err) {
-      return res.status(500).json({message: 'Database failure when deleting the user!'})
-  }
 }
 

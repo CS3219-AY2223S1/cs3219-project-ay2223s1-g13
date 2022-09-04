@@ -21,7 +21,7 @@ export async function findUser(username) {
 
 
 export async function deleteUser(username) {
-  return UserModel.find({username: username}).remove().exec()
+  return UserModel.find({ username: username }).remove().exec()
 }
 
 export async function changePassword(username, newPassword) {
