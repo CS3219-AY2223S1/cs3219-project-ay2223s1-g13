@@ -11,9 +11,10 @@ import {
 } from "@mui/material";
 import { useState } from "react";
 import axios from "axios";
-import { URL_USER_SVC } from "../configs";
-import { STATUS_CODE_CONFLICT, STATUS_CODE_CREATED } from "../constants";
+import { URL_USER_SVC, URL_LOGIN_SVC } from "../configs";
+import { STATUS_CODE_CONFLICT, STATUS_CODE_CREATED, STATUS_OK, STATUS_BAD_REQUEST } from "../constants";
 import { Link } from "react-router-dom";
+
 
 function SignupPage() {
     const [username, setUsername] = useState("")
@@ -39,6 +40,20 @@ function SignupPage() {
         }
     }
 
+    const handleLogin = async () => {
+        const res = await axios.post(URL_LOGIN_SVC, { username, password })
+            .catch((err) => {
+                if (err.response.status === STATUS_BAD_REQUEST) {
+                    setErrorDialog('Login failed')
+                } else {
+                    setErrorDialog('Something went wrong.. .Please try again later')
+                }
+            })
+        if (res && res.status === STATUS_OK) {
+            setSuccessDialog('User credentials are correct -- log in to be implemented')
+        }
+    }
+
     const closeDialog = () => setIsDialogOpen(false)
 
     const setSuccessDialog = (msg) => {
@@ -55,7 +70,7 @@ function SignupPage() {
 
     return (
         <Box display={"flex"} flexDirection={"column"} width={"30%"}>
-            <Typography variant={"h3"} marginBottom={"2rem"}>Sign Up</Typography>
+            <Typography variant={"h3"} marginBottom={"2rem"}>Welcome</Typography>
             <TextField
                 label="Username"
                 variant="standard"
@@ -72,8 +87,9 @@ function SignupPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 sx={{ marginBottom: "2rem" }}
             />
-            <Box display={"flex"} flexDirection={"row"} justifyContent={"flex-end"}>
-                <Button variant={"outlined"} onClick={handleSignup}>Sign up</Button>
+            <Box display={"flex"} flexDirection={"row"} justifyContent={"flex-end"} >
+                <Button sx={{ m: 1 }} variant={"outlined"} onClick={handleLogin}>Login</Button>
+                <Button sx={{ m: 1 }} variant={"outlined"} onClick={handleSignup}>Sign up</Button>
             </Box>
 
             <Dialog
