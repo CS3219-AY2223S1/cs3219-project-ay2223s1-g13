@@ -110,7 +110,6 @@ export async function changePassword(req, res) {
 export async function authenticateToken(req, res, next) {
     try {
         const {token} = req.body
-        console.log(token)
 
         if (!token) {
             return res.status(403).send("A token is required for authentication");

@@ -17,13 +17,9 @@ import { Link, Navigate, useNavigate } from "react-router-dom";
 
 
 function HomePage() {
-    const [username, setUsername] = useState("")
-    const [password, setPassword] = useState("")
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [dialogTitle, setDialogTitle] = useState("")
     const [dialogMsg, setDialogMsg] = useState("")
-    const [isSignupSuccess, setIsSignupSuccess] = useState(false)
-    const [isAuthenticated, setIsAuthenticated] = useState(false)
 
     const navigate = useNavigate()
 
@@ -60,6 +56,7 @@ function HomePage() {
 
     const logoutUser = () => {
         sessionStorage.removeItem("accessToken")
+        sessionStorage.removeItem("username")
         navigate('/signup')
     }
 
