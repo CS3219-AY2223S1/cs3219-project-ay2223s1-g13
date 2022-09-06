@@ -35,9 +35,9 @@ function HomePage() {
       });
 
 
-    const setSuccessDialog = (msg) => {
+    const setConfirmDialog = (msg) => {
         setIsDialogOpen(true)
-        setDialogTitle('Success')
+        setDialogTitle('Are You Sure?')
         setDialogMsg(msg)
     }
 
@@ -54,11 +54,33 @@ function HomePage() {
                 navigate('/signup'); 
             })
     }
+    
+    const confirmLogout = async () => {
+        setConfirmDialog("Do you want to log out?")
+    }
+
+    const logoutUser = () => {
+        sessionStorage.removeItem("accessToken")
+        navigate('/signup')
+    }
 
     return (
         <Box display={"flex"} flexDirection={"column"} width={"30%"}>
             <Typography variant={"h3"} marginBottom={"2rem"}> Welcome Home</Typography>
-            <Button sx={{ m: 1 }} onClick={checkLoggedIn} variant={"outlined"}>Logout</Button>
+            <Button sx={{ m: 1 }} onClick={confirmLogout} variant={"outlined"}>Logout</Button>
+
+            <Dialog
+                open={isDialogOpen}
+                onClose={closeDialog}
+            >
+                <DialogTitle>{dialogTitle}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>{dialogMsg}</DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={logoutUser}>Close</Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     )
 }
