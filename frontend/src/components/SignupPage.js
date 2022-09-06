@@ -12,9 +12,8 @@ import {
 import { useState } from "react";
 import axios from "axios";
 import { URL_USER_SVC, URL_LOGIN_SVC } from "../configs";
-import { STATUS_CODE_CONFLICT, STATUS_CODE_CREATED, STATUS_OK, STATUS_BAD_REQUEST } from "../constants";
+import { STATUS_CODE_CONFLICT, STATUS_CODE_CREATED, STATUS_OK, STATUS_BAD_REQUEST, STATUS_CODE_NOT_ACCEPTABLE } from "../constants";
 import { Link } from "react-router-dom";
-
 
 function SignupPage() {
     const [username, setUsername] = useState("")
@@ -54,6 +53,22 @@ function SignupPage() {
         }
     }
 
+    const handleDelete = async () => {
+      const res = await axios.delete(URL_USER_SVC, {data: { username, password }})
+          .catch((err) => {
+              if (err.response.status === STATUS_CODE_CONFLICT) {
+                  setErrorDialog('Incorrect password!')
+              } else if (err.response.status === STATUS_CODE_NOT_ACCEPTABLE) {
+                setErrorDialog('Username not found!')
+              } else {
+                  setErrorDialog('Something went wrong')
+              }
+          })
+      if (res && res.status === STATUS_OK) {
+          setSuccessDialog(`User ${username} deleted successfully!`)
+      }
+  }
+
     const closeDialog = () => setIsDialogOpen(false)
 
     const setSuccessDialog = (msg) => {
@@ -90,6 +105,7 @@ function SignupPage() {
             <Box display={"flex"} flexDirection={"row"} justifyContent={"flex-end"} >
                 <Button sx={{ m: 1 }} variant={"outlined"} onClick={handleLogin}>Login</Button>
                 <Button sx={{ m: 1 }} variant={"outlined"} onClick={handleSignup}>Sign up</Button>
+                <Button sx={{ m: 1 }} variant={"outlined"} onClick={handleDelete}>Delete</Button>
             </Box>
 
             <Dialog
