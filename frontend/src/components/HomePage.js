@@ -48,7 +48,6 @@ function HomePage() {
     }
 
     const checkLoggedIn = async () => {
-        console.log(localStorage.getItem("accessToken"))
         const res = await axios.post(URL_CHECK_TOKEN, {token: sessionStorage.getItem("accessToken")})
             .catch((err) => {
                 navigate('/signup'); 

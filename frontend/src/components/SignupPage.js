@@ -31,7 +31,6 @@ function SignupPage() {
       });
     
       const checkLoggedIn = async () => {
-        console.log(localStorage.getItem("accessToken"))
         const res = await axios.post(URL_CHECK_TOKEN, {token: sessionStorage.getItem("accessToken")})
             .catch((err) => {
                 //navigate('/signup'); 
@@ -64,7 +63,7 @@ function SignupPage() {
                 if (err.response.status === STATUS_BAD_REQUEST) {
                     setErrorDialog('Login failed')
                 } else {
-                    setErrorDialog('Something went wrong.. .Please try again later')
+                    setErrorDialog('Something went wrong... Please try again later')
                 }
             })
 
@@ -72,7 +71,7 @@ function SignupPage() {
             setIsLoginSuccess(true)
             const token = res.data.accessToken
             sessionStorage.setItem("accessToken", token)
-            console.log("put in storage")
+            sessionStorage.setItem("username", username)
             navigate('/home');
         } 
     }
