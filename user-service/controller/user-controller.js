@@ -1,5 +1,5 @@
 import { ormCreateUser as _createUser, ormFindUser as _findUser, ormDeleteUser as _deleteUser, ormChangePassword as _changePassword } from '../model/user-orm.js'
-import "bcrypt"
+import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
 
 export async function createUser(req, res) {
@@ -60,18 +60,15 @@ export async function loginUser(req, res) {
 
 async function checkPassword(typedPassword, requiredPassword) {
     //compare 2 passwords
-    bcrypt.compare(typedPassword, requiredPassword, function (result) {
-        return result;
-    })
+    const validPassword = await bcrypt.compare(typedPassword, requiredPassword);
+
+    return validPassword;
 }
 
 async function hashPassword(password) {
-    const saltRounds = 10;
-    bcrypt.genSalt(saltRounds, function (salt) {
-        bcrypt.hash(password, salt, function (hash) {
-            return hash;
-        });
-    })
+    const salt = await bcrypt.genSalt(10);
+    const hash = await bcrypt.hash(password, salt);
+    return hash;
 }
 
 export async function changePassword(req, res) {
