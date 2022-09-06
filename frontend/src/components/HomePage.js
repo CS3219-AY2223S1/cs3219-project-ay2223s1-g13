@@ -37,7 +37,7 @@ function HomePage() {
 
     const setConfirmDialog = (msg) => {
         setIsDialogOpen(true)
-        setDialogTitle('Are You Sure?')
+        setDialogTitle('Warning')
         setDialogMsg(msg)
     }
 
@@ -56,7 +56,7 @@ function HomePage() {
     }
     
     const confirmLogout = async () => {
-        setConfirmDialog("Do you want to log out?")
+        setConfirmDialog("You sure you want log out?")
     }
 
     const logoutUser = () => {
@@ -78,7 +78,7 @@ function HomePage() {
                     <DialogContentText>{dialogMsg}</DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={logoutUser}>Close</Button>
+                    <Button onClick={logoutUser}>Sure ahhh!</Button>
                 </DialogActions>
             </Dialog>
         </Box>
