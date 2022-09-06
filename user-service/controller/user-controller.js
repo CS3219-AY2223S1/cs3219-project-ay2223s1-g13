@@ -97,19 +97,26 @@ export async function changePassword(req, res) {
 }
 
 // This is an middleware to authenticate user actions
-function authenticateToken(req, res, next) {
-    const authHeader = req.headers['authorization']
-    const token = authHeader && authHeader.split(' ')[1]
-    if (token == null) {
-        return res.status(401).json({ message: "No token provided" })
-    }
+export async function authenticateToken(req, res, next) {
+    try {
+        const {token} = req.body
+        console.log(token)
 
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, payload) => {
-        if (err) return res.status(403).json({ message: "Invalid Token" })
-        req.user = payload.user
-        next()
-    })
+        if (!token) {
+            return res.status(403).send("A token is required for authentication");
+        }
+        try {
+            const decoded = jwt.verify(token, "ACCESS_TOKEN");
+            req.user = decoded;
+            return res.status(200).send("Valid Token");
+        } catch (err) {
+            return res.status(401).send("Invalid Token");
+        }
+    } catch (err) {
+        return res.status(500).send("Problem authenticating code")
+    }
 }
+
 
 export async function deleteUser(req, res) {
   try {

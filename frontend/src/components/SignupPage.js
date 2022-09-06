@@ -9,11 +9,11 @@ import {
     TextField,
     Typography
 } from "@mui/material";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import axios from "axios";
-import { URL_USER_SVC, URL_LOGIN_SVC } from "../configs";
-import { STATUS_CODE_CONFLICT, STATUS_CODE_CREATED, STATUS_OK, STATUS_BAD_REQUEST } from "../constants";
-import { Link } from "react-router-dom";
+import { URL_USER_SVC, URL_LOGIN_SVC, URL_CHECK_TOKEN } from "../configs";
+import { STATUS_CODE_CONFLICT, STATUS_CODE_CREATED, STATUS_OK, STATUS_BAD_REQUEST, STATUS_INVALID_TOKEN } from "../constants";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 
 
 function SignupPage() {
@@ -23,6 +23,23 @@ function SignupPage() {
     const [dialogTitle, setDialogTitle] = useState("")
     const [dialogMsg, setDialogMsg] = useState("")
     const [isSignupSuccess, setIsSignupSuccess] = useState(false)
+    const [isLoginSuccess, setIsLoginSuccess] = useState(false)
+    const navigate = useNavigate()
+
+    useEffect(() => {
+        checkLoggedIn()
+      });
+    
+      const checkLoggedIn = async () => {
+        console.log(localStorage.getItem("accessToken"))
+        const res = await axios.post(URL_CHECK_TOKEN, {token: sessionStorage.getItem("accessToken")})
+            .catch((err) => {
+                //navigate('/signup'); 
+            })
+        if (res.status === STATUS_OK) {
+            navigate('/home')
+        }
+    }
 
     const handleSignup = async () => {
         setIsSignupSuccess(false)
@@ -43,15 +60,21 @@ function SignupPage() {
     const handleLogin = async () => {
         const res = await axios.post(URL_LOGIN_SVC, { username, password })
             .catch((err) => {
+                setIsLoginSuccess(false)
                 if (err.response.status === STATUS_BAD_REQUEST) {
                     setErrorDialog('Login failed')
                 } else {
                     setErrorDialog('Something went wrong.. .Please try again later')
                 }
             })
-        if (res && res.status === STATUS_OK) {
-            setSuccessDialog('User credentials are correct -- log in to be implemented')
-        }
+
+        if (res.status === STATUS_OK) {
+            setIsLoginSuccess(true)
+            const token = res.data.accessToken
+            sessionStorage.setItem("accessToken", token)
+            console.log("put in storage")
+            navigate('/home');
+        } 
     }
 
     const closeDialog = () => setIsDialogOpen(false)
@@ -69,6 +92,7 @@ function SignupPage() {
     }
 
     return (
+        
         <Box display={"flex"} flexDirection={"column"} width={"30%"}>
             <Typography variant={"h3"} marginBottom={"2rem"}>Welcome</Typography>
             <TextField
@@ -102,8 +126,8 @@ function SignupPage() {
                 </DialogContent>
                 <DialogActions>
                     {isSignupSuccess
-                        ? <Button component={Link} to="/login">Log in</Button>
-                        : <Button onClick={closeDialog}>Done</Button>
+                        ? <Button component={Link} to="/home">Continue</Button>
+                        : <Button onClick={closeDialog}>Close</Button>
                     }
                 </DialogActions>
             </Dialog>
