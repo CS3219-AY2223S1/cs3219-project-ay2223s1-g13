@@ -76,22 +76,6 @@ function SignupPage() {
         } 
     }
 
-    const handleDelete = async () => {
-      const res = await axios.delete(URL_USER_SVC, {data: { username, password }})
-          .catch((err) => {
-              if (err.response.status === STATUS_CODE_CONFLICT) {
-                  setErrorDialog('Incorrect password!')
-              } else if (err.response.status === STATUS_CODE_NOT_ACCEPTABLE) {
-                setErrorDialog('Username not found!')
-              } else {
-                  setErrorDialog('Something went wrong')
-              }
-          })
-      if (res && res.status === STATUS_OK) {
-          setSuccessDialog(`User ${username} deleted successfully!`)
-      }
-  }
-
     const closeDialog = () => setIsDialogOpen(false)
 
     const setSuccessDialog = (msg) => {
@@ -129,7 +113,6 @@ function SignupPage() {
             <Box display={"flex"} flexDirection={"row"} justifyContent={"flex-end"} >
                 <Button sx={{ m: 1 }} variant={"outlined"} onClick={handleLogin}>Login</Button>
                 <Button sx={{ m: 1 }} variant={"outlined"} onClick={handleSignup}>Sign up</Button>
-                <Button sx={{ m: 1 }} variant={"outlined"} onClick={handleDelete}>Delete</Button>
             </Box>
 
             <Dialog

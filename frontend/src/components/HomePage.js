@@ -17,13 +17,14 @@ import { Link, Navigate, useNavigate } from "react-router-dom";
 
 
 function HomePage() {
-    const [username, setUsername] = useState("")
-    const [password, setPassword] = useState("")
     const [isDialogOpen, setIsDialogOpen] = useState(false)
     const [dialogTitle, setDialogTitle] = useState("")
     const [dialogMsg, setDialogMsg] = useState("")
-    const [isSignupSuccess, setIsSignupSuccess] = useState(false)
-    const [isAuthenticated, setIsAuthenticated] = useState(false)
+
+    const [password, setPassword] = useState("")
+    const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
+    const [isDeleteErrorDialogOpen, setDeleteErrorDialogOpen] = useState(false)
+    const [isDeleteSuccessDialogOpen, setDeleteSuccessDialogOpen] = useState(false)
 
     const navigate = useNavigate()
 
@@ -60,13 +61,27 @@ function HomePage() {
 
     const logoutUser = () => {
         sessionStorage.removeItem("accessToken")
+        sessionStorage.removeItem("username")
         navigate('/signup')
+    }
+
+    const handleDelete = async () => {
+        const res = await axios.delete(URL_USER_SVC, {data: { username: sessionStorage.getItem("username"), password: password }})
+            .catch((err) => {
+                setDeleteDialogOpen(false)
+                setDeleteErrorDialogOpen(true)
+            })
+        if (res && res.status === STATUS_OK) {
+            setDeleteDialogOpen(false) 
+            setDeleteSuccessDialogOpen(true)
+        }
     }
 
     return (
         <Box display={"flex"} flexDirection={"column"} width={"30%"}>
-            <Typography variant={"h3"} marginBottom={"2rem"}> Welcome Home</Typography>
-            <Button sx={{ m: 1 }} onClick={confirmLogout} variant={"outlined"}>Logout</Button>
+            <Typography variant={"h3"} marginBottom={"2rem"}> Welcome, {sessionStorage.getItem("username")}</Typography>
+            <Button sx={{ m: 1 }} variant={"outlined"} onClick={() => setDeleteDialogOpen(true)}>Delete</Button>
+            <Button sx={{ m: 1 }} variant={"outlined"} onClick={confirmLogout}>Logout</Button>
 
             <Dialog
                 open={isDialogOpen}
@@ -78,6 +93,30 @@ function HomePage() {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={logoutUser}>Sure ahhh!</Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={isDeleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+                <DialogContent>
+                    <Typography variant="body1">Please enter your password to confirm deleting account</Typography>
+                    <TextField variant="standard" type="password" onChange={e => setPassword(e.target.value)} />
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="contained" color="warning" onClick={handleDelete}>Confirm</Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={isDeleteErrorDialogOpen} onClose={() => setDeleteErrorDialogOpen(false)}>
+                <DialogTitle>Wrong Password</DialogTitle>
+                <DialogActions>
+                    <Button onClick={() => setDeleteErrorDialogOpen(false)}>Close</Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={isDeleteSuccessDialogOpen} onClose={() => setDeleteErrorDialogOpen(false)}>
+                <DialogActions>
+                    <Typography variant="body1">{sessionStorage.getItem("username")} is succesfully deleted!</Typography>
+                    <Button onClick={logoutUser}>Exit</Button>
                 </DialogActions>
             </Dialog>
         </Box>
