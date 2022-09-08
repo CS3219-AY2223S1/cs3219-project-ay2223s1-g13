@@ -1,0 +1,4 @@
+.difficultySelector_body {
+    display: flex;
+    justify-content: space-between;
+}
