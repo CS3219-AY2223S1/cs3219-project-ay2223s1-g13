@@ -1,19 +1,27 @@
-import mongoose from 'mongoose';
-import UserModel from '../../user-service/model/user-model';
+import { Sequelize, Model, DataTypes, DATE } from 'sequelize';
 
-var Schema = mongoose.Schema
-let MatchModelSchema = new Schema({
-    user: {
-        type: UserModel,
-        required: true,
-        unique: true
-    },
-    timeCreated: {
-        type: Date,
-        default: Date.now(),
+const sequelize = new Sequelize('sqlite::memory:');
+const MatchModel = sequelize.define('MatchModel', {
+    userOne: {
+        type: DataTypes.STRING,
         required: true
     },
-    isMatched: false
-})
+    userTwo: {
+        type: DataTypes.STRING,
+        required: true
+    },
+    timeCreated: {
+        type: DataTypes.DATE,
+        defaultValue: Date.now()
+    },
+    isFull: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false
+    }
+});
 
-export default mongoose.model('MatchModel', MatchModelSchema)
+sequelize.sync().then(() => {
+    console.log('Match table created successfully!')
+}).catch((err) => {
+    console.log('Unable to create Match table: ', err)
+})
