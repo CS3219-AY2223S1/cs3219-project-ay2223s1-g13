@@ -18,7 +18,6 @@ app.get("/", (req, res) => {
 
 
 // create a socket.io server
-
 const io = new Server(httpServer, {
     /* options */
     cors: {
