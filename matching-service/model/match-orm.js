@@ -1,8 +1,8 @@
-import { createMatch, findMatch } from "./repository.js";
+import { createMatch, findJoinableMatches } from "./repository.js";
 
-export async function ormCreateMatch(user1, user2, difficulty, createdAt, otherprops) {
+export async function ormCreateMatch(userOne, userTwo, timeCreated, isFull) {
     try {
-        await createMatch({ user1, user2, difficulty, createdAt, otherprops });
+        await createMatch({ userOne, userTwo, timeCreated, isFull });
         return true;
     } catch (err) {
         console.log("ERROR: Could not create new match");
@@ -16,6 +16,16 @@ export async function ormFindMatch(user) {
         return true;
     } catch (err) {
         console.log("ERROR: Could not check for existing match");
+        return { err }
+    }
+}
+
+export async function ormFindJoinableMatches(timeCreated) {
+    try {
+        const joinableMatches = await findJoinableMatches({ timeCreated });
+        return joinableMatches;
+    } catch (err) {
+        console.log("ERROR: Could not find matches");
         return { err };
     }
 }
