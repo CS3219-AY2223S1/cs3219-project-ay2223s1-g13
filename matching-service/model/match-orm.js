@@ -1,8 +1,8 @@
 import { createMatch, findJoinableMatches } from "./repository.js";
 
-export async function ormCreateMatch(userOne, userTwo, timeCreated, isFull) {
+export async function ormCreateMatch(userOne, userTwo, difficulty, socketId, createdAt) {
     try {
-        await createMatch({ userOne, userTwo, timeCreated, isFull });
+        await createMatch({ userOne, userTwo, difficulty, socketId, createdAt });
         return true;
     } catch (err) {
         console.log("ERROR: Could not create new match");

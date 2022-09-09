@@ -2,8 +2,8 @@ import { ormCreateMatch as _createMatch } from "../model/match-orm";
 
 export async function createMatch(req, res) {
     try {
-        const { userOne, userTwo, timeCreated, isFull } = req.body;
-        const newMatch = _createMatch(userOne, userTwo, timeCreated, isFull);
+        const { userOne, userTwo, difficulty, socketId, createdAt } = req.body;
+        const newMatch = _createMatch(userOne, userTwo, difficulty, socketId, createdAt);
 
         if (newMatch) {
             return res.status(201).json({ message: "Created new match" });
