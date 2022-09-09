@@ -11,13 +11,17 @@ const MatchModel = sequelize.define('MatchModel', {
         required: true,
         allowNull: true
     },
-    timeCreated: {
+    difficulty: {
+        type: DataTypes.STRING,
+        required: true
+    },
+    socketId: {
+        type: DataTypes.STRING,
+        required: true
+    },
+    createdAt: {
         type: DataTypes.DATE,
         defaultValue: Date.now()
-    },
-    isFull: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false
     }
 });
 

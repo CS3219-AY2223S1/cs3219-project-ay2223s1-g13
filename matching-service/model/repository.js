@@ -1,5 +1,5 @@
 import MatchModel from './match-model.js';
-import { Sequelize } from 'sequelize';
+import { Sequelize, Op } from 'sequelize';
 
 
 const sequelize = new Sequelize('sqlite::memory:');
@@ -9,4 +9,14 @@ await matchModel.sync({ force: true });
 
 export async function createMatch(params) {
     return matchModel.create(params);
+}
+
+export async function findMatch(username) {
+    return matchModel.findAll({
+        where: {
+            [Op.or]: [
+                { userOne: username }
+            ]
+        }
+    });
 }
