@@ -18,7 +18,7 @@ app.get("/", (req, res) => {
 
 
 // create a socket.io server
-const io = new Server(httpServer, {
+export const io = new Server(httpServer, {
     /* options */
     cors: {
         origin: "http://localhost:3000",
@@ -28,8 +28,8 @@ const io = new Server(httpServer, {
 
 io.on("connection", (socket) => {
     // ...
+    socket.emit('match', "hihihi");
     console.log(`New Client connected ${socket.id}`);
 });
-
 
 httpServer.listen(8001);

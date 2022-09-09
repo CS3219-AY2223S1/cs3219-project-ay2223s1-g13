@@ -1,4 +1,10 @@
+import { isObjectIdOrHexString } from "mongoose";
 import { ormCreateMatch as _createMatch } from "../model/match-orm";
+import { io } from "../index";
+
+io.on('match', (msg) => {
+    console.log(msg)
+})
 
 export async function createMatch(req, res) {
     try {
