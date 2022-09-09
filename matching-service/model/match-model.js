@@ -8,7 +8,8 @@ const MatchModel = sequelize.define('MatchModel', {
     },
     userTwo: {
         type: DataTypes.STRING,
-        required: true
+        required: true,
+        allowNull: true
     },
     timeCreated: {
         type: DataTypes.DATE,
