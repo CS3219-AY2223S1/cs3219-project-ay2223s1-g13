@@ -20,9 +20,9 @@ export async function ormFindMatch(user) {
     }
 }
 
-export async function ormFindJoinableMatches(timeCreated) {
+export async function ormFindJoinableMatches(params) {
     try {
-        const joinableMatches = await findJoinableMatches({ timeCreated });
+        const joinableMatches = await findJoinableMatches(params.difficulty, params.createdAt);
         return joinableMatches;
     } catch (err) {
         console.log("ERROR: Could not find matches");

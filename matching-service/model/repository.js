@@ -20,11 +20,10 @@ export async function findMatch(username) {
     });
 }
 
-export async function findJoinableMatches(params) {
-    const { timeCreated } = params;
+export async function findJoinableMatches(difficulty, createdAt) {
     return matchModel.findAll({
         where: {
-            timeCreated: {
+            createdAt: {
                 [Op.gte]: new Date(start_time - 30000).getTime(),
             },
         },
