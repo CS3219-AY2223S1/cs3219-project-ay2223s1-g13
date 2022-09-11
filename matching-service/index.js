@@ -10,7 +10,7 @@ app.use(cors()); // config cors so that front-end can use
 app.options("*", cors());
 
 const httpServer = createServer(app);
-
+httpServer.listen(8001);
 
 app.get("/", (req, res) => {
     res.send("Hello World from matching-service");
@@ -28,8 +28,11 @@ export const io = new Server(httpServer, {
 
 io.on("connection", (socket) => {
     // ...
-    socket.emit('match', "hihihi");
     console.log(`New Client connected ${socket.id}`);
+    socket.on('match', (params) => {
+        params["socketId"] = socket.id;
+        console.log("hihihi", params)
+        socket.emit('createMatch', params)
+    })
 });
 
-httpServer.listen(8001);
