@@ -3,6 +3,7 @@ import cors from "cors";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import { createMatch } from "./controller/match-controller.js";
+import moment from "moment";
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
@@ -10,11 +11,7 @@ app.use(express.json());
 app.use(cors()); // config cors so that front-end can use
 app.options("*", cors());
 
-// // const router = express.Router()
-
-// // router.post('/', createMatch)
-
-const httpServer = createServer(app);
+export const httpServer = createServer(app);
 httpServer.listen(8001);
 
 app.get("/", (req, res) => {
@@ -22,7 +19,7 @@ app.get("/", (req, res) => {
 });
 
 // create a socket.io server
-const io = new Server(httpServer, {
+export const io = new Server(httpServer, {
     /* options */
     cors: {
         origin: "http://localhost:3000",
@@ -36,5 +33,11 @@ io.on("connection", (socket) => {
     socket.on("createMatch", (params) => {
         console.log("createMatch was called " + params);
     });
-    socket.on("match", createMatch);
+    socket.on("match", (params) => {
+        params["socketId"] = socket.id;
+        params["createdAt"] = moment().format("YYYY-MM-DD HH:mm:ss")
+        console.log(params.createdAt)
+        createMatch(params);
+        console.log("yay")
+    });
 });

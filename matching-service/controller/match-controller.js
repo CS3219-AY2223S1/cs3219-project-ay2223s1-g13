@@ -1,56 +1,47 @@
 // import { isObjectIdOrHexString } from "mongoose";
 import { ormCreateMatch as _createMatch, ormFindJoinableMatches as _findJoinableMatches } from "../model/match-orm.js";
-// import { io }from "../index"
-
-// const socket = io.connect();
-
-// // this part doesnt work basically index.js emits 'createMatch' after 
-// // it picks up event 'match' (sent thru postman socket.io) then we 
-// // need match controller to pick it up to call te createMatch func
-// socket.on('createMatch', (params) => {
-//     console.log("fkfkfk, ", params);
-// })
-
+import { io, httpServer } from "../index.js"
 
 
 export async function createMatch(params) {
     try {
-        const { userOne, difficulty, socketId, createdAt } = params;
+        const { userOne, socketId, difficulty, createdAt } = params;
         if (userOne && difficulty && socketId && createdAt) {
-
             const match = await _findJoinableMatches(difficulty, createdAt);
-
+            console.log(match)
             if (match) {
+                console.log("match was found")
                 // create a match
                 await _createMatch(userOne, match, difficulty, userOneSocketId, userTwoSocketId, Date.now(), false);
-                
+
                 // remove record for userTwo 'match'?
 
                 // add both user to a room
                 const addUserToRoom = await addToRoom(userOneSocketId, userTwoSocketId, userOne, match);
                 if (addUserToRoom) {
-                    return res.status(201).json({ message: `Successfully add ${userOne} and ${match} to room!` });
+                    console.log(`Successfully add ${userOne} and ${match} to room!`);
+                    return;
                 }
-
-                return res.status(201).json({ message: `Matched ${userOne} and ${match}` });
+                console.log(`Matched ${userOne} and ${match}`);
+                return;
             }
             const newMatch = await _createMatch(userOne, null, difficulty, socketId, null, Date.now(), true);
 
             if (newMatch) {
-                return res.status(201).json({ message: "Created new pending match" });
+                console.log("Created new pending match");
+                return;
                 // findmatch
             } else {
-                return res
-                    .status(400)
-                    .json({ message: "Could not create a new pending match!" });
+                io.emit('error-match', { message: 'Could not create a new pending match!' });
+                return;
             }
         } else {
-            return res.status(400).json({ message: "Missing args" });
+            io.emit('missing-args', { message: 'missing args' });
+            return;
         }
     } catch (err) {
-        return res
-            .status(500)
-            .json({ message: "Server error when creating match!" });
+        io.emit('error-server', { message: 'Server error when creating match' })
+        return;
     }
 }
 
