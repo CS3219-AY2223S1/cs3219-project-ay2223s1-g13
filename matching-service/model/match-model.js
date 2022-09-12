@@ -1,41 +1,44 @@
-import { Sequelize, Model, DataTypes, DATE } from 'sequelize';
+import { Sequelize, Model, DataTypes, DATE } from "sequelize";
 
-const sequelize = new Sequelize('sqlite::memory:');
-const MatchModel = sequelize.define('MatchModel', {
+const sequelize = new Sequelize("sqlite::memory:");
+export const MatchModel = sequelize.define("MatchModel", {
     userOne: {
         type: DataTypes.STRING,
-        required: true
+        required: true,
     },
     userTwo: {
         type: DataTypes.STRING,
         required: true,
-        allowNull: true
+        allowNull: true,
     },
     difficulty: {
         type: DataTypes.STRING,
-        required: true
+        required: true,
     },
     socketIdOne: {
         type: DataTypes.STRING,
-        required: true
+        required: true,
     },
     socketIdTwo: {
         type: DataTypes.STRING,
         required: true,
-        allowNull: true
+        allowNull: true,
     },
     createdAt: {
         type: DataTypes.DATE,
-        defaultValue: Date.now()
+        defaultValue: Date.now(),
     },
     isPending: {
         type: DataTypes.BOOLEAN,
-        defaultValue: false
-    }
+        defaultValue: false,
+    },
 });
 
-sequelize.sync().then(() => {
-    console.log('Match table created successfully!')
-}).catch((err) => {
-    console.log('Unable to create Match table: ', err)
-})
+sequelize
+    .sync()
+    .then(() => {
+        console.log("Match table created successfully!");
+    })
+    .catch((err) => {
+        console.log("Unable to create Match table: ", err);
+    });
