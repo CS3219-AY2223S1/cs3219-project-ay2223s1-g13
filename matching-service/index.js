@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { createMatch } from "./controller/match-controller.js";
+import { createMatch, getAllMatch } from "./controller/match-controller.js";
 import moment from "moment";
 
 const app = express();
@@ -30,9 +30,9 @@ export const io = new Server(httpServer, {
 io.on("connection", (socket) => {
     // ...
     console.log(`New Client connected ${socket.id}`);
-    socket.on("createMatch", (params) => {
-        console.log("createMatch was called " + params);
-    });
+    socket.on("get", () => {
+        getAllMatch();
+    })
     socket.on("match", (params) => {
         params["socketId"] = socket.id;
         params["createdAt"] = moment().format("YYYY-MM-DD HH:mm:ss")

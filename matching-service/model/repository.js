@@ -5,10 +5,14 @@ import moment from 'moment';
 const sequelize = new Sequelize("sqlite::memory:");
 
 const matchModel = new MatchModel(sequelize);
-await sequelize.sync({ force: true });
+await sequelize.sync({ force: false });
 
 export async function createMatch(params) {
     return MatchModel.create(params);
+}
+
+export async function getAllMatch() {
+    return MatchModel.findAll();
 }
 
 export async function findMatch(username) {
@@ -21,10 +25,13 @@ export async function findMatch(username) {
     });
 }
 
-export async function findJoinableMatches(difficulty, createdAt) {
-    return MatchModel.findAll({
+export async function findJoinableMatches(userOne, difficulty, createdAt) {
+    return MatchModel.findOne({
         where: {
             [Op.and]: {
+                userOne: {
+                    [Op.ne]: userOne
+                },
                 createdAt: {
                     [Op.between]: [moment(createdAt).subtract(30, 'seconds'), moment(createdAt).add(30, 'seconds')]
                 },
@@ -34,4 +41,30 @@ export async function findJoinableMatches(difficulty, createdAt) {
             }
         },
     });
+}
+
+export async function deleteMatch(user) {
+    return MatchModel.destroy({
+        where: {
+            userOne: user
+        }
+    })
+}
+
+export async function updateMatch(userOne, userTwo, userTwoSocketId, createdAt, isPending) {
+    return MatchModel.update({
+        userTwo: userTwo,
+        userTwoSocketId: userTwoSocketId,
+        createdAt: createdAt,
+        isPending: isPending
+    },
+        {
+            where: {
+                userOne: userOne
+            },
+            returning: true,
+            plain: true
+        }).then((updatedUser) => {
+            console.log(updatedUser)
+        })
 }

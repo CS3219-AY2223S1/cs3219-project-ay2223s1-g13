@@ -4,7 +4,7 @@ const sequelize = new Sequelize("sqlite::memory:");
 export const MatchModel = sequelize.define("MatchModel", {
     userOne: {
         type: DataTypes.STRING,
-        required: true,
+        required: true
     },
     userTwo: {
         type: DataTypes.STRING,
@@ -35,7 +35,9 @@ export const MatchModel = sequelize.define("MatchModel", {
 });
 
 sequelize
-    .sync()
+    .sync({
+        force: false
+    })
     .then(() => {
         console.log("Match table created successfully!");
     })
