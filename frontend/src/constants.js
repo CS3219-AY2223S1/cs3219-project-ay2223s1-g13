@@ -5,3 +5,5 @@ export const STATUS_OK = 200
 export const STATUS_NO_TOKEN = 401
 export const STATUS_INVALID_TOKEN = 403
 export const STATUS_CODE_NOT_ACCEPTABLE = 406
+
+export const difficulties = ["Easy", "Medium", "Hard"]

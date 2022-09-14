@@ -1,0 +1,39 @@
+.difficultycard_container {
+    width: 25vw;
+    height: 8vh;
+    color: white;
+    box-shadow: 2px 2px 5px black;
+}
+
+.difficultycard_button {
+    position: relative;
+    margin: 10px 10px;
+    color: #03e9f4;
+    font-size: 1.4em;
+    letter-spacing: 2px;
+    cursor: pointer;
+    display: inline-block;
+    text-transform: uppercase;
+    text-align: center;
+    -webkit-box-reflect: below 1px linear-gradient(transparent, #0005);
+}
+
+.difficultycard_button:hover {
+    background-color: #03e9f4;
+    color: #212121;
+    box-shadow: 0 0 5px #03e9f4, 0 0 25px #03e9f4, 0 0 50px #03e9f4, 0 0 200px #03e9f4;
+}
+
+.difficultycard_text {
+    font-size: x-large;
+    font-weight: 600;
+    padding: 1rem;
+}
+
+.difficultycard_container_selected {
+    width: 25vw;
+    height: 8vh;
+    background-color: #03e9f4;
+    color: #212121;
+    box-shadow: 0 0 5px #03e9f4, 0 0 25px #03e9f4, 0 0 50px #03e9f4, 0 0 200px #03e9f4;
+}
