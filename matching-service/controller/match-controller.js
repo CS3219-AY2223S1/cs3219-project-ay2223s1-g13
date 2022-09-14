@@ -30,17 +30,19 @@ export async function createMatch(params) {
             }
 
             // find a match for the pending match
-            const match = await _findJoinableMatches(userOne, difficulty, createdAt);
+            console.log({difficulty, createdAt})
+            const match = await _findJoinableMatches( userOne, difficulty, createdAt);
+            console.log(match);
             if (match) {
                 // join match for both users
-                console.log(`Found a match ${match.userOne} with socketId ${match.socketId} for difficulty ${match.difficulty} for user ${userOne}`)
-                await _updateMatch(userOne, match, match.socketId, moment().format("YYYY-MM-DD HH:mm:ss"), false);
+                console.log(`Found a match ${match.userOne} with socketId ${match.socketIdOne} for difficulty ${match.difficulty} for user ${userOne}`)
+                await _updateMatch(userOne, match, match.socketIdOne, moment().format("YYYY-MM-DD HH:mm:ss"), false);
 
                 // delete match's pending entry
                 await _deleteMatch(match)
 
                 // add to same room
-                const addUserToRoom = await addToRoom(socketId, match.socketId, userOne, match);
+                const addUserToRoom = await addToRoom(socketId, match.socketIdOne, userOne, match);
                 if (addUserToRoom) {
                     console.log(`Successfully add ${userOne} and ${match} to room!`);
                 } else {

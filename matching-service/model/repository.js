@@ -4,7 +4,7 @@ import moment from 'moment';
 
 const sequelize = new Sequelize("sqlite::memory:");
 
-const matchModel = new MatchModel(sequelize);
+// const matchModel = new MatchModel(sequelize);
 await sequelize.sync({ force: false });
 
 export async function createMatch(params) {
@@ -25,20 +25,26 @@ export async function findMatch(username) {
     });
 }
 
-export async function findJoinableMatches(userOne, difficulty, createdAt) {
+export async function findJoinableMatches( userOne, difficulty, createdAt) {
     return MatchModel.findOne({
         where: {
-            [Op.and]: {
-                userOne: {
-                    [Op.ne]: userOne
+            [Op.and]: [
+                // {
+                //     createdAt: {
+                //         [Op.between]: [moment(createdAt).subtract(30, 'seconds'), moment(createdAt).add(30, 'seconds')]
+                //     }
+                // },
+                {
+                    difficulty: {
+                        [Op.eq]: difficulty
+                    }
                 },
-                createdAt: {
-                    [Op.between]: [moment(createdAt).subtract(30, 'seconds'), moment(createdAt).add(30, 'seconds')]
-                },
-                difficulty: {
-                    [Op.eq]: difficulty
+                {
+                    userOne: {
+                        [Op.ne]: userOne
+                    }
                 }
-            }
+            ]
         },
     });
 }
