@@ -29,11 +29,11 @@ export async function findJoinableMatches( userOne, difficulty, createdAt) {
     return MatchModel.findOne({
         where: {
             [Op.and]: [
-                // {
-                //     createdAt: {
-                //         [Op.between]: [moment(createdAt).subtract(30, 'seconds'), moment(createdAt).add(30, 'seconds')]
-                //     }
-                // },
+                {
+                    createdAt: {
+                        [Op.between]: [moment(createdAt).subtract(30, 'seconds').toDate(), moment(createdAt).add(30, 'seconds').toDate()]
+                    }
+                },
                 {
                     difficulty: {
                         [Op.eq]: difficulty
