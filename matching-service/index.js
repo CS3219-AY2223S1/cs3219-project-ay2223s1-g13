@@ -27,12 +27,24 @@ export const io = new Server(httpServer, {
     },
 });
 
+export const users = [];
+
 io.on("connection", (socket) => {
-    // ...
+    // add user to users
+    const user = {
+        "socket": socket,
+        "socketId": socket.id
+    }
+    users.push(user);
+
     console.log(`New Client connected ${socket.id}`);
+
+    // see all match items
     socket.on("get", () => {
         getAllMatch();
     })
+
+    // call to create match
     socket.on("match", (params) => {
         params["socketId"] = socket.id;
         params["createdAt"] = moment().format("YYYY-MM-DD HH:mm:ss")
@@ -41,3 +53,8 @@ io.on("connection", (socket) => {
         console.log("yay")
     });
 });
+
+// io.on('disconnect', (socketId) => {
+//     users = users.filter(u => u.socketId !== user.socketId); // removing disconnected user
+
+// });

@@ -25,7 +25,7 @@ export async function findMatch(username) {
     });
 }
 
-export async function findJoinableMatches( userOne, difficulty, createdAt) {
+export async function findJoinableMatches(userOne, difficulty, createdAt) {
     return MatchModel.findOne({
         where: {
             [Op.and]: [
@@ -58,7 +58,7 @@ export async function deleteMatch(user) {
 }
 
 export async function updateMatch(userOne, userTwo, userTwoSocketId, createdAt, isPending) {
-    return MatchModel.update({
+    return await MatchModel.update({
         userTwo: userTwo,
         userTwoSocketId: userTwoSocketId,
         createdAt: createdAt,
@@ -67,10 +67,6 @@ export async function updateMatch(userOne, userTwo, userTwoSocketId, createdAt, 
         {
             where: {
                 userOne: userOne
-            },
-            returning: true,
-            plain: true
-        }).then((updatedUser) => {
-            console.log(updatedUser)
+            }
         })
 }
