@@ -1,4 +1,3 @@
-// import { isObjectIdOrHexString } from "mongoose";
 import {
     ormCreateMatch as _createMatch,
     ormFindJoinableMatches as _findJoinableMatches,
@@ -6,7 +5,7 @@ import {
     ormDeleteMatch as _deleteMatch,
     ormUpdateMatch as _updateMatch
 } from "../model/match-orm.js";
-import { io, httpServer } from "../index.js"
+import { io, users } from "../index.js"
 import moment from "moment";
 
 export async function getAllMatch() {
@@ -30,23 +29,24 @@ export async function createMatch(params) {
             }
 
             // find a match for the pending match
-            console.log({difficulty, createdAt})
-            const match = await _findJoinableMatches( userOne, difficulty, createdAt);
+            console.log({ difficulty, createdAt })
+            const match = await _findJoinableMatches(userOne, difficulty, createdAt);
             console.log(match);
             if (match) {
                 // join match for both users
                 console.log(`Found a match ${match.userOne} with socketId ${match.socketIdOne} for difficulty ${match.difficulty} for user ${userOne}`)
-                await _updateMatch(userOne, match, match.socketIdOne, moment().format("YYYY-MM-DD HH:mm:ss"), false);
+                await _updateMatch(userOne, match.userOne, match.socketIdOne, moment().format("YYYY-MM-DD HH:mm:ss"), false);
 
                 // delete match's pending entry
-                await _deleteMatch(match)
+                await _deleteMatch(match.userOne)
 
                 // add to same room
-                const addUserToRoom = await addToRoom(socketId, match.socketIdOne, userOne, match);
+                const roomName = getRoomName(userOne, match.userOne);
+                const addUserToRoom = await addToRoom(socketId, match.socketIdOne, roomName);
                 if (addUserToRoom) {
-                    console.log(`Successfully add ${userOne} and ${match} to room!`);
+                    console.log(`Successfully add ${userOne} and ${match.userOne} to room!`);
                 } else {
-                    console.log(`Cannot add ${userOne} and ${match} to room!`);
+                    console.log(`Cannot add ${userOne} and ${match.userOne} to room!`);
                 }
             } else {
                 console.log(`No valid pending match in db for ${userOne}`);
@@ -82,14 +82,16 @@ async function findMatch(params) {
     }
 }
 
-async function getRoomName(userOne, userTwo) {
-    return userOne + "_" + userTwo;
+function getRoomName(userOne, userTwo) {
+    const roomname = userOne + "_" + userTwo;
+    return roomname;
 }
 
-async function addToRoom(userOneSocketId, userTwoSocketId, userOne, userTwo) {
-    const roomName = getRoomName(userOne, userTwo);
-    const socketOne = io.sockets.sockets.get(userOneSocketId);
-    const socketTwo = io.sockets.sockets.get(userTwoSocketId);
+async function addToRoom(userOneSocketId, userTwoSocketId, roomName) {
+    const userOne = users.filter(user => user.socketId == userOneSocketId);
+    const userTwo = users.filter(user => user.socketId == userTwoSocketId);
+    const socketOne = userOne[0]["socket"];
+    const socketTwo = userTwo[0]["socket"];
     socketOne.join(roomName);
     socketTwo.join(roomName);
     // emit event to userone and userTwo
