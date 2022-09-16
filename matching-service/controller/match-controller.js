@@ -1,4 +1,3 @@
-// import { isObjectIdOrHexString } from "mongoose";
 import {
     ormCreateMatch as _createMatch,
     ormFindJoinableMatches as _findJoinableMatches,
@@ -6,7 +5,7 @@ import {
     ormDeleteMatch as _deleteMatch,
     ormUpdateMatch as _updateMatch
 } from "../model/match-orm.js";
-import { io, httpServer, users } from "../index.js"
+import { io, users } from "../index.js"
 import moment from "moment";
 
 export async function getAllMatch() {
@@ -41,7 +40,6 @@ export async function createMatch(params) {
                 // delete match's pending entry
                 await _deleteMatch(match.userOne)
 
-                console.log("!!", socketId, "-", match.socketIdOne)
                 // add to same room
                 const roomName = getRoomName(userOne, match.userOne);
                 const addUserToRoom = await addToRoom(socketId, match.socketIdOne, roomName);
