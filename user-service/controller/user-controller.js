@@ -95,7 +95,7 @@ export async function changePassword(req, res) {
                 return res.status(400).json({ message: 'Could not update password!' })
             } else {
                 console.log(`Successfully updated password for user ${username}!`)
-                return res.status(201).json({ message: `Successfully updated password for user ${username}!` })
+                return res.status(200).json({ message: `Successfully updated password for user ${username}!` })
             }
 
         } else {

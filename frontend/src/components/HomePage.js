@@ -6,12 +6,13 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
+    Stack,
     TextField,
     Typography
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import axios from "axios";
-import { URL_USER_SVC, URL_LOGIN_SVC, URL_CHECK_TOKEN } from "../configs";
+import { URL_USER_SVC, URL_LOGIN_SVC, URL_CHECK_TOKEN, URL_CHANGE_PASSWORD } from "../configs";
 import { STATUS_CODE_CONFLICT, STATUS_CODE_CREATED, STATUS_OK, STATUS_BAD_REQUEST, STATUS_NO_TOKEN, STATUS_INVALID_TOKEN } from "../constants";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 
@@ -22,9 +23,12 @@ function HomePage() {
     const [dialogMsg, setDialogMsg] = useState("")
 
     const [password, setPassword] = useState("")
+    const [newPassword, setNewPassword] = useState("")
     const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
-    const [isDeleteErrorDialogOpen, setDeleteErrorDialogOpen] = useState(false)
+    const [isWrongPasswordDialogOpen, setWrongPasswordDialogOpen] = useState(false)
     const [isDeleteSuccessDialogOpen, setDeleteSuccessDialogOpen] = useState(false)
+    const [isChangePasswordDialogOpen, setChangePasswordDialogOpen] = useState(false)
+    const [isChangeSuccessOpen, setChangeSuccessOpen] = useState(false)
 
     const navigate = useNavigate()
 
@@ -69,7 +73,7 @@ function HomePage() {
         const res = await axios.delete(URL_USER_SVC, {data: { username: sessionStorage.getItem("username"), password: password }})
             .catch((err) => {
                 setDeleteDialogOpen(false)
-                setDeleteErrorDialogOpen(true)
+                setWrongPasswordDialogOpen(true)
             })
         if (res && res.status === STATUS_OK) {
             setDeleteDialogOpen(false) 
@@ -77,9 +81,22 @@ function HomePage() {
         }
     }
 
+    const handleChange = async () => {
+        const res = await axios.post(URL_CHANGE_PASSWORD, { username: sessionStorage.getItem("username"), oldPassword: password, newPassword: newPassword })
+            .catch((err) => {
+                setChangePasswordDialogOpen(false)
+                setWrongPasswordDialogOpen(true)
+            })
+        if (res && res.status === STATUS_OK) {
+            setChangePasswordDialogOpen(false) 
+            setChangeSuccessOpen(true)
+        }
+    }
+
     return (
         <Box display={"flex"} flexDirection={"column"} width={"30%"}>
             <Typography variant={"h3"} marginBottom={"2rem"}> Welcome, {sessionStorage.getItem("username")}</Typography>
+            <Button sx={{ m: 1 }} variant={"outlined"} onClick={() => setChangePasswordDialogOpen(true)}>Change Password</Button>
             <Button sx={{ m: 1 }} variant={"outlined"} onClick={() => setDeleteDialogOpen(true)}>Delete</Button>
             <Button sx={{ m: 1 }} variant={"outlined"} onClick={confirmLogout}>Logout</Button>
 
@@ -106,17 +123,36 @@ function HomePage() {
                 </DialogActions>
             </Dialog>
 
-            <Dialog open={isDeleteErrorDialogOpen} onClose={() => setDeleteErrorDialogOpen(false)}>
+            <Dialog open={isWrongPasswordDialogOpen} onClose={() => setWrongPasswordDialogOpen(false)}>
                 <DialogTitle>Wrong Password</DialogTitle>
                 <DialogActions>
-                    <Button onClick={() => setDeleteErrorDialogOpen(false)}>Close</Button>
+                    <Button onClick={() => setWrongPasswordDialogOpen(false)}>Close</Button>
                 </DialogActions>
             </Dialog>
 
-            <Dialog open={isDeleteSuccessDialogOpen} onClose={() => setDeleteErrorDialogOpen(false)}>
+            <Dialog open={isDeleteSuccessDialogOpen} onClose={() => setDeleteSuccessDialogOpen(false)}>
                 <DialogActions>
                     <Typography variant="body1">{sessionStorage.getItem("username")} is succesfully deleted!</Typography>
                     <Button onClick={logoutUser}>Exit</Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={isChangePasswordDialogOpen} onClose={() => setChangePasswordDialogOpen(false)}>
+                <DialogContent>
+                    <Stack>
+                        <TextField label="Old Password" variant="standard" type="password" onChange={e => setPassword(e.target.value)} />
+                        <TextField label="New Password" variant="standard" type="password" onChange={e => setNewPassword(e.target.value)} />
+                    </Stack>
+                </DialogContent>
+                <DialogActions>
+                    <Button variant="contained" color="warning" onClick={handleChange}>Confirm</Button>
+                </DialogActions>
+            </Dialog>
+
+            <Dialog open={isChangeSuccessOpen} onClose={() => setChangeSuccessOpen(false)}>
+                <DialogActions>
+                    <Typography variant="body1">{sessionStorage.getItem("username")}'s password is succesfully changed!</Typography>
+                    <Button onClick={() => setChangeSuccessOpen(false)}>Close</Button>
                 </DialogActions>
             </Dialog>
         </Box>
