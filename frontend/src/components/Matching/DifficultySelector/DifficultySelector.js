@@ -38,12 +38,14 @@ function DifficultySelector() {
             "difficulty": selectedDifficulty
         }
         socket.emit('match', userDetails); 
+        setWaitingDialog("Waiting for match")
         startListener(socket)
     }
 
     const startListener = (socket) => {
         console.log("listener start")
         socket.on('matchSuccess', (...args) => {
+            setDialogMsg(false)
             setMatchedDialog("Connected!")   
         });
     }
@@ -54,19 +56,20 @@ function DifficultySelector() {
     };
 
     const closeMatchDialog = () => {
+        setMatchedDialog(false)
         navigate('/room')
     }
 
-    const closeDialog = () => setDialogOpen(false)
+    const closeDialog = () => setDialogOpen(false) 
 
     const setMatchedDialog = (msg) => {
         setMatchedDialogOpen(true)
-        setDialogTitle('Waiting for match')
+        setDialogTitle('Match Set')
         setDialogMsg(msg)
     }
 
     const setWaitingDialog = (msg) => {
-        setMatchedDialog(true)
+        setDialogOpen(true)
         setDialogTitle('Waiting for match')
         setDialogMsg(msg)
     }
@@ -92,16 +95,17 @@ function DifficultySelector() {
                 </div>
             </div>
             <Dialog open={isDialogOpen}
-            onClose={closeDialog}>  
-            <DialogContent>
-                <DialogContentText>{dialogMsg}</DialogContentText>
-            </DialogContent>
-            <DialogActions>
-                <Button onClick={closeDialog}>Close</Button>
-            </DialogActions>
+                onClose={closeDialog}>  
+                <DialogContent>
+                    <DialogContentText>{dialogMsg}</DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={closeDialog}>Close</Button>
+                </DialogActions>
             </Dialog>     
 
-            <Dialog open = {isMatchedDialogOpen}>
+            <Dialog open = {isMatchedDialogOpen}
+                onClose = {closeMatchDialog}>
                 <DialogContent>
                     <DialogContentText>{dialogMsg}</DialogContentText>
                 </DialogContent>
