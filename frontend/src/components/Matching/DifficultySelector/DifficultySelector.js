@@ -8,6 +8,7 @@ import {
     DialogContent,
     DialogContentText,
     DialogTitle,
+    fabClasses,
     Stack,
     TextField,
     Typography
@@ -20,13 +21,15 @@ import axios from "axios";
 import { io } from "socket.io-client";
 import "./DifficultySelector.css";
 import { URL_MATCHING } from "../../../configs";
+import { Navigate, useNavigate } from "react-router-dom";
 
 function DifficultySelector() {
     const [selectedDifficulty, setSelectedDifficulty] = useState("");
     const [isDialogOpen, setDialogOpen] = useState(false);
     const [dialogMsg, setDialogMsg] = useState("")
     const [dialogTitle, setDialogTitle] = useState("")
-
+    const [isMatchedDialogOpen, setMatchedDialogOpen] = useState(false)
+    const navigate = useNavigate()
 
     const startMatching = () => {
         const socket = io("ws://localhost:8001");
@@ -35,25 +38,35 @@ function DifficultySelector() {
             "difficulty": selectedDifficulty
         }
         socket.emit('match', userDetails); 
-        startListener(socket); 
+        startListener(socket)
     }
 
     const startListener = (socket) => {
-        socket.on('match', (...args) => {
-            setWaitingDialog("args")
-          });    
+        console.log("listener start")
+        socket.on('matchSuccess', (...args) => {
+            setMatchedDialog("Connected!")   
+        });
     }
-
 
     const onClickDifficulty = (clickedDifficulty) => {
         setSelectedDifficulty(clickedDifficulty);
         startMatching(); 
     };
 
+    const closeMatchDialog = () => {
+        navigate('/room')
+    }
+
     const closeDialog = () => setDialogOpen(false)
 
+    const setMatchedDialog = (msg) => {
+        setMatchedDialogOpen(true)
+        setDialogTitle('Waiting for match')
+        setDialogMsg(msg)
+    }
+
     const setWaitingDialog = (msg) => {
-        setDialogOpen(true)
+        setMatchedDialog(true)
         setDialogTitle('Waiting for match')
         setDialogMsg(msg)
     }
@@ -87,6 +100,15 @@ function DifficultySelector() {
                 <Button onClick={closeDialog}>Close</Button>
             </DialogActions>
             </Dialog>     
+
+            <Dialog open = {isMatchedDialogOpen}>
+                <DialogContent>
+                    <DialogContentText>{dialogMsg}</DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                <Button onClick={closeMatchDialog}>Close</Button>
+                </DialogActions>
+            </Dialog>
         </Box>      
     );
 }

@@ -3,6 +3,7 @@ import SignupPage from './components/SignupPage';
 import HomePage from './components/HomePage';
 import {Box} from "@mui/material";
 import DifficultySelector from "./components/Matching/DifficultySelector/DifficultySelector";
+import RoomPage from "./components/RoomPage";
 
 function App() {
     return (
@@ -14,6 +15,7 @@ function App() {
                         <Route path="/signup" element={<SignupPage/>}/>
                         <Route path="/home" element={<HomePage/>}/> 
                         <Route path="/difficulty_test" element={<DifficultySelector/>}/>
+                        <Route path="/room" element={<RoomPage/>}/>
                     </Routes>
                 </Router>
             </Box>
