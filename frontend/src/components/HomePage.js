@@ -93,11 +93,16 @@ function HomePage() {
         }
     }
 
+    const goToMatchingService = () => {
+        navigate('/difficulty_test')
+    }
+
     return (
         <Box display={"flex"} flexDirection={"column"} width={"30%"}>
             <Typography variant={"h3"} marginBottom={"2rem"}> Welcome, {sessionStorage.getItem("username")}</Typography>
             <Button sx={{ m: 1 }} variant={"outlined"} onClick={() => setChangePasswordDialogOpen(true)}>Change Password</Button>
             <Button sx={{ m: 1 }} variant={"outlined"} onClick={() => setDeleteDialogOpen(true)}>Delete</Button>
+            <Button sx={{ m: 1 }} variant={"outlined"} onClick={goToMatchingService}>Matching Service</Button>
             <Button sx={{ m: 1 }} variant={"outlined"} onClick={confirmLogout}>Logout</Button>
 
             <Dialog
