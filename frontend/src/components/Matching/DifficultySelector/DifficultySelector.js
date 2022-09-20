@@ -30,29 +30,27 @@ function DifficultySelector() {
     const [dialogTitle, setDialogTitle] = useState("")
     const [isMatchedDialogOpen, setMatchedDialogOpen] = useState(false)
     const navigate = useNavigate()
+    const socket = io("ws://localhost:8001", {transports: ['websocket']});
+    
+
 
     const startMatching = () => {
-        const socket = io("ws://localhost:8001");
         var userDetails = {
             "userOne": sessionStorage.getItem("username"),
-            "difficulty": selectedDifficulty
+            "difficulty": "Easy"
         }
         socket.emit('match', userDetails); 
         setWaitingDialog("Waiting for match")
-        startListener(socket)
-    }
-
-    const startListener = (socket) => {
-        console.log("listener start")
         socket.on('matchSuccess', (...args) => {
             setDialogMsg(false)
             setMatchedDialog("Connected!")   
-        });
+        })
     }
 
-    const onClickDifficulty = (clickedDifficulty) => {
+    const onClickDifficulty = async (clickedDifficulty) => {
         setSelectedDifficulty(clickedDifficulty);
-        startMatching(); 
+        startMatching()
+        console.log("running here")
     };
 
     const closeMatchDialog = () => {
