@@ -7,7 +7,15 @@ import {
     DialogContentText,
     DialogTitle,
     TextField,
-    Typography
+    Typography, 
+    FormControlLabel,
+    Checkbox,
+    Container,
+    Grid,
+    CssBaseline,
+    Avatar,
+    Icon, 
+    PageviewIcon
 } from "@mui/material";
 import { useState, useEffect } from "react";
 import axios from "axios";
@@ -15,123 +23,156 @@ import axios from "axios";
 import { URL_USER_SVC, URL_LOGIN_SVC, URL_CHECK_TOKEN } from "../configs";
 import { STATUS_CODE_CONFLICT, STATUS_CODE_CREATED, STATUS_OK, STATUS_BAD_REQUEST, STATUS_CODE_NOT_ACCEPTABLE, STATUS_INVALID_TOKEN } from "../constants";
 import { Link, Navigate, useNavigate } from "react-router-dom";
+import { createTheme, ThemeProvider } from '@mui/material/styles';
+import Image from '../resources/background.jpeg';
 
-function SignupPage() {
+function SignUpPage() {
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
-    const [isDialogOpen, setIsDialogOpen] = useState(false)
+    const [confirmPassword, setConfirmPassword] = useState("")
+    const [isDifferentPassword, setDifferentPassword] = useState(false) 
     const [dialogTitle, setDialogTitle] = useState("")
     const [dialogMsg, setDialogMsg] = useState("")
-    const [isSignupSuccess, setIsSignupSuccess] = useState(false)
-    const [isLoginSuccess, setIsLoginSuccess] = useState(false)
-    const navigate = useNavigate()
+    const [signUpSuccess, setIsSignupSuccess] = useState("")
+    const theme = createTheme();
 
-    useEffect(() => {
-        checkLoggedIn()
-      });
-    
-      const checkLoggedIn = async () => {
-        const res = await axios.post(URL_CHECK_TOKEN, {token: sessionStorage.getItem("accessToken")})
-            .catch((err) => {
-                //navigate('/signup'); 
-            })
-        if (res.status === STATUS_OK) {
-            navigate('/home')
-        }
+    const closeDifferentPassword = () => setDifferentPassword(false) 
+
+
+    const openDifferentPasswordDialog = () => { 
+        setDifferentPassword(true)
+        setDialogTitle('Error')
+        setDialogMsg('Passwords do not match')
     }
 
-    const handleSignup = async () => {
-        setIsSignupSuccess(false)
-        const res = await axios.post(URL_USER_SVC, { username, password })
-            .catch((err) => {
-                if (err.response.status === STATUS_CODE_CONFLICT) {
-                    setErrorDialog('This username already exists')
-                } else {
-                    setErrorDialog('Please try again later')
-                }
-            })
-        if (res && res.status === STATUS_CODE_CREATED) {
-            setSuccessDialog('Account successfully created')
-            setIsSignupSuccess(true)
-        }
-    }
-
-    const handleLogin = async () => {
-        const res = await axios.post(URL_LOGIN_SVC, { username, password })
-            .catch((err) => {
-                setIsLoginSuccess(false)
-                if (err.response.status === STATUS_BAD_REQUEST) {
-                    setErrorDialog('Login failed')
-                } else {
-                    setErrorDialog('Something went wrong... Please try again later')
-                }
-            })
-
-        if (res.status === STATUS_OK) {
-            setIsLoginSuccess(true)
-            const token = res.data.accessToken
-            sessionStorage.setItem("accessToken", token)
-            sessionStorage.setItem("username", username)
-            navigate('/home');
-        } 
-    }
-
-    const closeDialog = () => setIsDialogOpen(false)
-
-    const setSuccessDialog = (msg) => {
-        setIsDialogOpen(true)
-        setDialogTitle('Success')
-        setDialogMsg(msg)
-    }
-
-    const setErrorDialog = (msg) => {
-        setIsDialogOpen(true)
+    const setErrorDialog = (msg) => { 
+        setDifferentPassword(true)
         setDialogTitle('Error')
         setDialogMsg(msg)
     }
 
+    const openSignUpSuccessDialog = (msg) => {
+        setIsSignupSuccess(true) 
+        setDialogTitle('Success')
+        setDialogMsg(msg)
+    }
+
+    const closeSignUpSuccessDialog = () => setIsSignupSuccess(false)
+
+    const handleSignUp = async () => {
+        if (password != confirmPassword) {
+            openDifferentPasswordDialog()
+        } else { 
+
+            const res = await axios.post(URL_USER_SVC, { username, password })
+                .catch((err) => {
+                    if (err.response.status === STATUS_CODE_CONFLICT) {
+                        setErrorDialog('This username already exists')
+                    } else {
+                        setErrorDialog('Please try again later')
+                    }
+                })
+            if (res && res.status === STATUS_CODE_CREATED) {
+                openSignUpSuccessDialog('Account successfully created')
+                setIsSignupSuccess(true)
+            }
+        }
+    }
+
+
     return (
-        
-        <Box display={"flex"} flexDirection={"column"} width={"30%"}>
-            <Typography variant={"h3"} marginBottom={"2rem"}>Welcome</Typography>
-            <TextField
+        <ThemeProvider theme={theme}> 
+        <Container component="main" maxWidth="xs" display='flex' justifyContent='center' > 
+          <CssBaseline />
+          <Box
+            sx={{
+              marginTop: 8,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+            }}
+          >              
+            <Typography component="h1" variant="h5">
+              Create New Account
+            </Typography>
+            <Box sx={{ mt: 1 }}>
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                id="username"
                 label="Username"
-                variant="standard"
+                name="username"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                sx={{ marginBottom: "1rem" }}
                 autoFocus
-            />
-            <TextField
+              />
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                name="password"
                 label="Password"
-                variant="standard"
                 type="password"
+                id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                sx={{ marginBottom: "2rem" }}
-            />
-            <Box display={"flex"} flexDirection={"row"} justifyContent={"flex-end"} >
-                <Button sx={{ m: 1 }} variant={"outlined"} onClick={handleLogin}>Login</Button>
-                <Button sx={{ m: 1 }} variant={"outlined"} onClick={handleSignup}>Sign up</Button>
+                autoComplete="current-password"
+              />
+              <TextField
+                margin="normal"
+                required
+                fullWidth
+                name="confirmPassword"
+                label="Confirm your password"
+                type="password"
+                id="confirmPassword"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+              />
+              <Button
+                type="submit"
+                fullWidth
+                variant="contained"
+                sx={{ mt: 3, mb: 2 }} onClick={handleSignUp}
+              >
+                Sign In
+              </Button>
+              <Grid container>
+                <Grid item xs>
+                </Grid>
+              </Grid>
             </Box>
-
-            <Dialog
-                open={isDialogOpen}
-                onClose={closeDialog}
+          </Box>
+          <Dialog
+                open={isDifferentPassword}
+                onClose={closeDifferentPassword}
             >
                 <DialogTitle>{dialogTitle}</DialogTitle>
                 <DialogContent>
                     <DialogContentText>{dialogMsg}</DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    {isSignupSuccess
-                        ? <Button component={Link} to="/home">Continue</Button>
-                        : <Button onClick={closeDialog}>Close</Button>
-                    }
+                    <Button onClick={closeDifferentPassword}>Close</Button>
                 </DialogActions>
             </Dialog>
-        </Box>
+
+            <Dialog
+                open={signUpSuccess}
+                onClose={closeSignUpSuccessDialog}
+            >
+                <DialogTitle>{dialogTitle}</DialogTitle>
+                <DialogContent>
+                    <DialogContentText>{dialogMsg}</DialogContentText>
+                </DialogContent>
+                <DialogActions>
+                    <Button component={Link} to="/signin">Continue</Button>
+                </DialogActions>
+            </Dialog>
+        </Container>
+      </ThemeProvider>
     )
 }
 
-export default SignupPage;
+
+export default SignUpPage;

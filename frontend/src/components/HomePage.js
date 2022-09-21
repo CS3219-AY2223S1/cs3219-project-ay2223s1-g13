@@ -66,7 +66,7 @@ function HomePage() {
     const logoutUser = () => {
         sessionStorage.removeItem("accessToken")
         sessionStorage.removeItem("username")
-        navigate('/signup')
+        navigate('/signin')
     }
 
     const handleDelete = async () => {
