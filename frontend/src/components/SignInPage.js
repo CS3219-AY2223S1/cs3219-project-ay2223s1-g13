@@ -77,6 +77,7 @@ function SignInPage() {
             navigate('/home');
         } 
     }
+    
 
     const closeDialog = () => setIsDialogOpen(false)
 
@@ -84,6 +85,12 @@ function SignInPage() {
         setIsDialogOpen(true)
         setDialogTitle('Error')
         setDialogMsg(msg)
+    }
+
+    const handleKey = (key) => {
+        if (key.keyCode == 13) {
+            handleLogin() 
+        }
     }
 
     return (
@@ -123,6 +130,7 @@ function SignInPage() {
                 id="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                onKeyDown={handleKey}
                 autoComplete="current-password"
               />
               <Button
@@ -153,10 +161,7 @@ function SignInPage() {
                     <DialogContentText>{dialogMsg}</DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    {isSignupSuccess
-                        ? <Button component={Link} to="/home">Continue</Button>
-                        : <Button onClick={closeDialog}>Close</Button>
-                    }
+                <Button onClick={closeDialog}>Close</Button>
                 </DialogActions>
             </Dialog>
         </Container>

@@ -25,19 +25,17 @@ import { Navigate, useNavigate } from "react-router-dom";
 
 function DifficultySelector() {
     const [selectedDifficulty, setSelectedDifficulty] = useState("");
-    const [isDialogOpen, setDialogOpen] = useState(false);
     const [dialogMsg, setDialogMsg] = useState("")
     const [dialogTitle, setDialogTitle] = useState("")
-    const [isMatchedDialogOpen, setMatchedDialogOpen] = useState(false)
     const navigate = useNavigate()
     const socket = io("ws://localhost:8001", {transports: ['websocket']});
-    
+    var userDetails 
 
 
     const startMatching = () => {
         var userDetails = {
             "userOne": sessionStorage.getItem("username"),
-            "difficulty": "Easy"
+            "difficulty": selectedDifficulty
         }
         socket.emit('match', userDetails); 
         setWaitingDialog("Waiting for match")
