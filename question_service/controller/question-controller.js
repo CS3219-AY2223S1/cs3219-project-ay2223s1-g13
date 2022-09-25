@@ -31,7 +31,6 @@ export async function createQuestion(req, res) {
 
 export async function findQuestion(req, res) {
     try {
-        console.log(req);
         const { difficulty } = req.query;
         if (difficulty) {
             const question = await _findQuestion(difficulty);
