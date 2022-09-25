@@ -197,8 +197,8 @@ function HomePage() {
             <Button onClick={() => startMatching("Medium")}> 
                 Medium
             </Button>
-            <Button onClick={() => startMatching("Difficult")}> 
-                Difficult
+            <Button onClick={() => startMatching("Hard")}> 
+                Hard
             </Button>
         </Grid>
       </Container>

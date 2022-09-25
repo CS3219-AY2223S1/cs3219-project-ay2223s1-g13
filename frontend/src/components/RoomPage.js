@@ -8,17 +8,16 @@ import {
     DialogTitle,
     Stack,
     TextField,
-    Typography
+    Typography,
 } from "@mui/material";
+import Question from "./Question/Question";
 
 function RoomPage() {
-
     return (
         <Box>
-            Hello World!
+            <Question />
         </Box>
-    )
+    );
+}
 
-} 
-
-export default RoomPage; 
+export default RoomPage;
