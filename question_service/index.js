@@ -13,9 +13,8 @@ import { createQuestion, findQuestion } from './controller/question-controller.j
 const router = express.Router()
 
 // Controller will contain all the User-defined Routes
-router.get('/', (_, res) => res.send('Hello World from question-service'))
-router.get('/question', findQuestion)
-router.post('/question', createQuestion)
+router.get('/', findQuestion)
+router.post('/', createQuestion)
 
 app.use('/api/question', router).all((_, res) => {
     res.setHeader('content-type', 'application/json')

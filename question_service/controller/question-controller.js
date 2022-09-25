@@ -1,4 +1,4 @@
-import { ormCreateQuestion as _createQuestion, ormFindQuestion as _findQuestion } from "../model/question-orm";
+import { ormCreateQuestion as _createQuestion, ormFindQuestion as _findQuestion } from "../model/question-orm.js";
 
 
 export async function createQuestion(req, res) {
