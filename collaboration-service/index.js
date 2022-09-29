@@ -20,7 +20,7 @@ app.get("/", (req, res) => {
 });
 
 // create a socket.io server
-const io = new Server(httpServer, {
+export const io = new Server(httpServer, {
     /* options */
     cors: {
         origin: "http://localhost:3000",
@@ -28,10 +28,13 @@ const io = new Server(httpServer, {
     },
 });
 
-
 io.on("connection", (socket) => {
-    log("Connected")
-    socket.on('message', (evt) => {
-        socket.broadcast.emit('message', evt)
+    socket.on('joinRoom', (params) => {
+        socket.join(params["roomId"]);
+        log("joined room " + params["roomId"]);
+    });
+
+    socket.on('message', (params) => {
+        socket.to(params.roomId).emit('message', params.text);
     })
 });

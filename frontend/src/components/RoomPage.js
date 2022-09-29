@@ -22,31 +22,40 @@ function RoomPage() {
     const [element, setElement] = useState(null);
     const [userCode, setUserCode] = useState(""); 
 
+    const [isFirstConnect, setIsFirstConnect] = useState(true);
+
+    useEffect(() => {
+        if (isFirstConnect) {
+            socket.emit("joinRoom", {roomId: sessionStorage.getItem("roomId")});
+        }
+        setIsFirstConnect(false);
+    });
 
     const delay = ms => new Promise(
         resolve => setTimeout(resolve, ms)
-      );
+    );
 
     useEffect(() => {
         setElement(document.getElementById('textbox'));
-        socket.on("message", (data) => {
-            setUserCode(data)
-        })
     });
+
+    socket.on("message", (data) => {
+        setUserCode(data)
+    })
 
     const sendToSocket =  () => {
         setUserCode(element.value)
         const text = element.value
-        socket.emit("message", text) 
+        socket.emit("message", {roomId: sessionStorage.getItem("roomId"), text: text}) 
     }; 
 
     return (
-        <Grid container spacing={2}  >
-            <Grid>
-            <Question/>
+        <Grid container spacing={2}>
+            <Grid item>
+                <Question/>
             </Grid>
-            <Grid>
-            <TextField multiline rows={20} value={userCode} id="textbox" variant="outlined" onChange={sendToSocket} style = {{width: 500}}/>
+            <Grid item>
+                <TextField multiline rows={20} value={userCode} id="textbox" variant="outlined" onChange={sendToSocket} style = {{width: 500}}/>
             </Grid>
         </Grid>
     );

@@ -129,8 +129,7 @@ function HomePage() {
             setMatchedDialog(true) 
             setDialogTitle('Matched')
             setDialogMsg("You have found a match!")
-            
-
+            sessionStorage.setItem("roomId", args[0].roomId)
         })
     }
 
@@ -267,13 +266,12 @@ function HomePage() {
                 </DialogActions>
             </Dialog>     
 
-            <Dialog open = {isMatchedDialog}
-                onClose = {() => setMatchedDialog(false)}>
+            <Dialog open = {isMatchedDialog} onClose = {(e, r) => {if (r != "backdropClick") { navigate('/room') }}}>
                 <DialogContent>
                     <DialogContentText>{dialogMsg}</DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                <Button onClick={()=> setMatchedDialog(false)}>Close</Button>
+                    <Button onClick={()=> navigate('/room')}>Start</Button>
                 </DialogActions>
             </Dialog> 
         </React.Fragment>
