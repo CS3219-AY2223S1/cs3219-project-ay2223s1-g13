@@ -4,7 +4,7 @@ import {Box} from "@mui/material";
 import DifficultySelector from "./components/Matching/DifficultySelector/DifficultySelector";
 import RoomPage from "./components/RoomPage";
 import SignInPage from "./components/SignInPage";
-import SignUpPage from "./components/SignupPage";
+import SignUpPage from "./components/SignUpPage";
 
 
 function App() {
