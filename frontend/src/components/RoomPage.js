@@ -17,9 +17,7 @@ import React, { useEffect, useState } from "react";
 
 
 function RoomPage() {
-
     const socket = io('http://localhost:8003');
-    const [element, setElement] = useState(null);
     const [userCode, setUserCode] = useState(""); 
 
     const [isFirstConnect, setIsFirstConnect] = useState(true);
@@ -35,18 +33,14 @@ function RoomPage() {
         resolve => setTimeout(resolve, ms)
     );
 
-    useEffect(() => {
-        setElement(document.getElementById('textbox'));
-    });
-
-    socket.on("message", (data) => {
+    socket.on("receive code", (data) => {
         setUserCode(data)
     })
 
     const sendToSocket =  () => {
-        setUserCode(element.value)
-        const text = element.value
-        socket.emit("message", {roomId: sessionStorage.getItem("roomId"), text: text}) 
+        setUserCode(document.getElementById('textbox').value)
+        const code = document.getElementById('textbox').value
+        socket.emit("send code", {roomId: sessionStorage.getItem("roomId"), text: code}) 
     }; 
 
     return (

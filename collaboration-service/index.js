@@ -34,7 +34,7 @@ io.on("connection", (socket) => {
         log("joined room " + params["roomId"]);
     });
 
-    socket.on('message', (params) => {
-        socket.to(params.roomId).emit('message', params.text);
+    socket.on('send code', (params) => {
+        socket.to(params.roomId).emit('receive code', params.text);
     })
 });
