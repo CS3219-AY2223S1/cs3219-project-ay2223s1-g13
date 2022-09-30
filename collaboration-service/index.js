@@ -29,12 +29,16 @@ export const io = new Server(httpServer, {
 });
 
 io.on("connection", (socket) => {
-    socket.on('joinRoom', (params) => {
+    socket.on('join room', (params) => {
         socket.join(params["roomId"]);
         log("joined room " + params["roomId"]);
     });
 
     socket.on('send code', (params) => {
         socket.to(params.roomId).emit('receive code', params.text);
+    });
+
+    socket.on('exit', (params) => {
+        socket.to(params.roomId).emit('partner exit');
     })
 });

@@ -133,6 +133,15 @@ function HomePage() {
         })
     }
 
+    const handleStart = () => {
+        socket.emit('start', {roomId: sessionStorage.getItem("roomId")});
+        navigate('/room');
+    };
+
+    socket.on("partner start", () => {
+        navigate('/room');
+    });
+
     return (
         <React.Fragment>
             <AppBar
@@ -271,7 +280,7 @@ function HomePage() {
                     <DialogContentText>{dialogMsg}</DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={()=> navigate('/room')}>Start</Button>
+                    <Button onClick={handleStart}>Start</Button>
                 </DialogActions>
             </Dialog> 
         </React.Fragment>

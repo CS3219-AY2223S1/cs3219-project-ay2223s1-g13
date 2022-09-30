@@ -52,6 +52,10 @@ io.on("connection", (socket) => {
         createMatch(params);
         console.log("yay")
     });
+
+    socket.on("start", (params) => {
+        socket.to(params.roomId).emit("partner start");
+    });
 });
 
 // io.on('disconnect', (socketId) => {
