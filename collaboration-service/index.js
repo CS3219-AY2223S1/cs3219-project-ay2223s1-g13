@@ -3,7 +3,7 @@ import cors from "cors";
 import { createServer } from "http";
 import { Server } from "socket.io";
 
-const log = console.log
+const PORT = 8003;
 
 const app = express();
 app.use(express.urlencoded({ extended: true }));
@@ -12,8 +12,8 @@ app.use(cors()); // config cors so that front-end can use
 app.options("*", cors());
 
 const httpServer = createServer(app);
-httpServer.listen(8003);
-console.log("Hello World from collaboration-service") 
+httpServer.listen(PORT);
+console.log("collaboration-service listening on port 8003"); 
 
 app.get("/", (req, res) => {
     res.send("Hello World from collaboration-service");
@@ -31,7 +31,7 @@ export const io = new Server(httpServer, {
 io.on("connection", (socket) => {
     socket.on('join room', (params) => {
         socket.join(params["roomId"]);
-        log("joined room " + params["roomId"]);
+        console.log("joined room " + params["roomId"]);
     });
 
     socket.on('send code', (params) => {
