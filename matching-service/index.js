@@ -5,6 +5,8 @@ import { Server } from "socket.io";
 import { createMatch, getAllMatch } from "./controller/match-controller.js";
 import moment from "moment";
 
+const PORT = 8001;
+
 const app = express();
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -12,7 +14,8 @@ app.use(cors()); // config cors so that front-end can use
 app.options("*", cors());
 
 export const httpServer = createServer(app);
-httpServer.listen(8001);
+httpServer.listen(PORT);
+console.log("matching-service listening on port " + PORT);
 
 app.get("/", (req, res) => {
     res.send("Hello World from matching-service");
@@ -50,7 +53,10 @@ io.on("connection", (socket) => {
         params["createdAt"] = moment().format("YYYY-MM-DD HH:mm:ss")
         console.log(params.createdAt)
         createMatch(params);
-        console.log("yay")
+    });
+
+    socket.on("start", (params) => {
+        socket.to(params.roomId).emit("partner start");
     });
 });
 

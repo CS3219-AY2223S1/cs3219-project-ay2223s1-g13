@@ -129,10 +129,18 @@ function HomePage() {
             setMatchedDialog(true) 
             setDialogTitle('Matched')
             setDialogMsg("You have found a match!")
-            
-
+            sessionStorage.setItem("roomId", args[0].roomId)
         })
     }
+
+    const handleStart = () => {
+        socket.emit('start', {roomId: sessionStorage.getItem("roomId")});
+        navigate('/room');
+    };
+
+    socket.on("partner start", () => {
+        navigate('/room');
+    });
 
     return (
         <React.Fragment>
@@ -267,13 +275,12 @@ function HomePage() {
                 </DialogActions>
             </Dialog>     
 
-            <Dialog open = {isMatchedDialog}
-                onClose = {() => setMatchedDialog(false)}>
+            <Dialog open = {isMatchedDialog} onClose = {(e, r) => {if (r != "backdropClick") { navigate('/room') }}}>
                 <DialogContent>
                     <DialogContentText>{dialogMsg}</DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                <Button onClick={()=> setMatchedDialog(false)}>Close</Button>
+                    <Button onClick={handleStart}>Start</Button>
                 </DialogActions>
             </Dialog> 
         </React.Fragment>
