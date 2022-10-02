@@ -1,6 +1,9 @@
 import { Sequelize, Model, DataTypes, DATE } from "sequelize";
 
-const sequelize = new Sequelize("sqlite::memory:");
+const sequelize = new Sequelize({
+    dialect: 'sqlite',
+    storage: 'path/to/database.sqlite'
+});
 export const MatchModel = sequelize.define("MatchModel", {
     userOne: {
         type: DataTypes.STRING,
