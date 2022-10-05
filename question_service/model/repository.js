@@ -1,4 +1,5 @@
 import QuestionModel from "./question-model.js";
+import QuestionRoomModel from "./question-room-model.js";
 import "dotenv/config";
 
 // Set up mongoose connection
@@ -23,3 +24,44 @@ export async function findQuestion(difficulty) {
         { $sample: { size: 1 } },
     ]);
 }
+
+export async function createRoomQuestion(roomId, question) {
+    const existRoomQuestion = await QuestionRoomModel.findOne({ roomId: roomId }).populate('question');
+    console.log("existRoomQues ", existRoomQuestion);
+    if (existRoomQuestion) {
+        return QuestionRoomModel.updateOne({ roomId: roomId },
+            {
+                $push: {
+                    question: question
+                }
+            });
+    } else {
+        const roomQuestion = new QuestionRoomModel({
+            roomId: roomId
+        })
+        roomQuestion.question.push(question);
+        await roomQuestion.save();
+        return roomQuestion;
+    }
+}
+
+export async function deleteRoomQuestion(roomId) {
+    await QuestionRoomModel.deleteOne({ roomId: roomId }, (err) => {
+        if (err) {
+            return { err };
+        }
+    });
+}
+
+export async function findRoomQuestion(roomId) {
+    await QuestionRoomModel.findOne({ roomId: roomId })
+        .populate('question')
+        .exec((err, roomQuestion) => {
+            console.log("sigh ", roomQuestion);
+            if (err) {
+                return { err };
+            }
+            return roomQuestion;
+        });
+}
+

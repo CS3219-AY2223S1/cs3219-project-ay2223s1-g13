@@ -1,10 +1,9 @@
 import axios from "axios";
-import { URL_QUESTION_SVC } from "../../configs";
+import { URL_ROOMQUESTION_SVC } from "../../configs";
 
-export const fetchQuestion = async (difficulty) => {
-    const res = await axios.get(URL_QUESTION_SVC, {
-        params: { difficulty: difficulty },
+export const fetchRoomQuestion = async (roomId) => {
+    const res = await axios.get(URL_ROOMQUESTION_SVC, {
+        params: { roomId: roomId },
     });
-    console.log(res);
     return res.data;
 };

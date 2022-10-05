@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { formatLinesToQuestion } from "../common/Formatter/Formatter";
 import Section from "../common/Section/Section";
-import { fetchQuestion } from "./api";
+import { fetchRoomQuestion } from "./api";
 
 function Question() {
     const [selectedQuestion, setSelectedQuestion] = useState();
@@ -9,7 +9,7 @@ function Question() {
 
     useEffect(() => {
         const _fetchQuestion = async () => {
-            const res = await fetchQuestion(difficulty);
+            const res = await fetchRoomQuestion(sessionStorage.getItem("roomId"));
             setSelectedQuestion(res.question[0]);
         };
         _fetchQuestion();
@@ -25,8 +25,8 @@ function Question() {
                         selectedQuestion.difficulty === "Hard"
                             ? "red"
                             : selectedQuestion.difficulty === "Medium"
-                            ? "var(--yellow)"
-                            : "var(--green)"
+                                ? "var(--yellow)"
+                                : "var(--green)"
                     }
                 >
                     <div>{formatLinesToQuestion(selectedQuestion.body)}</div>

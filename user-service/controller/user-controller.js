@@ -109,7 +109,7 @@ export async function changePassword(req, res) {
 // This is an middleware to authenticate user actions
 export async function authenticateToken(req, res, next) {
     try {
-        const {token} = req.body
+        const { token } = req.body
 
         if (!token) {
             return res.status(403).send("A token is required for authentication");
@@ -128,32 +128,32 @@ export async function authenticateToken(req, res, next) {
 
 
 export async function deleteUser(req, res) {
-  try {
-    const { username, password } = req.body;
-    if (username && password) {
-      const user = await _findUser(username);
-      if (!user) {
-          return res.status(406).json({ message: "User does not exist" })
-      }
+    try {
+        const { username, password } = req.body;
+        if (username && password) {
+            const user = await _findUser(username);
+            if (!user) {
+                return res.status(406).json({ message: "User does not exist" })
+            }
 
-      const isCorrectPassword = await checkPassword(password, user.password);
-      if (!isCorrectPassword) {
-          return res.status(409).json({ message: "Invalid Password" })
-      }
+            const isCorrectPassword = await checkPassword(password, user.password);
+            if (!isCorrectPassword) {
+                return res.status(409).json({ message: "Invalid Password" })
+            }
 
-      const resp = await _deleteUser(username);
-      console.log(resp);
-      if (resp.err) {
-          return res.status(400).json({message: 'Could not delete the user!'});
-      } else {
-          console.log(`User ${username} is deleted successfully!`)
-          return res.status(200).json({message: `Deleted user ${username} successfully!`});
-      }
-    } else {
-      return res.status(400).json({message: 'Username and/or password missing!'});
-    } 
-  } catch (err) {
-    return res.status(500).json({ message: 'Database failure when deleting the user!' })
-  }
+            const resp = await _deleteUser(username);
+            console.log(resp);
+            if (resp.err) {
+                return res.status(400).json({ message: 'Could not delete the user!' });
+            } else {
+                console.log(`User ${username} is deleted successfully!`)
+                return res.status(200).json({ message: `Deleted user ${username} successfully!` });
+            }
+        } else {
+            return res.status(400).json({ message: 'Username and/or password missing!' });
+        }
+    } catch (err) {
+        return res.status(500).json({ message: 'Database failure when deleting the user!' })
+    }
 }
 
