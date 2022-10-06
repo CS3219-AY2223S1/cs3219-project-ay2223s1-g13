@@ -10,14 +10,14 @@ import {
     TextField,
     Typography,
     AppBar,
-    Toolbar, 
-    Link, 
-    Container, 
-    Grid, 
+    Toolbar,
+    Link,
+    Container,
+    Grid,
     tiers,
     Card,
-    CardHeader, 
-    StarIcon, 
+    CardHeader,
+    StarIcon,
     CardContent,
     CardActions,
     ButtonBase
@@ -42,7 +42,7 @@ function HomePage() {
     const [isDeleteSuccessDialogOpen, setDeleteSuccessDialogOpen] = useState(false)
     const [isChangePasswordDialogOpen, setChangePasswordDialogOpen] = useState(false)
     const [isChangeSuccessOpen, setChangeSuccessOpen] = useState(false)
-    const socket = io("ws://localhost:8001", {transports: ['websocket']})
+    const socket = io("ws://localhost:8001", { transports: ['websocket'] })
     const [isWaitingDialog, setWaitingDialog] = useState(false)
     const [isMatchedDialog, setMatchedDialog] = useState(false)
     const navigate = useNavigate()
@@ -54,7 +54,7 @@ function HomePage() {
     useEffect(() => {
         // Update the document title using the browser API
         checkLoggedIn()
-      });
+    });
 
 
     const setConfirmDialog = (msg) => {
@@ -75,12 +75,12 @@ function HomePage() {
     }
 
     const checkLoggedIn = async () => {
-        const res = await axios.post(URL_CHECK_TOKEN, {token: sessionStorage.getItem("accessToken")})
+        const res = await axios.post(URL_CHECK_TOKEN, { token: sessionStorage.getItem("accessToken") })
             .catch((err) => {
-                navigate('/signin'); 
+                navigate('/signin');
             })
     }
-    
+
     const confirmLogout = async () => {
         setConfirmDialog("You sure you want log out?")
     }
@@ -92,13 +92,13 @@ function HomePage() {
     }
 
     const handleDelete = async () => {
-        const res = await axios.delete(URL_USER_SVC, {data: { username: sessionStorage.getItem("username"), password: password }})
+        const res = await axios.delete(URL_USER_SVC, { data: { username: sessionStorage.getItem("username"), password: password } })
             .catch((err) => {
                 setDeleteDialogOpen(false)
                 setWrongPasswordDialogOpen(true)
             })
         if (res && res.status === STATUS_OK) {
-            setDeleteDialogOpen(false) 
+            setDeleteDialogOpen(false)
             setDeleteSuccessDialogOpen(true)
         }
     }
@@ -110,7 +110,7 @@ function HomePage() {
                 setWrongPasswordDialogOpen(true)
             })
         if (res && res.status === STATUS_OK) {
-            setChangePasswordDialogOpen(false) 
+            setChangePasswordDialogOpen(false)
             setChangeSuccessOpen(true)
         }
     }
@@ -120,21 +120,22 @@ function HomePage() {
             "userOne": sessionStorage.getItem("username"),
             "difficulty": selectedDifficulty
         }
-        socket.emit('match', userDetails); 
+        socket.emit('match', userDetails);
         setDialogTitle('Matching')
         setDialogMsg("waiting")
-        setWaitingDialog(true) 
+        setWaitingDialog(true)
         socket.on('matchSuccess', (...args) => {
             setWaitingDialog(false)
-            setMatchedDialog(true) 
+            setMatchedDialog(true)
             setDialogTitle('Matched')
             setDialogMsg("You have found a match!")
             sessionStorage.setItem("roomId", args[0].roomId)
+            sessionStorage.setItem("difficulty", selectedDifficulty)
         })
     }
 
     const handleStart = () => {
-        socket.emit('start', {roomId: sessionStorage.getItem("roomId")});
+        socket.emit('start', { roomId: sessionStorage.getItem("roomId") });
         navigate('/room');
     };
 
@@ -145,71 +146,71 @@ function HomePage() {
     return (
         <React.Fragment>
             <AppBar
-            color="default"
-            elevation={3}
-            sx={{ borderBottom: (theme) => `1px solid ${theme.palette.divider}` }}>
-            <Toolbar sx={{ flexWrap: 'wrap' }}>
-                <Typography variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>Welcome Back, {sessionStorage.getItem("username")}</Typography>
-                <nav>
-                    <Link
-                    variant="button"
-                    color="text.primary"
-                    href="#"
-                    sx={{ my: 1, mx: 1.5 }}
-                    onClick={() => setChangePasswordDialogOpen(true)}
-                    >
-                    Change Password
-                    </Link>
-                    <Link
-                    variant="button"
-                    color="text.primary"
-                    href="#"
-                    sx={{ my: 1, mx: 1.5 }}
-                    onClick={() => setDeleteDialogOpen(true)}
-                    >
-                    Delete Account
-                    </Link>
-                    <Link
-                    variant="button"
-                    color="text.primary"
-                    href="#"
-                    sx={{ my: 1, mx: 1.5 }}
-                    onClick={confirmLogout}
-                    >
-                    Logout
-                    </Link>
-                </nav>
-            </Toolbar>
+                color="default"
+                elevation={3}
+                sx={{ borderBottom: (theme) => `1px solid ${theme.palette.divider}` }}>
+                <Toolbar sx={{ flexWrap: 'wrap' }}>
+                    <Typography variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>Welcome Back, {sessionStorage.getItem("username")}</Typography>
+                    <nav>
+                        <Link
+                            variant="button"
+                            color="text.primary"
+                            href="#"
+                            sx={{ my: 1, mx: 1.5 }}
+                            onClick={() => setChangePasswordDialogOpen(true)}
+                        >
+                            Change Password
+                        </Link>
+                        <Link
+                            variant="button"
+                            color="text.primary"
+                            href="#"
+                            sx={{ my: 1, mx: 1.5 }}
+                            onClick={() => setDeleteDialogOpen(true)}
+                        >
+                            Delete Account
+                        </Link>
+                        <Link
+                            variant="button"
+                            color="text.primary"
+                            href="#"
+                            sx={{ my: 1, mx: 1.5 }}
+                            onClick={confirmLogout}
+                        >
+                            Logout
+                        </Link>
+                    </nav>
+                </Toolbar>
             </AppBar>
 
-        <Container disableGutters maxWidth="sm" component="main" sx={{ pt: 8, pb: 6 }}>
-        <Typography
-          component="h1"
-          variant="h2"
-          align="center"
-          color="text.primary"
-          gutterBottom
-        >
-          Select Your Difficulty
-        </Typography>
-        <Typography variant="h5" align="center" color="text.secondary" component="p">
-            Match with someone online and get start coding! If there are no available opponents,
-            we will let you know within 30 seconds.
-        </Typography>
-      </Container>
-      <Container maxWidth="md" component="main">
-        <Grid container spacing={5}>
-            <Button onClick={() => startMatching("Easy")}> 
-                Easy
-            </Button>
-            <Button onClick={() => startMatching("Medium")}> 
-                Medium
-            </Button>
-            <Button onClick={() => startMatching("Hard")}> 
-                Hard
-            </Button>
-        </Grid>
-      </Container>
+            <Container disableGutters maxWidth="sm" component="main" sx={{ pt: 8, pb: 6 }}>
+                <Typography
+                    component="h1"
+                    variant="h2"
+                    align="center"
+                    color="text.primary"
+                    gutterBottom
+                >
+                    Select Your Difficulty
+                </Typography>
+                <Typography variant="h5" align="center" color="text.secondary" component="p">
+                    Match with someone online and get start coding! If there are no available opponents,
+                    we will let you know within 30 seconds.
+                </Typography>
+            </Container>
+            <Container maxWidth="md" component="main">
+                <Grid container spacing={5}>
+                    <Button onClick={() => startMatching("Easy")}>
+                        Easy
+                    </Button>
+                    <Button onClick={() => startMatching("Medium")}>
+                        Medium
+                    </Button>
+                    <Button onClick={() => startMatching("Hard")}>
+                        Hard
+                    </Button>
+                </Grid>
+            </Container>
             <Dialog
                 open={isDialogOpen}
                 onClose={closeDialog}
@@ -264,27 +265,27 @@ function HomePage() {
                     <Typography variant="body1">{sessionStorage.getItem("username")}'s password is succesfully changed!</Typography>
                     <Button onClick={() => setChangeSuccessOpen(false)}>Close</Button>
                 </DialogActions>
-            </Dialog>       
+            </Dialog>
             <Dialog open={isWaitingDialog}
-                onClose={() => setWaitingDialog(false)}>  
+                onClose={() => setWaitingDialog(false)}>
                 <DialogContent>
                     <DialogContentText>{dialogMsg}</DialogContentText>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setWaitingDialog(false)}>Close</Button>
                 </DialogActions>
-            </Dialog>     
+            </Dialog>
 
-            <Dialog open = {isMatchedDialog} onClose = {(e, r) => {if (r != "backdropClick") { navigate('/room') }}}>
+            <Dialog open={isMatchedDialog} onClose={(e, r) => { if (r != "backdropClick") { navigate('/room') } }}>
                 <DialogContent>
                     <DialogContentText>{dialogMsg}</DialogContentText>
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleStart}>Start</Button>
                 </DialogActions>
-            </Dialog> 
+            </Dialog>
         </React.Fragment>
-        
+
     )
 }
 

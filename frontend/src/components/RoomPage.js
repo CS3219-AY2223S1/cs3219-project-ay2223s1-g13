@@ -14,22 +14,52 @@ import io from 'socket.io-client';
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Box } from "@mui/system";
+import { fetchQuestion } from "./Question/api";
 
 function RoomPage() {
     const socket = io('http://localhost:8003');
     const navigate = useNavigate();
 
-    const [userCode, setUserCode] = useState(""); 
+    const [userCode, setUserCode] = useState("");
     const [isFirstConnect, setIsFirstConnect] = useState(true);
     const [exitDialogOpen, setExitDialogOpen] = useState(false);
     const [partnerExitedDialogOpen, setPartnerExitedDialogOpen] = useState(false);
+    const [questionA, setQuestionA] = useState({});
+    const [isASet, setIsASet] = useState(false);
+    const [isBSet, setIsBSet] = useState(false);
+    const [questionB, setQuestionB] = useState({});
 
     useEffect(() => {
         if (isFirstConnect) {
-            socket.emit("join room", {roomId: sessionStorage.getItem("roomId")});
+            socket.emit("join room", { roomId: sessionStorage.getItem("roomId") });
         }
         setIsFirstConnect(false);
     });
+
+    useEffect(() => {
+        const _fetchQuestion = async (difficulty) => {
+            const res = await fetchQuestion(difficulty);
+            return res;
+        };
+
+        if (!isASet) {
+            _fetchQuestion(sessionStorage.getItem("difficulty")).then((ques) => {
+                setQuestionA(ques)
+                console.log("zx ques: ", ques);
+                socket.emit("exchange question", { roomId: sessionStorage.getItem("roomId"), question: ques });
+            })
+        }
+        setIsASet(true);
+
+        // socket.on("receive other question", (data) => {
+        //     // setQuestions(questions => [...questions, data]);
+        //     // const picked = (({ title, body }) => ({ title, body }))(data);
+        //     console.log("zx receive the other ques ", data);
+        //     setQuestionB(data);
+        // })
+
+
+    }, [questionA, questionB])
 
     const delay = ms => new Promise(
         resolve => setTimeout(resolve, ms)
@@ -39,6 +69,13 @@ function RoomPage() {
         setUserCode(data)
     });
 
+    socket.on("receive other question", (data) => {
+        // setQuestions(questions => [...questions, data]);
+        // const picked = (({ title, body }) => ({ title, body }))(data);
+        console.log("zx receive the other ques ", data);
+        setQuestionB(data);
+    })
+
     socket.on("partner exit", () => {
         setPartnerExitedDialogOpen(true);
     });
@@ -46,11 +83,11 @@ function RoomPage() {
     const sendToSocket = () => {
         setUserCode(document.getElementById('textbox').value)
         const code = document.getElementById('textbox').value
-        socket.emit("send code", {roomId: sessionStorage.getItem("roomId"), text: code}) 
-    }; 
+        socket.emit("send code", { roomId: sessionStorage.getItem("roomId"), text: code })
+    };
 
     const handleFirstExit = () => {
-        socket.emit("exit", {roomId: sessionStorage.getItem("roomId")});
+        socket.emit("exit", { roomId: sessionStorage.getItem("roomId") });
         sessionStorage.removeItem('roomId');
         navigate('/home');
     }
@@ -60,22 +97,32 @@ function RoomPage() {
         navigate('/home');
     }
 
+    const tp = {
+        title: "hi",
+        body: "Given an integer x, return true if x is palindrome integer.\nAn integer is a palindrome when it reads the same backward as forward.\nFor example, 121 is a palindrome while 123 is not.",
+        difficulty: "Easy"
+    }
+
+    console.log("zx qA : ", questionA)
+    console.log("zx qB : ", questionB)
+
     return (
         <Box>
             <Grid container spacing={5}>
                 <Grid item>
                     <IconButton onClick={() => setExitDialogOpen(true)}>
-                        <ArrowBackIosIcon/>
+                        <ArrowBackIosIcon />
                         <Typography variant='h5'>Exit</Typography>
                     </IconButton>
-                    <Question/>
+                    <Question {...questionA} />
+                    <Question {...questionB} />
                 </Grid>
                 <Grid item>
-                    <TextField multiline rows={20} value={userCode} id="textbox" variant="outlined" onChange={sendToSocket} style = {{width: 500}}/>
+                    <TextField multiline rows={20} value={userCode} id="textbox" variant="outlined" onChange={sendToSocket} style={{ width: 500 }} />
                 </Grid>
             </Grid>
 
-            <Dialog open = {exitDialogOpen} onClose = {() => setExitDialogOpen(false)}>
+            <Dialog open={exitDialogOpen} onClose={() => setExitDialogOpen(false)}>
                 <DialogContent>
                     <Stack display='flex' alignItems='center' spacing={2}>
                         <Typography variant='body1'>Are you sure you want to exit?</Typography>
@@ -85,16 +132,16 @@ function RoomPage() {
                         </Stack>
                     </Stack>
                 </DialogContent>
-            </Dialog> 
+            </Dialog>
 
-            <Dialog open = {partnerExitedDialogOpen} onClose = {(e, r) => {if (r != "backdropClick") { navigate('/home') }}}>
+            <Dialog open={partnerExitedDialogOpen} onClose={(e, r) => { if (r != "backdropClick") { navigate('/home') } }}>
                 <DialogContent>
                     <Stack display='flex' alignItems='center' spacing={2}>
                         <Typography variant='body1'>The other user has exited!</Typography>
                         <Button variant='contained' onClick={handleSecondExit}>Exit</Button>
                     </Stack>
                 </DialogContent>
-            </Dialog> 
+            </Dialog>
         </Box>
     );
 }

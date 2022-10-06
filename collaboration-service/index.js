@@ -13,7 +13,7 @@ app.options("*", cors());
 
 const httpServer = createServer(app);
 httpServer.listen(PORT);
-console.log("collaboration-service listening on port 8003"); 
+console.log("collaboration-service listening on port 8003");
 
 app.get("/", (req, res) => {
     res.send("Hello World from collaboration-service");
@@ -33,6 +33,10 @@ io.on("connection", (socket) => {
         socket.join(params["roomId"]);
         console.log("joined room " + params["roomId"]);
     });
+
+    socket.on('exchange question', (params) => {
+        socket.to(params.roomId).emit('receive other question', params.question);
+    })
 
     socket.on('send code', (params) => {
         socket.to(params.roomId).emit('receive code', params.text);
