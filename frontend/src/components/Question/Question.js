@@ -8,13 +8,6 @@ function Question({ title, body }) {
     const [difficulty, setDifficulty] = useState(sessionStorage.getItem("difficulty"));
 
     useEffect(() => {
-        // const _fetchQuestion = async () => {
-        //     const res = await fetchQuestion(difficulty);
-        //     setSelectedQuestion(res.question[0]);
-        // };
-        // _fetchQuestion();
-        // setSelectedQuestion(props.val);
-        console.log("zx : ", body);
         console.log(sessionStorage.getItem("difficulty"));
     }, []);
     return (

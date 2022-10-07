@@ -45,20 +45,17 @@ function RoomPage() {
         if (!isASet) {
             _fetchQuestion(sessionStorage.getItem("difficulty")).then((ques) => {
                 setQuestionA(ques)
-                console.log("zx ques: ", ques);
                 socket.emit("exchange question", { roomId: sessionStorage.getItem("roomId"), question: ques });
             })
         }
         setIsASet(true);
 
-        // socket.on("receive other question", (data) => {
-        //     // setQuestions(questions => [...questions, data]);
-        //     // const picked = (({ title, body }) => ({ title, body }))(data);
-        //     console.log("zx receive the other ques ", data);
-        //     setQuestionB(data);
-        // })
-
-
+        if (!isBSet) {
+            // socket.emit("exchange question", { roomId: sessionStorage.getItem("roomId"), question: questionA });
+            exchangeQuestion();
+            receiveQuestion();
+        }
+        setIsBSet(true);
     }, [questionA, questionB])
 
     const delay = ms => new Promise(
@@ -69,16 +66,22 @@ function RoomPage() {
         setUserCode(data)
     });
 
-    socket.on("receive other question", (data) => {
-        // setQuestions(questions => [...questions, data]);
-        // const picked = (({ title, body }) => ({ title, body }))(data);
-        console.log("zx receive the other ques ", data);
-        setQuestionB(data);
-    })
+    const receiveQuestion = () => {
+        socket.on("receive other question", (data) => {
+            setQuestionB(data);
+        })
+        if (questionB != {}) {
+            setIsBSet(true)
+        }
+    }
 
     socket.on("partner exit", () => {
         setPartnerExitedDialogOpen(true);
     });
+
+    const exchangeQuestion = () => {
+        socket.emit("exchange question", { roomId: sessionStorage.getItem("roomId"), question: questionA });
+    }
 
     const sendToSocket = () => {
         setUserCode(document.getElementById('textbox').value)
@@ -96,15 +99,6 @@ function RoomPage() {
         sessionStorage.removeItem('roomId');
         navigate('/home');
     }
-
-    const tp = {
-        title: "hi",
-        body: "Given an integer x, return true if x is palindrome integer.\nAn integer is a palindrome when it reads the same backward as forward.\nFor example, 121 is a palindrome while 123 is not.",
-        difficulty: "Easy"
-    }
-
-    console.log("zx qA : ", questionA)
-    console.log("zx qB : ", questionB)
 
     return (
         <Box>
