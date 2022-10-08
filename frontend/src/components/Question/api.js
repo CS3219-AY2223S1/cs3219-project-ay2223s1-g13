@@ -5,6 +5,9 @@ export const fetchQuestion = async (difficulty) => {
     const res = await axios.get(URL_QUESTION_SVC, {
         params: { difficulty: difficulty },
     });
-    console.log(res);
-    return res.data;
+    const filtered = {
+        title: res.data.question[0].title,
+        body: res.data.question[0].body,
+    };
+    return filtered;
 };
