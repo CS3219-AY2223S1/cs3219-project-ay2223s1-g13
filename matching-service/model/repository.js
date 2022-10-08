@@ -2,7 +2,11 @@ import { MatchModel } from './match-model.js';
 import { Sequelize, Op } from 'sequelize';
 import moment from 'moment';
 
-const sequelize = new Sequelize("sqlite::memory:");
+const sequelize = new Sequelize({
+    dialect: 'sqlite',
+    storage: 'path/to/database.sqlite'
+});
+
 
 // const matchModel = new MatchModel(sequelize);
 await sequelize.sync({ force: false });
