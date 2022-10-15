@@ -144,8 +144,6 @@ function SignInPage() {
               Sign In
             </Button>
             <Grid container>
-              <Grid item xs>
-              </Grid>
               <Grid item>
                 <Link href="/signup" variant="body2">
                   {"Don't have an account? Sign Up"}

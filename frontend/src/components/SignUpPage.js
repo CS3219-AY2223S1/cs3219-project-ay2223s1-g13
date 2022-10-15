@@ -12,6 +12,7 @@ import {
     Checkbox,
     Container,
     Grid,
+    Link,
     CssBaseline,
     Avatar,
     Icon, 
@@ -22,7 +23,7 @@ import axios from "axios";
 
 import { URL_USER_SVC, URL_LOGIN_SVC, URL_CHECK_TOKEN } from "../configs";
 import { STATUS_CODE_CONFLICT, STATUS_CODE_CREATED, STATUS_OK, STATUS_BAD_REQUEST, STATUS_CODE_NOT_ACCEPTABLE, STATUS_INVALID_TOKEN } from "../constants";
-import { Link, Navigate, useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Image from '../resources/background.jpeg';
 
@@ -139,9 +140,12 @@ function SignUpPage() {
                 Sign Up
               </Button>
               <Grid container>
-                <Grid item xs>
-                </Grid>
+              <Grid item>
+                <Link href="/signin" variant="body2">
+                  {"Already have an account? Sign In"}
+                </Link>
               </Grid>
+            </Grid>
             </Box>
           </Box>
           <Dialog

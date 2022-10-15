@@ -16,6 +16,8 @@ import { useNavigate } from "react-router-dom";
 import { Box } from "@mui/system";
 import { fetchQuestion } from "./Question/api";
 
+import "./RoomPage.css"
+
 function RoomPage() {
     const socket = io('http://localhost:8003');
     const navigate = useNavigate();
@@ -25,9 +27,10 @@ function RoomPage() {
     const [exitDialogOpen, setExitDialogOpen] = useState(false);
     const [partnerExitedDialogOpen, setPartnerExitedDialogOpen] = useState(false);
     const [questionA, setQuestionA] = useState({});
+    const [questionB, setQuestionB] = useState({});
     const [isASet, setIsASet] = useState(false);
     const [isBSet, setIsBSet] = useState(false);
-    const [questionB, setQuestionB] = useState({});
+    const [chosenQuestion, setChosenQuestion] = useState(true);
 
     useEffect(() => {
         if (isFirstConnect) {
@@ -100,19 +103,34 @@ function RoomPage() {
         navigate('/home');
     }
 
+    const displayQuestions = () => {
+        return (
+            <div>
+                <div style={{display: "flex", justifyContent: "space-around", padding: "1rem" }}>
+                    <div className={"question_selector"} style={{background: `${chosenQuestion ? "rgba(20,20,20,0.2)" : ""}`}} onClick={() => setChosenQuestion(true)}>Your Question</div>
+                    <div className={"question_selector"} style={{background: `${!chosenQuestion ? "rgba(20,20,20,0.2)" : ""}`}} onClick={() => setChosenQuestion(false)}>Peer's Question</div>
+                </div>
+                {chosenQuestion && <Question {...questionA} />}
+                { !chosenQuestion && <Question {...questionB} />}
+            </div>
+        )
+    }
+    
+
+
     return (
         <Box>
+            <IconButton onClick={() => setExitDialogOpen(true)}>
+                <ArrowBackIosIcon />
+                <Typography variant='h5'>Exit</Typography>
+            </IconButton>
             <Grid container spacing={5}>
                 <Grid item>
-                    <IconButton onClick={() => setExitDialogOpen(true)}>
-                        <ArrowBackIosIcon />
-                        <Typography variant='h5'>Exit</Typography>
-                    </IconButton>
-                    <Question {...questionA} />
-                    <Question {...questionB} />
+
+                    {displayQuestions()}
                 </Grid>
                 <Grid item>
-                    <TextField multiline rows={20} value={userCode} id="textbox" variant="outlined" onChange={sendToSocket} style={{ width: 500 }} />
+                    <TextField multiline inputProps={{ style: { color: "white" } }} rows={20} value={userCode} id="textbox" variant="outlined" onChange={sendToSocket} style={{ width: 500, background:"black" }}/>
                 </Grid>
             </Grid>
 
