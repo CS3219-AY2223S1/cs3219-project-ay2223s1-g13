@@ -25,7 +25,7 @@ import {
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { URL_USER_SVC, URL_LOGIN_SVC, URL_CHECK_TOKEN, URL_CHANGE_PASSWORD } from "../configs";
-import { STATUS_CODE_CONFLICT, STATUS_CODE_CREATED, STATUS_OK, STATUS_BAD_REQUEST, STATUS_NO_TOKEN, STATUS_INVALID_TOKEN } from "../constants";
+import { STATUS_CODE_CONFLICT, STATUS_CODE_CREATED, STATUS_OK, STATUS_BAD_REQUEST, STATUS_NO_TOKEN, STATUS_INVALID_TOKEN, difficulties } from "../constants";
 import { Navigate, useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 
@@ -199,16 +199,12 @@ function HomePage() {
                 </Typography>
             </Container>
             <Container maxWidth="md" component="main">
-                <Grid container spacing={5}>
-                    <Button onClick={() => startMatching("Easy")}>
-                        Easy
-                    </Button>
-                    <Button onClick={() => startMatching("Medium")}>
-                        Medium
-                    </Button>
-                    <Button onClick={() => startMatching("Hard")}>
-                        Hard
-                    </Button>
+                <Grid container justifyContent="center" spacing={1}>
+                    {difficulties.map((difficulty) => {
+                        return <Button onClick={() => startMatching(difficulty)} size="large" key={difficulty}>
+                            {difficulty}
+                        </Button>
+                    })}
                 </Grid>
             </Container>
             <Dialog
@@ -266,6 +262,7 @@ function HomePage() {
                     <Button onClick={() => setChangeSuccessOpen(false)}>Close</Button>
                 </DialogActions>
             </Dialog>
+
             <Dialog open={isWaitingDialog}
                 onClose={() => setWaitingDialog(false)}>
                 <DialogContent>

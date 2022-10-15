@@ -1,0 +1,8 @@
+.question_selector {
+    padding: 0.1rem 0.5rem;
+    border-radius: 5rem;
+}
+
+.question_selector:hover {
+    cursor: pointer;
+}
