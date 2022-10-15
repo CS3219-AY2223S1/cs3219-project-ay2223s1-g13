@@ -30,7 +30,7 @@ function RoomPage() {
     const [questionB, setQuestionB] = useState({});
     const [isASet, setIsASet] = useState(false);
     const [isBSet, setIsBSet] = useState(false);
-    const [chosenQuestion, setChosenQuestion] = useState(true);
+    const [question, setQuestion] = useState({});
 
     useEffect(() => {
         if (isFirstConnect) {
@@ -59,6 +59,14 @@ function RoomPage() {
             receiveQuestion();
         }
         setIsBSet(true);
+
+        if (isASet && isBSet) {
+            if (questionA.id > questionB.id) {
+                setQuestion(questionA);
+            } else {
+                setQuestion(questionB);
+            }
+        }
     }, [questionA, questionB])
 
     const delay = ms => new Promise(
@@ -126,8 +134,7 @@ function RoomPage() {
             </IconButton>
             <Grid container spacing={5}>
                 <Grid item>
-
-                    {displayQuestions()}
+                    <Question {...question} />
                 </Grid>
                 <Grid item>
                     <TextField multiline inputProps={{ style: { color: "white" } }} rows={20} value={userCode} id="textbox" variant="outlined" onChange={sendToSocket} style={{ width: 500, background:"black" }}/>

@@ -8,6 +8,7 @@ export const fetchQuestion = async (difficulty) => {
     const filtered = {
         title: res.data.question[0].title,
         body: res.data.question[0].body,
+        id: res.data.question[0]._id
     };
     return filtered;
 };
