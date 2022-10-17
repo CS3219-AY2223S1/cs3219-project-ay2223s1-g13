@@ -4,6 +4,7 @@
   --gray: #e8eaeb;
   --yellow: rgb(255 184 0);
   --green: rgb(0 175 155);
+  --darkgray: rgba(0, 0, 0, 0.87);
 }
 
 body {
