@@ -31,6 +31,7 @@ function RoomPage() {
     const [isASet, setIsASet] = useState(false);
     const [isBSet, setIsBSet] = useState(false);
     const [question, setQuestion] = useState({});
+    const [chosenQuestion, setChosenQuestion] = useState(false);
 
     useEffect(() => {
         if (isFirstConnect) {
