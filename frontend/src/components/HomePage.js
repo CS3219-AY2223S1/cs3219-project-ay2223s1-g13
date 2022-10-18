@@ -1,5 +1,4 @@
 import {
-    Box,
     Button,
     Dialog,
     DialogActions,
@@ -14,20 +13,18 @@ import {
     Link,
     Container,
     Grid,
-    tiers,
-    Card,
-    CardHeader,
-    StarIcon,
-    CardContent,
-    CardActions,
-    ButtonBase
 } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { URL_USER_SVC, URL_LOGIN_SVC, URL_CHECK_TOKEN, URL_CHANGE_PASSWORD } from "../configs";
-import { STATUS_CODE_CONFLICT, STATUS_CODE_CREATED, STATUS_OK, STATUS_BAD_REQUEST, STATUS_NO_TOKEN, STATUS_INVALID_TOKEN, difficulties } from "../constants";
-import { Navigate, useNavigate } from "react-router-dom";
+import { URL_USER_SVC, URL_CHECK_TOKEN, URL_CHANGE_PASSWORD } from "../configs";
+import {  STATUS_OK, difficulties } from "../constants";
+import {  useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
+import Slide from '@mui/material/Slide';
+
+const Transition = React.forwardRef(function Transition(props, ref) {
+  return <Slide direction="up" ref={ref} {...props} />;
+});
 
 
 function HomePage() {
@@ -48,8 +45,6 @@ function HomePage() {
     const navigate = useNavigate()
 
     const closeDialog = () => setIsDialogOpen(false)
-    const closeWaitingDialog = () => setWaitingDialog(false)
-    const closeMatchDialog = () => setMatchedDialog(false)
 
     useEffect(() => {
         // Update the document title using the browser API
@@ -63,19 +58,8 @@ function HomePage() {
         setDialogMsg(msg)
     }
 
-    const setMatchingDialog = (msg) => {
-        setIsDialogOpen(true)
-
-    }
-
-    const setErrorDialog = (msg) => {
-        setIsDialogOpen(true)
-        setDialogTitle('Error')
-        setDialogMsg(msg)
-    }
-
     const checkLoggedIn = async () => {
-        const res = await axios.post(URL_CHECK_TOKEN, { token: sessionStorage.getItem("accessToken") })
+        await axios.post(URL_CHECK_TOKEN, { token: sessionStorage.getItem("accessToken") })
             .catch((err) => {
                 navigate('/signin');
             })
@@ -122,7 +106,7 @@ function HomePage() {
         }
         socket.emit('match', userDetails);
         setDialogTitle('Matching')
-        setDialogMsg("waiting")
+        setDialogMsg("We are looking for a peer and a question for you")
         setWaitingDialog(true)
         socket.on('matchSuccess', (...args) => {
             setWaitingDialog(false)
@@ -210,6 +194,7 @@ function HomePage() {
             <Dialog
                 open={isDialogOpen}
                 onClose={closeDialog}
+                TransitionComponent={Transition}
             >
                 <DialogTitle>{dialogTitle}</DialogTitle>
                 <DialogContent>
@@ -220,7 +205,7 @@ function HomePage() {
                 </DialogActions>
             </Dialog>
 
-            <Dialog open={isDeleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+            <Dialog open={isDeleteDialogOpen} onClose={() => setDeleteDialogOpen(false)} TransitionComponent={Transition}>
                 <DialogContent>
                     <Typography variant="body1">Please enter your password to confirm deleting account</Typography>
                     <TextField variant="standard" type="password" onChange={e => setPassword(e.target.value)} />
@@ -230,21 +215,21 @@ function HomePage() {
                 </DialogActions>
             </Dialog>
 
-            <Dialog open={isWrongPasswordDialogOpen} onClose={() => setWrongPasswordDialogOpen(false)}>
+            <Dialog open={isWrongPasswordDialogOpen} onClose={() => setWrongPasswordDialogOpen(false)} TransitionComponent={Transition}>
                 <DialogTitle>Wrong Password</DialogTitle>
                 <DialogActions>
                     <Button onClick={() => setWrongPasswordDialogOpen(false)}>Close</Button>
                 </DialogActions>
             </Dialog>
 
-            <Dialog open={isDeleteSuccessDialogOpen} onClose={() => setDeleteSuccessDialogOpen(false)}>
+            <Dialog open={isDeleteSuccessDialogOpen} onClose={() => setDeleteSuccessDialogOpen(false)} TransitionComponent={Transition}>
                 <DialogActions>
                     <Typography variant="body1">{sessionStorage.getItem("username")} is succesfully deleted!</Typography>
                     <Button onClick={logoutUser}>Exit</Button>
                 </DialogActions>
             </Dialog>
 
-            <Dialog open={isChangePasswordDialogOpen} onClose={() => setChangePasswordDialogOpen(false)}>
+            <Dialog open={isChangePasswordDialogOpen} onClose={() => setChangePasswordDialogOpen(false)} TransitionComponent={Transition}>
                 <DialogContent>
                     <Stack>
                         <TextField label="Old Password" variant="standard" type="password" onChange={e => setPassword(e.target.value)} />
@@ -256,7 +241,7 @@ function HomePage() {
                 </DialogActions>
             </Dialog>
 
-            <Dialog open={isChangeSuccessOpen} onClose={() => setChangeSuccessOpen(false)}>
+            <Dialog open={isChangeSuccessOpen} onClose={() => setChangeSuccessOpen(false)} TransitionComponent={Transition}>
                 <DialogActions>
                     <Typography variant="body1">{sessionStorage.getItem("username")}'s password is succesfully changed!</Typography>
                     <Button onClick={() => setChangeSuccessOpen(false)}>Close</Button>
@@ -264,7 +249,8 @@ function HomePage() {
             </Dialog>
 
             <Dialog open={isWaitingDialog}
-                onClose={() => setWaitingDialog(false)}>
+                onClose={() => setWaitingDialog(false)} TransitionComponent={Transition}>
+                <DialogTitle>Please wait</DialogTitle>
                 <DialogContent>
                     <DialogContentText>{dialogMsg}</DialogContentText>
                 </DialogContent>
@@ -273,7 +259,8 @@ function HomePage() {
                 </DialogActions>
             </Dialog>
 
-            <Dialog open={isMatchedDialog} onClose={(e, r) => { if (r != "backdropClick") { navigate('/room') } }}>
+            <Dialog open={isMatchedDialog} onClose={(e, r) => { if (r !== "backdropClick") { navigate('/room') } }} TransitionComponent={Transition}>
+                <DialogTitle>Yay🎉</DialogTitle>                
                 <DialogContent>
                     <DialogContentText>{dialogMsg}</DialogContentText>
                 </DialogContent>
