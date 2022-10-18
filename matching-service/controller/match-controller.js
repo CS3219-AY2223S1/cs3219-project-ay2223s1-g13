@@ -100,4 +100,12 @@ async function addToRoom(userOneSocketId, userTwoSocketId, roomName) {
     return io.sockets.adapter.rooms.get(roomName).size == 2;
 }
 
-
+export async function deleteMatch(params) {
+    try {
+        const { user } = params;
+        _deleteMatch(user)
+    } catch (err) {
+        io.emit('error-server', { message: 'Server error when deleting match' })
+        return;
+    }
+}

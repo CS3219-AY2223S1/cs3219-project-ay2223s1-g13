@@ -157,6 +157,7 @@ function HomePage() {
         setWaitingDialog(false)
         setNoMatchDialog(true)
         clearInterval(timer)
+        socket.emit('cancelmatch', {user: sessionStorage.getItem("username")})
     }
 
     const handleStart = () => {
