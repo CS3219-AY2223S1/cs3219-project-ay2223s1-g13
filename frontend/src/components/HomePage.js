@@ -13,6 +13,14 @@ import {
     Link,
     Container,
     Grid,
+    LinearProgress,
+    tiers,
+    Card,
+    CardHeader,
+    StarIcon,
+    CardContent,
+    CardActions,
+    ButtonBase
 } from "@mui/material";
 import React, { useState, useEffect } from "react";
 import axios from "axios";
@@ -42,7 +50,25 @@ function HomePage() {
     const socket = io("ws://localhost:8001", { transports: ['websocket'] })
     const [isWaitingDialog, setWaitingDialog] = useState(false)
     const [isMatchedDialog, setMatchedDialog] = useState(false)
+    const [isNoMatchDialog, setNoMatchDialog] = useState(false)
+    const [selectedDifficulty, setSelectedDifficulty] = useState("")
     const navigate = useNavigate()
+
+    const [timeLeft, setTimeLeft] = useState(10)
+    var timer
+    const startTimer = () => {
+        setTimeLeft(30)
+        timer = setInterval(() => {
+            setTimeLeft((remaining) => {
+                if (remaining > 0) {
+                    return remaining - 1
+                } else {
+                    endMatching()
+                    return 0
+                }
+            });
+        }, 1000);
+    }
 
     const closeDialog = () => setIsDialogOpen(false)
 
@@ -55,6 +81,16 @@ function HomePage() {
     const setConfirmDialog = (msg) => {
         setIsDialogOpen(true)
         setDialogTitle('Warning')
+        setDialogMsg(msg)
+    }
+
+    const setMatchingDialog = (msg) => {
+        setIsDialogOpen(true)
+    }
+
+    const setErrorDialog = (msg) => {
+        setIsDialogOpen(true)
+        setDialogTitle('Error')
         setDialogMsg(msg)
     }
 
@@ -99,7 +135,7 @@ function HomePage() {
         }
     }
 
-    const startMatching = (selectedDifficulty) => {
+    const startMatching = () => {
         var userDetails = {
             "userOne": sessionStorage.getItem("username"),
             "difficulty": selectedDifficulty
@@ -108,6 +144,7 @@ function HomePage() {
         setDialogTitle('Matching')
         setDialogMsg("We are looking for a peer and a question for you")
         setWaitingDialog(true)
+        startTimer()
         socket.on('matchSuccess', (...args) => {
             setWaitingDialog(false)
             setMatchedDialog(true)
@@ -116,6 +153,13 @@ function HomePage() {
             sessionStorage.setItem("roomId", args[0].roomId)
             sessionStorage.setItem("difficulty", selectedDifficulty)
         })
+    }
+
+    const endMatching = () => {
+        setWaitingDialog(false)
+        setNoMatchDialog(true)
+        clearInterval(timer)
+        socket.emit('cancelmatch', {user: sessionStorage.getItem("username")})
     }
 
     const handleStart = () => {
@@ -185,7 +229,7 @@ function HomePage() {
             <Container maxWidth="md" component="main">
                 <Grid container justifyContent="center" spacing={1}>
                     {difficulties.map((difficulty) => {
-                        return <Button onClick={() => startMatching(difficulty)} size="large" key={difficulty}>
+                        return <Button onClick={() => {setSelectedDifficulty(difficulty); startMatching(difficulty)}} size="large" key={difficulty}>
                             {difficulty}
                         </Button>
                     })}
@@ -248,15 +292,29 @@ function HomePage() {
                 </DialogActions>
             </Dialog>
 
-            <Dialog open={isWaitingDialog}
-                onClose={() => setWaitingDialog(false)} TransitionComponent={Transition}>
-                <DialogTitle>Please wait</DialogTitle>
+            <Dialog open={isWaitingDialog} onClose={(e, r) => { if (r != "backdropClick") {setWaitingDialog(false)}}}>
+
                 <DialogContent>
-                    <DialogContentText>{dialogMsg}</DialogContentText>
+                    <Stack spacing={2} p={1}>
+                        <Stack spacing={1}>
+                            <Typography variant="h4">Finding a Match...</Typography>
+                            <Typography variant="h6">Selected Difficulty: {selectedDifficulty}</Typography>
+                        </Stack>
+                        <LinearProgress variant="determinate" value={(30 - timeLeft)/30 * 100}/>
+                        <Typography variant="h6">{timeLeft} seconds left</Typography>
+                        <Button onClick={() => {setTimeLeft(0); endMatching()}}>Stop</Button>
+                    </Stack>
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={() => setWaitingDialog(false)}>Close</Button>
-                </DialogActions>
+            </Dialog>
+
+            <Dialog open={isNoMatchDialog} onClose={(e, r) => { if (r != "backdropClick") {setNoMatchDialog(false)}}}>
+                <DialogContent>
+                    <Stack spacing={1} p={1} alignItems="center" justifyContent="center">
+                        <Typography variant="h5">No Match Found</Typography>
+                        <Typography variant="h6">Select another difficulty or try again later!</Typography>
+                        <Button onClick={() => setNoMatchDialog(false)}>Close</Button>
+                    </Stack>
+                </DialogContent>
             </Dialog>
 
             <Dialog open={isMatchedDialog} onClose={(e, r) => { if (r !== "backdropClick") { navigate('/room') } }} TransitionComponent={Transition}>
