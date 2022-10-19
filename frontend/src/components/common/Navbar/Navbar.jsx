@@ -1,9 +1,21 @@
 import './Navbar.css'
 
+import { useState } from "react";
 import { headers } from './constants'
 import { Button } from '@mui/material'
+import { Link } from "react-router-dom";
+
 
 const NavBar = () => {
+
+  function getURL(header) {
+    if (header === "Sign In") {
+      return "/signin"
+    } else if (header === "Sign Up") {
+      return "/signup"
+    }
+  }
+
   return (
     <div className="navbar">
       <div
@@ -19,7 +31,7 @@ const NavBar = () => {
             style={{ fontSize: '1.8rem', cursor: 'pointer' }}
             onClick={() => 'home'}
           >
-            CodeUS
+            <Link>CodeUS</Link>
           </strong>
         </div>
         <div
@@ -36,8 +48,7 @@ const NavBar = () => {
                   variant="label"
                   color="inherit"
                   style={{ fontWeight: '600', color: 'var(--darkgray)' }}
-                >
-                  {header}
+                > <Link to={getURL(header)}>{header}</Link>
                 </Button>
               </div>
             )
