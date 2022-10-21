@@ -1,4 +1,3 @@
-import { ReactElement } from 'react'
 import { getSectionMarginRight, getSectionWidth } from './helper'
 import './Section.css'
 
