@@ -31,7 +31,7 @@ const NavBar = () => {
             style={{ fontSize: '1.8rem', cursor: 'pointer' }}
             onClick={() => 'home'}
           >
-            <Link>CodeUS</Link>
+            CodeUS
           </strong>
         </div>
         <div

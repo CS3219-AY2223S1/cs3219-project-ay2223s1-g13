@@ -14,7 +14,7 @@ export async function createUser(req, res) {
             }
 
             const hash = await hashPassword(password);
-            const resp = await _createUser(username, hash);
+            const resp = await _createUser(username.toLowerCase(), hash);
             console.log(resp);
             if (resp.err) {
                 return res.status(400).json({ message: 'Could not create a new user!' });
@@ -33,8 +33,8 @@ export async function createUser(req, res) {
 export async function loginUser(req, res) {
     try {
         const { username, password } = req.body;
-        if (username && password) {
-            const user = await _findUser(username);
+        if (username && password) {2
+            const user = await _findUser(username.toLowerCase());
             // check if username exists
             if (!user) {
                 return res.status(400).json({ message: "User does not exist" })
@@ -57,11 +57,9 @@ export async function loginUser(req, res) {
     }
 }
 
-
 async function checkPassword(typedPassword, requiredPassword) {
     //compare 2 passwords
     const validPassword = await bcrypt.compare(typedPassword, requiredPassword);
-
     return validPassword;
 }
 
@@ -133,7 +131,7 @@ export async function deleteUser(req, res) {
     if (username && password) {
       const user = await _findUser(username);
       if (!user) {
-          return res.status(406).json({ message: "User does not exist" })
+        return res.status(406).json({ message: "User does not exist" })
       }
 
       const isCorrectPassword = await checkPassword(password, user.password);

@@ -23,11 +23,13 @@ import axios from "axios";
 
 import { URL_USER_SVC, URL_LOGIN_SVC, URL_CHECK_TOKEN } from "../configs";
 import { STATUS_CODE_CONFLICT, STATUS_CODE_CREATED, STATUS_OK, STATUS_BAD_REQUEST, STATUS_CODE_NOT_ACCEPTABLE, STATUS_INVALID_TOKEN } from "../constants";
-import { Navigate, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import Image from '../resources/background.jpeg';
 
 function SignUpPage() {
+    const navigate = useNavigate();
+
     const [username, setUsername] = useState("")
     const [password, setPassword] = useState("")
     const [confirmPassword, setConfirmPassword] = useState("")
@@ -38,7 +40,6 @@ function SignUpPage() {
     const theme = createTheme();
 
     const closeDifferentPassword = () => setDifferentPassword(false) 
-
 
     const openDifferentPasswordDialog = () => { 
         setDifferentPassword(true)
@@ -61,7 +62,9 @@ function SignUpPage() {
     const closeSignUpSuccessDialog = () => setIsSignupSuccess(false)
 
     const handleSignUp = async () => {
-        if (password != confirmPassword) {
+        if (username === "" || password === "" || confirmPassword === "") {
+            setErrorDialog("All fields are required!")
+        } else if (password != confirmPassword) {
             openDifferentPasswordDialog()
         } else { 
 
@@ -80,7 +83,6 @@ function SignUpPage() {
         }
     }
 
-
     return (
         <ThemeProvider theme={theme}> 
         <Container component="main" maxWidth="xs" display='flex' justifyContent='center' > 
@@ -92,7 +94,7 @@ function SignUpPage() {
               flexDirection: 'column',
               alignItems: 'center',
             }}
-          >              
+          >  
             <Typography component="h1" variant="h5">
               Create New Account
             </Typography>
@@ -170,7 +172,7 @@ function SignUpPage() {
                     <DialogContentText>{dialogMsg}</DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button component={Link} to="/signin">Continue</Button>
+                    <Button component={Link} onClick={() => navigate("/signin")}>Continue</Button>
                 </DialogActions>
             </Dialog>
         </Container>

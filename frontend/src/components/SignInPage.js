@@ -39,7 +39,6 @@ function SignInPage() {
   const navigate = useNavigate()
   const theme = createTheme();
 
-
   useEffect(() => {
     checkLoggedIn()
   });
@@ -61,11 +60,18 @@ function SignInPage() {
   }
 
   const handleLogin = async () => {
+    if (username === "" || password === "") {
+        setIsDialogOpen(true)
+        setDialogTitle("")
+        setDialogMsg("Please enter both username and password!")
+        return;
+    }
+
     const res = await axios.post(URL_LOGIN_SVC, { username, password })
       .catch((err) => {
         setIsLoginSuccess(false)
         if (err.response.status === STATUS_BAD_REQUEST) {
-          setErrorDialog('Login failed')
+          setErrorDialog('Incorrect username/password!')
         } else {
           setErrorDialog('Something went wrong... Please try again later')
         }
@@ -75,11 +81,10 @@ function SignInPage() {
       setIsLoginSuccess(true)
       const token = res.data.accessToken
       sessionStorage.setItem("accessToken", token)
-      sessionStorage.setItem("username", username)
+      sessionStorage.setItem("username", username.toLowerCase())
       navigate('/home');
     }
   }
-
 
   const closeDialog = () => setIsDialogOpen(false)
 
@@ -108,7 +113,7 @@ function SignInPage() {
           }}
         >
           <Typography component="h1" variant="h5">
-            Welcome
+            Sign In
           </Typography>
           <Box sx={{ mt: 1 }}>
             <TextField
@@ -152,10 +157,7 @@ function SignInPage() {
             </Grid>
           </Box>
         </Box>
-        <Dialog
-          open={isDialogOpen}
-          onClose={closeDialog}
-        >
+        <Dialog open={isDialogOpen} onClose={closeDialog}>
           <DialogTitle>{dialogTitle}</DialogTitle>
           <DialogContent>
             <DialogContentText>{dialogMsg}</DialogContentText>
