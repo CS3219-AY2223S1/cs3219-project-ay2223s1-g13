@@ -64,6 +64,19 @@ io.on("connection", (socket) => {
     socket.on("start", (params) => {
         socket.to(params.roomId).emit("partner start");
     });
+
+    socket.on("removematch", (params) => {
+        deleteMatchWithName(params);
+    })
+
+    socket.on('disconnect', () => {
+        let i = users.indexOf(user);
+        if (i == -1) {
+            return;
+        }
+        users.splice(i, 1);
+        console.log("zx disconnected user: ", user);
+    })
 });
 
 // io.on('disconnect', (socketId) => {

@@ -25,13 +25,13 @@ import {
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { URL_USER_SVC, URL_CHECK_TOKEN, URL_CHANGE_PASSWORD } from "../configs";
-import {  STATUS_OK, difficulties } from "../constants";
-import {  useNavigate } from "react-router-dom";
+import { STATUS_OK, difficulties } from "../constants";
+import { useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
 import Slide from '@mui/material/Slide';
 
 const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
+    return <Slide direction="up" ref={ref} {...props} />;
 });
 
 
@@ -103,6 +103,9 @@ function HomePage() {
 
     const confirmLogout = async () => {
         setConfirmDialog("You sure you want log out?")
+        console.log("zx confirm Logout for: ", socket.id);
+        socket.emit('removematch', { user: sessionStorage.getItem("username") })
+        socket.disconnect();
     }
 
     const logoutUser = () => {
@@ -159,7 +162,7 @@ function HomePage() {
         setWaitingDialog(false)
         setNoMatchDialog(true)
         clearInterval(timer)
-        socket.emit('cancelmatch', {user: sessionStorage.getItem("username")})
+        socket.emit('cancelmatch', { user: sessionStorage.getItem("username") })
     }
 
     const handleStart = () => {
@@ -229,7 +232,7 @@ function HomePage() {
             <Container maxWidth="md" component="main">
                 <Grid container justifyContent="center" spacing={1}>
                     {difficulties.map((difficulty) => {
-                        return <Button onClick={() => {setSelectedDifficulty(difficulty); startMatching(difficulty)}} size="large" key={difficulty}>
+                        return <Button onClick={() => { setSelectedDifficulty(difficulty); startMatching(difficulty) }} size="large" key={difficulty}>
                             {difficulty}
                         </Button>
                     })}
@@ -292,7 +295,7 @@ function HomePage() {
                 </DialogActions>
             </Dialog>
 
-            <Dialog open={isWaitingDialog} onClose={(e, r) => { if (r != "backdropClick") {setWaitingDialog(false)}}}>
+            <Dialog open={isWaitingDialog} onClose={(e, r) => { if (r != "backdropClick") { setWaitingDialog(false) } }}>
 
                 <DialogContent>
                     <Stack spacing={2} p={1}>
@@ -300,14 +303,14 @@ function HomePage() {
                             <Typography variant="h4">Finding a Match...</Typography>
                             <Typography variant="h6">Selected Difficulty: {selectedDifficulty}</Typography>
                         </Stack>
-                        <LinearProgress variant="determinate" value={(30 - timeLeft)/30 * 100}/>
+                        <LinearProgress variant="determinate" value={(30 - timeLeft) / 30 * 100} />
                         <Typography variant="h6">{timeLeft} seconds left</Typography>
-                        <Button onClick={() => {setTimeLeft(0); endMatching()}}>Stop</Button>
+                        <Button onClick={() => { setTimeLeft(0); endMatching() }}>Stop</Button>
                     </Stack>
                 </DialogContent>
             </Dialog>
 
-            <Dialog open={isNoMatchDialog} onClose={(e, r) => { if (r != "backdropClick") {setNoMatchDialog(false)}}}>
+            <Dialog open={isNoMatchDialog} onClose={(e, r) => { if (r != "backdropClick") { setNoMatchDialog(false) } }}>
                 <DialogContent>
                     <Stack spacing={1} p={1} alignItems="center" justifyContent="center">
                         <Typography variant="h5">No Match Found</Typography>
@@ -318,7 +321,7 @@ function HomePage() {
             </Dialog>
 
             <Dialog open={isMatchedDialog} onClose={(e, r) => { if (r !== "backdropClick") { navigate('/room') } }} TransitionComponent={Transition}>
-                <DialogTitle>Yay🎉</DialogTitle>                
+                <DialogTitle>Yay🎉</DialogTitle>
                 <DialogContent>
                     <DialogContentText>{dialogMsg}</DialogContentText>
                 </DialogContent>

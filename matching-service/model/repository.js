@@ -61,8 +61,23 @@ export async function deleteMatch(user) {
     })
 }
 
+export async function deleteMatchWithName(username) {
+    return MatchModel.destroy({
+        where: {
+            [Op.or]: [
+                {
+                    userOne: user
+                },
+                {
+                    userTwo: user
+                }
+            ]
+        }
+    })
+}
+
 export async function updateMatch(userOne, userTwo, userTwoSocketId, createdAt, isPending) {
-    return await MatchModel.update({
+    return MatchModel.update({
         userTwo: userTwo,
         userTwoSocketId: userTwoSocketId,
         createdAt: createdAt,
