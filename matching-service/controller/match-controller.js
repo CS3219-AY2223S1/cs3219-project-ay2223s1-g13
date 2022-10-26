@@ -3,7 +3,8 @@ import {
     ormFindJoinableMatches as _findJoinableMatches,
     ormGetAllMatch as _getAllMatch,
     ormDeleteMatch as _deleteMatch,
-    ormUpdateMatch as _updateMatch
+    ormUpdateMatch as _updateMatch,
+    ormDeleteMatchWithName as _deleteMatchWithName
 } from "../model/match-orm.js";
 import { io, users } from "../index.js"
 import moment from "moment";
@@ -19,8 +20,9 @@ export async function createMatch(params) {
         if (userOne && difficulty && socketId && createdAt) {
 
             // create pending match for user
+            console.log("zx1");
             const newMatch = await _createMatch(userOne, null, difficulty, socketId, null, createdAt, true);
-
+            console.log("zx2");
             if (newMatch) {
                 console.log("Created new pending match");
             } else {
@@ -106,6 +108,16 @@ export async function deleteMatch(params) {
         _deleteMatch(user)
     } catch (err) {
         io.emit('error-server', { message: 'Server error when deleting match' })
+        return;
+    }
+}
+
+export async function deleteMatchWithName(params) {
+    try {
+        const { user } = params;
+        _deleteMatchWithName(user);
+    } catch (err) {
+        io.emit('error-server', { message: 'Server error when deleting all match with given name' });
         return;
     }
 }

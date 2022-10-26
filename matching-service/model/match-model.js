@@ -7,14 +7,12 @@ const sequelize = new Sequelize({
 export const MatchModel = sequelize.define("MatchModel", {
     userOne: {
         type: DataTypes.STRING,
-        required: true,
-        unique: true
+        required: true
     },
     userTwo: {
         type: DataTypes.STRING,
         required: true,
-        allowNull: true,
-        unique: true
+        allowNull: true
     },
     difficulty: {
         type: DataTypes.STRING,

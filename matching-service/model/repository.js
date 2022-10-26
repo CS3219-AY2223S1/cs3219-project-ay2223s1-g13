@@ -66,10 +66,10 @@ export async function deleteMatchWithName(username) {
         where: {
             [Op.or]: [
                 {
-                    userOne: user
+                    userOne: username
                 },
                 {
-                    userTwo: user
+                    userTwo: username
                 }
             ]
         }

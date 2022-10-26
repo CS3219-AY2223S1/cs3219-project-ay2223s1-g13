@@ -1,6 +1,6 @@
 import { where } from "sequelize";
 import { MatchModel } from "./match-model.js";
-import { createMatch, findJoinableMatches, getAllMatch, deleteMatch, updateMatch } from "./repository.js";
+import { createMatch, findJoinableMatches, getAllMatch, deleteMatch, updateMatch, deleteMatchWithName } from "./repository.js";
 
 export async function ormCreateMatch(userOne, userTwo, difficulty, socketIdOne, socketIdTwo, createdAt, isPending) {
     try {
@@ -47,6 +47,16 @@ export async function ormDeleteMatch(user) {
         return true;
     } catch (err) {
         console.log("ERROR: Could not delete match");
+        return { err };
+    }
+}
+
+export async function ormDeleteMatchWithName(user) {
+    try {
+        await deleteMatchWithName(user);
+        return true;
+    } catch (err) {
+        console.log("ERROR: Could not delete match with given name");
         return { err };
     }
 }
