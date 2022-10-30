@@ -1,34 +1,28 @@
 import {
+    AppBar,
     Button,
+    Container,
     Dialog,
     DialogActions,
     DialogContent,
     DialogContentText,
     DialogTitle,
-    Stack,
-    TextField,
-    Typography,
-    AppBar,
-    Toolbar,
-    Link,
-    Container,
     Grid,
     LinearProgress,
-    tiers,
-    Card,
-    CardHeader,
-    StarIcon,
-    CardContent,
-    CardActions,
-    ButtonBase
+    Link,
+    Slide,
+    Stack,
+    TextField,
+    Toolbar,
+    Typography
 } from "@mui/material";
 import React, { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import { URL_USER_SVC, URL_CHECK_TOKEN, URL_CHANGE_PASSWORD } from "../configs";
-import {  STATUS_OK, difficulties } from "../constants";
-import {  useNavigate } from "react-router-dom";
 import { io } from "socket.io-client";
-import Slide from '@mui/material/Slide';
+
+import { URL_USER_SVC, URL_CHECK_TOKEN, URL_CHANGE_PASSWORD } from "../configs";
+import { STATUS_OK, difficulties } from "../constants";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -77,20 +71,9 @@ function HomePage() {
         checkLoggedIn()
     });
 
-
     const setConfirmDialog = (msg) => {
         setIsDialogOpen(true)
         setDialogTitle('Warning')
-        setDialogMsg(msg)
-    }
-
-    const setMatchingDialog = (msg) => {
-        setIsDialogOpen(true)
-    }
-
-    const setErrorDialog = (msg) => {
-        setIsDialogOpen(true)
-        setDialogTitle('Error')
         setDialogMsg(msg)
     }
 
@@ -292,8 +275,7 @@ function HomePage() {
                 </DialogActions>
             </Dialog>
 
-            <Dialog open={isWaitingDialog} onClose={(e, r) => { if (r != "backdropClick") {setWaitingDialog(false)}}}>
-
+            <Dialog open={isWaitingDialog} onClose={(e, r) => { if (r !== "backdropClick") {setWaitingDialog(false)}}} TransitionComponent={Transition}>
                 <DialogContent>
                     <Stack spacing={2} p={1}>
                         <Stack spacing={1}>
@@ -307,7 +289,7 @@ function HomePage() {
                 </DialogContent>
             </Dialog>
 
-            <Dialog open={isNoMatchDialog} onClose={(e, r) => { if (r != "backdropClick") {setNoMatchDialog(false)}}}>
+            <Dialog open={isNoMatchDialog} onClose={(e, r) => { if (r !== "backdropClick") {setNoMatchDialog(false)}}} TransitionComponent={Transition}>
                 <DialogContent>
                     <Stack spacing={1} p={1} alignItems="center" justifyContent="center">
                         <Typography variant="h5">No Match Found</Typography>

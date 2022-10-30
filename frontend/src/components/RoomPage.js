@@ -31,14 +31,13 @@ function RoomPage() {
     const [isASet, setIsASet] = useState(false);
     const [isBSet, setIsBSet] = useState(false);
     const [question, setQuestion] = useState({});
-    const [chosenQuestion, setChosenQuestion] = useState(false);
 
     useEffect(() => {
         if (isFirstConnect) {
             socket.emit("join room", { roomId: sessionStorage.getItem("roomId") });
         }
         setIsFirstConnect(false);
-    });
+    }, [isFirstConnect, socket]);
 
     useEffect(() => {
         const _fetchQuestion = async (difficulty) => {
@@ -55,7 +54,6 @@ function RoomPage() {
         setIsASet(true);
 
         if (!isBSet) {
-            // socket.emit("exchange question", { roomId: sessionStorage.getItem("roomId"), question: questionA });
             exchangeQuestion();
             receiveQuestion();
         }
@@ -70,10 +68,6 @@ function RoomPage() {
         }
     }, [questionA, questionB])
 
-    const delay = ms => new Promise(
-        resolve => setTimeout(resolve, ms)
-    );
-
     socket.on("receive code", (data) => {
         setUserCode(data)
     });
@@ -82,7 +76,7 @@ function RoomPage() {
         socket.on("receive other question", (data) => {
             setQuestionB(data);
         })
-        if (questionB != {}) {
+        if (questionB !== {}) {
             setIsBSet(true)
         }
     }
@@ -112,21 +106,6 @@ function RoomPage() {
         navigate('/home');
     }
 
-    const displayQuestions = () => {
-        return (
-            <div>
-                <div style={{display: "flex", justifyContent: "space-around", padding: "1rem" }}>
-                    <div className={"question_selector"} style={{background: `${chosenQuestion ? "rgba(20,20,20,0.2)" : ""}`}} onClick={() => setChosenQuestion(true)}>Your Question</div>
-                    <div className={"question_selector"} style={{background: `${!chosenQuestion ? "rgba(20,20,20,0.2)" : ""}`}} onClick={() => setChosenQuestion(false)}>Peer's Question</div>
-                </div>
-                {chosenQuestion && <Question {...questionA} />}
-                { !chosenQuestion && <Question {...questionB} />}
-            </div>
-        )
-    }
-    
-
-
     return (
         <Box>
             <IconButton onClick={() => setExitDialogOpen(true)}>
@@ -154,7 +133,7 @@ function RoomPage() {
                 </DialogContent>
             </Dialog>
 
-            <Dialog open={partnerExitedDialogOpen} onClose={(e, r) => { if (r != "backdropClick") { navigate('/home') } }}>
+            <Dialog open={partnerExitedDialogOpen} onClose={(e, r) => { if (r !== "backdropClick") { navigate('/home') } }}>
                 <DialogContent>
                     <Stack display='flex' alignItems='center' spacing={2}>
                         <Typography variant='body1'>The other user has exited!</Typography>
