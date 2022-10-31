@@ -107,6 +107,12 @@ function RoomPage() {
         navigate('/home');
     }
 
+    const section = {
+        width:"210%",
+        paddingTop: 5,
+        backgroundColor: "#fff"
+      };
+
     return (
         <Box>
             <IconButton onClick={() => setExitDialogOpen(true)}>
@@ -118,9 +124,10 @@ function RoomPage() {
                     <Question {...question} />
                 </Grid>
                 <Grid item>
-                    <CodeEditor room_id={sessionStorage.getItem("roomId")} style={{ width: 500 }}></CodeEditor>
+                    <div style={section}><CodeEditor room_id={sessionStorage.getItem("roomId")} style={{ width: 500 }}></CodeEditor></div>
                 </Grid>
             </Grid>
+
 
             <Dialog open={exitDialogOpen} onClose={() => setExitDialogOpen(false)}>
                 <DialogContent>
