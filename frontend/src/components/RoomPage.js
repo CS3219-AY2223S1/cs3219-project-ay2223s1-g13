@@ -10,6 +10,7 @@ import {
 } from "@mui/material";
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import Question from "./Question/Question";
+import CodeEditor from "./CodeEditor";
 import io from 'socket.io-client';
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -117,7 +118,7 @@ function RoomPage() {
                     <Question {...question} />
                 </Grid>
                 <Grid item>
-                    <TextField multiline inputProps={{ style: { color: "white" } }} rows={20} value={userCode} id="textbox" variant="outlined" onChange={sendToSocket} style={{ width: 500, background:"black" }}/>
+                    <CodeEditor room_id={sessionStorage.getItem("roomId")} style={{ width: 500 }}></CodeEditor>
                 </Grid>
             </Grid>
 
