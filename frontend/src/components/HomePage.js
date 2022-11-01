@@ -124,8 +124,6 @@ function HomePage() {
             "difficulty": selectedDifficulty
         }
         socket.emit('match', userDetails);
-        setDialogTitle('Matching')
-        setDialogMsg("We are looking for a peer and a question for you")
         setWaitingDialog(true)
         startTimer()
         socket.on('matchSuccess', (...args) => {

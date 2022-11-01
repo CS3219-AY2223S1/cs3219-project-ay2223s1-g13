@@ -6,3 +6,11 @@
 .question_selector:hover {
     cursor: pointer;
 }
+
+.editor-container{
+    width:500px;
+}
+
+.ql-editor{
+    min-height:500px;
+}
