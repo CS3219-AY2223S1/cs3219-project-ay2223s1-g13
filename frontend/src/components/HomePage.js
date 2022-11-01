@@ -47,6 +47,7 @@ function HomePage() {
     const [isMatchedDialog, setMatchedDialog] = useState(false)
     const [isNoMatchDialog, setNoMatchDialog] = useState(false)
     const [selectedDifficulty, setSelectedDifficulty] = useState("");
+    const [waitingDifficulty, setWaitingDifficulty] = useState("");
     const [selectedDifficultyAvail, setSelectedDifficultyAvail] = useState(false);
     const navigate = useNavigate()
 
@@ -150,6 +151,7 @@ function HomePage() {
             "difficulty": selectedDifficulty
         }
         socket.emit('match', userDetails);
+        setWaitingDifficulty(selectedDifficulty)
         setWaitingDialog(true)
         startTimer()
         socket.on('matchSuccess', (...args) => {
@@ -308,7 +310,7 @@ function HomePage() {
                     <Stack spacing={2} p={1}>
                         <Stack spacing={1}>
                             <Typography variant="h4">Finding a Match...</Typography>
-                            <Typography variant="h6">Selected Difficulty: {selectedDifficulty}</Typography>
+                            <Typography variant="h6">Selected Difficulty: {waitingDifficulty}</Typography>
                         </Stack>
                         <LinearProgress variant="determinate" value={(30 - timeLeft) / 30 * 100} />
                         <Typography variant="h6">{timeLeft} seconds left</Typography>
