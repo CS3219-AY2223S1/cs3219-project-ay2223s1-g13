@@ -14,15 +14,28 @@ const CodeEditor = (props) => {
         const ydoc = new Y.Doc()
         const ytext = ydoc.getText('quill')
         const binding = new QuillBinding(ytext, quillRef)
-        console.log("connecting to room " + props.room_id)
-        const provider = new WebsocketProvider('ws://localhost:8003', props.room_id, ydoc)
+        const provider = new WebsocketProvider('ws://127.0.01:8003', props.room_id, ydoc)
     }, [])
 
-  return (
-    <div>
-        <ReactQuill ref={e => { reactQuillRef = e }} theme={'snow'} />
-    </div>
-  )
+    const modules = {
+        toolbar: [
+          [{ size: [] }],
+          ['bold', 'italic', 'underline', 'strike',],
+          [
+            { indent: '-1' },
+            { indent: '+1' },
+          ],
+        ]
+      }
+
+    return (
+        <div>
+            <ReactQuill 
+                ref={e => { reactQuillRef = e }} 
+                theme={'snow'} 
+                modules={modules} />
+        </div>
+    )
 }
 
 export default CodeEditor;
