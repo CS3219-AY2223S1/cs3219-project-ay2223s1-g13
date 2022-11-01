@@ -4,7 +4,6 @@ import {
     DialogContent,
     Grid,
     IconButton,
-    TextField,
     Stack,
     Typography
 } from "@mui/material";
@@ -23,7 +22,6 @@ function RoomPage() {
     const socket = io('http://localhost:8003');
     const navigate = useNavigate();
 
-    const [userCode, setUserCode] = useState("");
     const [isFirstConnect, setIsFirstConnect] = useState(true);
     const [exitDialogOpen, setExitDialogOpen] = useState(false);
     const [partnerExitedDialogOpen, setPartnerExitedDialogOpen] = useState(false);
@@ -69,10 +67,6 @@ function RoomPage() {
         }
     }, [questionA, questionB])
 
-    socket.on("receive code", (data) => {
-        setUserCode(data)
-    });
-
     const receiveQuestion = () => {
         socket.on("receive other question", (data) => {
             setQuestionB(data);
@@ -82,19 +76,13 @@ function RoomPage() {
         }
     }
 
-    socket.on("partner exit", () => {
-        setPartnerExitedDialogOpen(true);
-    });
-
     const exchangeQuestion = () => {
         socket.emit("exchange question", { roomId: sessionStorage.getItem("roomId"), question: questionA });
     }
 
-    const sendToSocket = () => {
-        setUserCode(document.getElementById('textbox').value)
-        const code = document.getElementById('textbox').value
-        socket.emit("send code", { roomId: sessionStorage.getItem("roomId"), text: code })
-    };
+    socket.on("partner exit", () => {
+        setPartnerExitedDialogOpen(true);
+    });
 
     const handleFirstExit = () => {
         socket.emit("exit", { roomId: sessionStorage.getItem("roomId") });
