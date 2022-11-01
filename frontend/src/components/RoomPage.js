@@ -102,27 +102,17 @@ function RoomPage() {
         matchsocket.emit('removematch', { user: sessionStorage.getItem("username") });
     }
 
-    const section = {
-        width: "210%",
-        paddingTop: 5,
-        backgroundColor: "#fff"
-    };
-
     return (
         <Box>
             <IconButton onClick={() => setExitDialogOpen(true)}>
                 <ArrowBackIosIcon />
                 <Typography variant='h5'>Exit</Typography>
             </IconButton>
-            <Grid container spacing={5}>
-                <Grid item>
-                    <Question {...question} />
-                </Grid>
-                <Grid item>
-                    <div style={section}><CodeEditor room_id={sessionStorage.getItem("roomId")} style={{ width: 500 }}></CodeEditor></div>
-                </Grid>
-            </Grid>
-
+            <Stack pt={2}>
+                <Question {...question} />
+                
+                <CodeEditor room_id={sessionStorage.getItem("roomId")} style={{ width: 500 }}></CodeEditor>
+            </Stack>
 
             <Dialog open={exitDialogOpen} onClose={() => setExitDialogOpen(false)}>
                 <DialogContent>
