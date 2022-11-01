@@ -19,38 +19,35 @@ export async function getAllMatch() {
     return MatchModel.findAll();
 }
 
-export async function findMatch(username) {
+export async function findMatch(userOne, socketIdOne) {
     return MatchModel.findAll({
         where: {
-            userOne: {
-                [Op.eq]: username
-            }
+            [Op.and]: [
+                { userOne: { [Op.eq]: userOne } },
+                { socketIdOne: { [Op.eq]: socketIdOne } }
+            ]
         }
     });
 }
 
-export async function findJoinableMatches(userOne, difficulty, createdAt) {
-    return MatchModel.findOne({
+export async function findJoinableMatches(userOne, socketIdOne, difficulty) {
+    const match = await MatchModel.findOne({
         where: {
             [Op.and]: [
-                {
-                    createdAt: {
-                        [Op.between]: [moment(createdAt).subtract(30, 'seconds').toDate(), moment(createdAt).add(30, 'seconds').toDate()]
-                    }
-                },
-                {
-                    difficulty: {
-                        [Op.eq]: difficulty
-                    }
-                },
-                {
-                    userOne: {
-                        [Op.ne]: userOne
-                    }
-                }
+                { userTwo: { [Op.is]: null } },
+                { socketIdTwo: { [Op.is]: null } },
+                { difficulty: { [Op.eq]: difficulty } },
+                { userOne: { [Op.ne]: userOne } }
             ]
         },
     });
+
+    if (match) {
+        match.userTwo = userOne;
+        match.socketIdTwo = socketIdOne;
+        await match.save();
+    }
+    return match;
 }
 
 export async function deleteMatch(user) {
@@ -61,16 +58,15 @@ export async function deleteMatch(user) {
     })
 }
 
-export async function updateMatch(userOne, userTwo, userTwoSocketId, createdAt, isPending) {
-    return await MatchModel.update({
-        userTwo: userTwo,
-        userTwoSocketId: userTwoSocketId,
-        createdAt: createdAt,
-        isPending: isPending
-    },
-        {
-            where: {
-                userOne: userOne
-            }
-        })
+export async function updateMatch(userOne, match) {
+    const user = await MatchModel.findOne({
+        where: {
+            userOne: { [Op.eq]: userOne }
+        }
+    });
+
+    user.userTwo = match.userOne;
+    user.socketIdTwo = match.socketIdOne;
+    await user.save();
+    return;
 }

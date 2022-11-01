@@ -3,7 +3,8 @@ import {
     ormFindJoinableMatches as _findJoinableMatches,
     ormGetAllMatch as _getAllMatch,
     ormDeleteMatch as _deleteMatch,
-    ormUpdateMatch as _updateMatch
+    ormFindMatch as _findMatch
+    // ormUpdateMatch as _updateMatch
 } from "../model/match-orm.js";
 import { io, users } from "../index.js"
 import moment from "moment";
@@ -15,34 +16,26 @@ export async function getAllMatch() {
 
 export async function createMatch(params) {
     try {
-        const { userOne, socketId, difficulty, createdAt } = params;
-        if (userOne && difficulty && socketId && createdAt) {
+        const { userOne, difficulty, socketIdOne } = params;
+        if (userOne && difficulty && socketIdOne) {
 
             // create pending match for user
-            const newMatch = await _createMatch(userOne, null, difficulty, socketId, null, createdAt, true);
+            console.log('Creating match for ', userOne);
+            const newMatch = await _createMatch(userOne, null, difficulty, socketIdOne, null);
 
-            if (newMatch) {
-                console.log("Created new pending match");
-            } else {
+            if (!newMatch) {
                 io.emit('error-match', { message: 'Could not create a new pending match!' });
                 return;
             }
-
-            // find a match for the pending match
-            console.log({ difficulty, createdAt })
-            const match = await _findJoinableMatches(userOne, difficulty, createdAt);
-            console.log(match);
+            const match = await _findJoinableMatches(userOne, socketIdOne, difficulty);
+            // if there is a valid match, both userOne and the match's records is updated with each other's username and socketId
             if (match) {
                 // join match for both users
                 console.log(`Found a match ${match.userOne} with socketId ${match.socketIdOne} for difficulty ${match.difficulty} for user ${userOne}`)
-                await _updateMatch(userOne, match.userOne, match.socketIdOne, moment().format("YYYY-MM-DD HH:mm:ss"), false);
-
-                // delete match's pending entry
-                await _deleteMatch(match.userOne)
 
                 // add to same room
                 const roomName = getRoomName(userOne, match.userOne);
-                const addUserToRoom = await addToRoom(socketId, match.socketIdOne, roomName);
+                const addUserToRoom = await addToRoom(socketIdOne, match.socketIdOne, roomName);
                 if (addUserToRoom) {
                     console.log(`Successfully add ${userOne} and ${match.userOne} to room!`);
                 } else {
@@ -62,25 +55,25 @@ export async function createMatch(params) {
     }
 }
 
-async function findMatch(params) {
-    try {
-        const { userOne, difficulty, socketId, createdAt } = req.body;
-        if (userOne && difficulty && socketId && createdAt) {
-            const validMatch = await _findJoinableMatches(req.body);
+// async function findMatch(params) {
+//     try {
+//         const { userOne, difficulty, socketId, createdAt } = req.body;
+//         if (userOne && difficulty && socketId && createdAt) {
+//             const validMatch = await _findJoinableMatches(req.body);
 
-            if (validMatch) {
-                //join room for user and match
-                return res.status(201).json({ message: "Found a match" });
-            } else {
-                return res.status(400).json({ message: "Could not find a match!" });
-            }
-        } else {
-            return res.status(400).json({ message: "Missing args" })
-        }
-    } catch (err) {
-        return res.status(500).json({ message: "Server error when finding match!" })
-    }
-}
+//             if (validMatch) {
+//                 //join room for user and match
+//                 return res.status(201).json({ message: "Found a match" });
+//             } else {
+//                 return res.status(400).json({ message: "Could not find a match!" });
+//             }
+//         } else {
+//             return res.status(400).json({ message: "Missing args" })
+//         }
+//     } catch (err) {
+//         return res.status(500).json({ message: "Server error when finding match!" })
+//     }
+// }
 
 function getRoomName(userOne, userTwo) {
     const roomname = userOne + "_" + userTwo;
