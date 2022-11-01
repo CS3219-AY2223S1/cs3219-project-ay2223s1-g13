@@ -35,11 +35,11 @@ export async function ormChangePassword(username, newPassword) {
 }
 
 export async function ormDeleteUser(username) {
-  try {
-      await deleteUser(username);
-      return true;
-  } catch (err) {
-      console.log('ERROR: Could not delete user');
-      return { err };
-  }
+    try {
+        await deleteUser(username);
+        return true;
+    } catch (err) {
+        console.log('ERROR: Could not delete user');
+        return { err };
+    }
 }

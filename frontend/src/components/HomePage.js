@@ -25,7 +25,7 @@ import { URL_USER_SVC, URL_CHECK_TOKEN, URL_CHANGE_PASSWORD } from "../configs";
 import { STATUS_OK, difficulties } from "../constants";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
-  return <Slide direction="up" ref={ref} {...props} />;
+    return <Slide direction="up" ref={ref} {...props} />;
 });
 
 
@@ -140,7 +140,11 @@ function HomePage() {
         setWaitingDialog(false)
         setNoMatchDialog(true)
         clearInterval(timer)
-        socket.emit('cancelmatch', {user: sessionStorage.getItem("username")})
+        removeOverdueMatch();
+    }
+
+    const removeOverdueMatch = () => {
+        socket.emit('cancelmatch', { user: sessionStorage.getItem("username") })
     }
 
     const handleStart = () => {
@@ -210,7 +214,7 @@ function HomePage() {
             <Container maxWidth="md" component="main">
                 <Grid container justifyContent="center" spacing={1}>
                     {difficulties.map((difficulty) => {
-                        return <Button onClick={() => {setSelectedDifficulty(difficulty); startMatching(difficulty)}} size="large" key={difficulty}>
+                        return <Button onClick={() => { setSelectedDifficulty(difficulty); startMatching(difficulty) }} size="large" key={difficulty}>
                             {difficulty}
                         </Button>
                     })}
@@ -273,32 +277,32 @@ function HomePage() {
                 </DialogActions>
             </Dialog>
 
-            <Dialog open={isWaitingDialog} onClose={(e, r) => { if (r !== "backdropClick") {setWaitingDialog(false)}}} TransitionComponent={Transition}>
+            <Dialog open={isWaitingDialog} onClose={(e, r) => { if (r !== "backdropClick") { setWaitingDialog(false) } }} TransitionComponent={Transition}>
                 <DialogContent>
                     <Stack spacing={2} p={1}>
                         <Stack spacing={1}>
                             <Typography variant="h4">Finding a Match...</Typography>
                             <Typography variant="h6">Selected Difficulty: {selectedDifficulty}</Typography>
                         </Stack>
-                        <LinearProgress variant="determinate" value={(30 - timeLeft)/30 * 100}/>
+                        <LinearProgress variant="determinate" value={(30 - timeLeft) / 30 * 100} />
                         <Typography variant="h6">{timeLeft} seconds left</Typography>
-                        <Button onClick={() => {setTimeLeft(0); endMatching()}}>Stop</Button>
+                        <Button onClick={() => { setTimeLeft(0); endMatching() }}>Stop</Button>
                     </Stack>
                 </DialogContent>
             </Dialog>
 
-            <Dialog open={isNoMatchDialog} onClose={(e, r) => { if (r !== "backdropClick") {setNoMatchDialog(false)}}} TransitionComponent={Transition}>
+            <Dialog open={isNoMatchDialog} onClose={(e, r) => { if (r !== "backdropClick") { setNoMatchDialog(false) } }} TransitionComponent={Transition}>
                 <DialogContent>
                     <Stack spacing={1} p={1} alignItems="center" justifyContent="center">
                         <Typography variant="h5">No Match Found</Typography>
                         <Typography variant="h6">Select another difficulty or try again later!</Typography>
-                        <Button onClick={() => setNoMatchDialog(false)}>Close</Button>
+                        <Button onClick={() => { setNoMatchDialog(false); removeOverdueMatch(); }}>Close</Button>
                     </Stack>
                 </DialogContent>
             </Dialog>
 
             <Dialog open={isMatchedDialog} onClose={(e, r) => { if (r !== "backdropClick") { navigate('/room') } }} TransitionComponent={Transition}>
-                <DialogTitle>Yay🎉</DialogTitle>                
+                <DialogTitle>Yay🎉</DialogTitle>
                 <DialogContent>
                     <DialogContentText>{dialogMsg}</DialogContentText>
                 </DialogContent>

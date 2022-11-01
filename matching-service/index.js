@@ -56,7 +56,7 @@ io.on("connection", (socket) => {
     });
 
     socket.on("cancelmatch", (params) => {
-        params["socketId"] = socket.id;
+        // params["socketId"] = socket.id;
         deleteMatch(params)
         console.log(params['user'] + "Cancelled")
     });
