@@ -26,15 +26,7 @@ export const MatchModel = sequelize.define("MatchModel", {
         type: DataTypes.STRING,
         required: true,
         allowNull: true,
-    },
-    createdAt: {
-        type: DataTypes.DATE,
-        defaultValue: Date.now(),
-    },
-    isPending: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-    },
+    }
 });
 
 sequelize

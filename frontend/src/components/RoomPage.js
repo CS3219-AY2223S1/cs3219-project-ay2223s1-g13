@@ -20,6 +20,7 @@ import "./RoomPage.css"
 
 function RoomPage() {
     const socket = io('http://localhost:8003');
+    const matchsocket = io("ws://localhost:8001", { transports: ['websocket'] });
     const navigate = useNavigate();
 
     const [isFirstConnect, setIsFirstConnect] = useState(true);
@@ -86,20 +87,26 @@ function RoomPage() {
 
     const handleFirstExit = () => {
         socket.emit("exit", { roomId: sessionStorage.getItem("roomId") });
+        removeMatch();
         sessionStorage.removeItem('roomId');
         navigate('/home');
     }
 
     const handleSecondExit = () => {
+        removeMatch();
         sessionStorage.removeItem('roomId');
         navigate('/home');
     }
 
+    const removeMatch = () => {
+        matchsocket.emit('removematch', { user: sessionStorage.getItem("username") });
+    }
+
     const section = {
-        width:"210%",
+        width: "210%",
         paddingTop: 5,
         backgroundColor: "#fff"
-      };
+    };
 
     return (
         <Box>

@@ -28,6 +28,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
+const socket = io("ws://localhost:8001", { transports: ['websocket'] })
 
 function HomePage() {
     const [isDialogOpen, setIsDialogOpen] = useState(false)
@@ -41,11 +42,12 @@ function HomePage() {
     const [isDeleteSuccessDialogOpen, setDeleteSuccessDialogOpen] = useState(false)
     const [isChangePasswordDialogOpen, setChangePasswordDialogOpen] = useState(false)
     const [isChangeSuccessOpen, setChangeSuccessOpen] = useState(false)
-    const socket = io("ws://localhost:8001", { transports: ['websocket'] })
+    const [isConnected, setIsConnected] = useState(socket.connected);
     const [isWaitingDialog, setWaitingDialog] = useState(false)
     const [isMatchedDialog, setMatchedDialog] = useState(false)
     const [isNoMatchDialog, setNoMatchDialog] = useState(false)
-    const [selectedDifficulty, setSelectedDifficulty] = useState("")
+    const [selectedDifficulty, setSelectedDifficulty] = useState("");
+    const [selectedDifficultyAvail, setSelectedDifficultyAvail] = useState(false);
     const navigate = useNavigate()
 
     const [timeLeft, setTimeLeft] = useState(10)
@@ -69,7 +71,30 @@ function HomePage() {
     useEffect(() => {
         // Update the document title using the browser API
         checkLoggedIn()
+        setSelectedDifficultyAvail(false)
     });
+
+    useEffect(() => {
+        socket.on('connect', () => {
+            setIsConnected(true);
+        });
+
+        socket.on('disconnect', () => {
+            setIsConnected(false);
+        });
+
+        return () => {
+            socket.off('connect');
+            socket.off('disconnect');
+        };
+    }, []);
+
+    useEffect(() => {
+        if (selectedDifficultyAvail) {
+            startMatching();
+            setSelectedDifficulty(false);
+        }
+    }, [selectedDifficulty]);
 
     const setConfirmDialog = (msg) => {
         setIsDialogOpen(true)
@@ -119,7 +144,8 @@ function HomePage() {
     }
 
     const startMatching = () => {
-        var userDetails = {
+        // setSelectedDifficulty(difficulty);
+        let userDetails = {
             "userOne": sessionStorage.getItem("username"),
             "difficulty": selectedDifficulty
         }
@@ -144,7 +170,7 @@ function HomePage() {
     }
 
     const removeOverdueMatch = () => {
-        socket.emit('cancelmatch', { user: sessionStorage.getItem("username") })
+        socket.emit('removematch', { user: sessionStorage.getItem("username") });
     }
 
     const handleStart = () => {
@@ -214,7 +240,7 @@ function HomePage() {
             <Container maxWidth="md" component="main">
                 <Grid container justifyContent="center" spacing={1}>
                     {difficulties.map((difficulty) => {
-                        return <Button onClick={() => { setSelectedDifficulty(difficulty); startMatching(difficulty) }} size="large" key={difficulty}>
+                        return <Button onClick={() => { setSelectedDifficultyAvail(true); setSelectedDifficulty(difficulty); }} size="large" key={difficulty}>
                             {difficulty}
                         </Button>
                     })}
