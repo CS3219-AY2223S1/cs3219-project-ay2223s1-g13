@@ -1,0 +1,74 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  deploy-user:
+    runs-on: ubuntu-latest
+    environment: user-service
+    env:
+      IMAGE_NAME: gcr.io/codeus-367813/zixin448/g13-codeus-user:latest
+    defaults:
+      run:
+        working-directory: "user-service"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Google Auth
+        id: auth
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: ${{secrets.GCP_CREDENTIALS}}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+
+      - name: Authorise Docker push
+        run: gcloud auth configure-docker gcr.io
+
+      - name: Build Docker image
+        run: docker build . -t $IMAGE_NAME
+
+      - name: Push Docker image
+        run: docker push $IMAGE_NAME
+
+      - name: Deploy Docker image
+        run: gcloud run deploy user-service --image $IMAGE_NAME --region us-central1 --platform managed --allow-unauthenticated
+
+  deploy-matching:
+    runs-on: ubuntu-latest
+    environment: matching-service
+    env:
+      IMAGE_NAME: cr.io/codeusmatching/zixin448/g13-codeus-matching:latest
+    defaults:
+      run:
+        working-directory: "matching-service"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Google Auth
+        id: auth
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: ${{secrets.GCP_CREDENTIALS}}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+
+      - name: Authorise Docker push
+        run: gcloud auth configure-docker gcr.io
+
+      - name: Build Docker image
+        run: docker build . -t $IMAGE_NAME
+
+      - name: Push Docker image
+        run: docker push $IMAGE_NAME
+
+      - name: Deploy Docker image
+        run: gcloud run deploy matching-service --image $IMAGE_NAME --region us-central1 --platform managed --allow-unauthenticated
