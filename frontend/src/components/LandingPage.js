@@ -16,10 +16,12 @@ const HomePage = () => {
       });
     
       const checkLoggedIn = async () => {
-        const res = await axios.post(URL_CHECK_TOKEN, { token: sessionStorage.getItem("accessToken") })
+        if (sessionStorage.getItem("accessToken")) {
+            const res = await axios.post(URL_CHECK_TOKEN, { token: sessionStorage.getItem("accessToken") });
 
-        if (res.status === STATUS_OK) {
-          navigate('/home')
+            if (res.status === STATUS_OK) {
+            navigate('/home')
+            }
         }
       }
 

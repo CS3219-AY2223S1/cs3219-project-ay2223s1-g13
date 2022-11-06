@@ -2,9 +2,9 @@ import { where } from "sequelize";
 import { MatchModel } from "./match-model.js";
 import { createMatch, findJoinableMatches, getAllMatch, deleteMatch, updateMatch } from "./repository.js";
 
-export async function ormCreateMatch(userOne, userTwo, difficulty, socketIdOne, socketIdTwo, createdAt, isPending) {
+export async function ormCreateMatch(userOne, userTwo, difficulty, socketIdOne, socketIdTwo) {
     try {
-        await createMatch({ userOne, userTwo, difficulty, socketIdOne, socketIdTwo, createdAt, isPending });
+        await createMatch({ userOne, userTwo, difficulty, socketIdOne, socketIdTwo });
         return true;
     } catch (err) {
         console.log("ERROR: Could not create new match ", err);
@@ -22,9 +22,9 @@ export async function ormGetAllMatch() {
     }
 }
 
-export async function ormFindMatch(user) {
+export async function ormFindMatch(userOne, socketIdOne) {
     try {
-        await findMatch(user.username);
+        await findMatch(userOne, socketIdOne);
         return true;
     } catch (err) {
         console.log("ERROR: Could not check for existing match");
@@ -32,9 +32,15 @@ export async function ormFindMatch(user) {
     }
 }
 
-export async function ormFindJoinableMatches(userOne, difficulty, createdAt) {
+export async function ormFindJoinableMatches(userOne, socketIdOne, difficulty) {
     try {
-        return await findJoinableMatches(userOne, difficulty, createdAt);
+        const match = await findJoinableMatches(userOne, socketIdOne, difficulty);
+
+        if (match) {
+            await updateMatch(userOne, match);
+            return match;
+        }
+        return false;
     } catch (err) {
         console.log("ERROR: Could not find matches");
         return { err };
@@ -51,12 +57,12 @@ export async function ormDeleteMatch(user) {
     }
 }
 
-export async function ormUpdateMatch(userOne, userTwo, userTwoSocketId, createdAt, isPending) {
-    try {
-        await updateMatch(userOne, userTwo, userTwoSocketId, createdAt, isPending);
-        return true;
-    } catch (err) {
-        console.log("ERROR: Could not update match");
-        return { err };
-    }
-}
+// export async function ormUpdateMatch(userOne, userTwo, userTwoSocketId, createdAt, isPending) {
+//     try {
+//         await updateMatch(userOne, userTwo, userTwoSocketId, createdAt, isPending);
+//         return true;
+//     } catch (err) {
+//         console.log("ERROR: Could not update match");
+//         return { err };
+//     }
+// }

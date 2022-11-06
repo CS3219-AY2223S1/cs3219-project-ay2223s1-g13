@@ -1,12 +1,12 @@
-import {BrowserRouter as Router, Routes, Route, Navigate} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Box } from "@mui/material";
+
+import LandingPage from "./components/LandingPage";
 import HomePage from './components/HomePage';
-import {Box} from "@mui/material";
-import DifficultySelector from "./components/Matching/DifficultySelector/DifficultySelector";
-import RoomPage from "./components/RoomPage";
 import SignInPage from "./components/SignInPage";
 import SignUpPage from "./components/SignUpPage";
-import LandingPage from "./components/LandingPage"
-
+import RoomPage from "./components/RoomPage";
+import CodeEditor from "./components/CodeEditor";
 
 function App() {
     return (
@@ -18,9 +18,9 @@ function App() {
                         <Route path="/signin" element={<SignInPage/>}/>
                         <Route path="/signup" element={<SignUpPage/>}/>
                         <Route path="/home" element={<HomePage/>}/> 
-                        <Route path="/difficulty_test" element={<DifficultySelector/>}/>
                         <Route path="/room" element={<RoomPage/>}/>
-
+                        <Route path="/test" element={<CodeEditor room_id="test"/>}/>
+                        <Route path="/test2" element={<CodeEditor room_id="test2"/>}/>
                     </Routes>
                 </Router>
             </Box>

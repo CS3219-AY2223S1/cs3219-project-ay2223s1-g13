@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { createMatch, getAllMatch } from "./controller/match-controller.js";
+import { createMatch, getAllMatch, deleteMatch } from "./controller/match-controller.js";
 import moment from "moment";
 
 const PORT = 8001;
@@ -40,7 +40,7 @@ io.on("connection", (socket) => {
     }
     users.push(user);
 
-    console.log(`New Client connected ${socket.id}`);
+    // console.log(`New Client connected ${socket.id}`);
 
     // see all match items
     socket.on("get", () => {
@@ -49,10 +49,14 @@ io.on("connection", (socket) => {
 
     // call to create match
     socket.on("match", (params) => {
-        params["socketId"] = socket.id;
-        params["createdAt"] = moment().format("YYYY-MM-DD HH:mm:ss")
-        console.log(params.createdAt)
+        params["socketIdOne"] = socket.id;
         createMatch(params);
+    });
+
+    socket.on("removematch", (params) => {
+        // params["socketId"] = socket.id;
+        deleteMatch(params)
+        console.log(params['user'] + "Cancelled")
     });
 
     socket.on("start", (params) => {
