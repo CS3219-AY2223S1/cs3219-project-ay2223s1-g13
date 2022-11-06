@@ -5,13 +5,14 @@ import {
 
 export async function createHistory(req, res) {
     try {
-        const { username, matchedUsername, difficulty, question } = req.body;
-        if (username && matchedUsername && difficulty && question) {
+        const { username, matchedUsername, difficulty, question, questionId } = req.body;
+        if (username && matchedUsername && difficulty && question && questionId) {
             const resp = await _createHistory(
                 username,
                 matchedUsername,
                 difficulty,
-                question
+                question,
+                questionId
             );
             if (resp.err) {
                 return res.status(400).json({

@@ -1,8 +1,8 @@
 import { createHistory, getHistories } from "./repository.js";
 
-export async function ormCreateHistory(username, matchedUsername, difficulty, question) {
+export async function ormCreateHistory(username, matchedUsername, difficulty, question, questionId) {
     try {
-        const newHistory = await createHistory({username, matchedUsername, difficulty, question});
+        const newHistory = await createHistory({username, matchedUsername, difficulty, question, questionId});
         newHistory.save(err => {
             if (err) console.log(err);
         })

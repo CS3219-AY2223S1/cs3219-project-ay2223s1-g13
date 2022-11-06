@@ -303,6 +303,21 @@ function HomePage() {
                     })}
                 </Grid>
             </Container>
+            <Container disableGutters maxWidth="sm" component="main" sx={{ pt: 8, pb: 6 }}>
+                <Typography
+                    component="h1"
+                    variant="h2"
+                    align="center"
+                    color="text.primary"
+                    gutterBottom
+                >
+                    Select Your Difficulty
+                </Typography>
+                <Typography variant="h5" align="center" color="text.secondary" component="p">
+                    Match with someone online and get start coding! If there are no available opponents,
+                    we will let you know within 30 seconds.
+                </Typography>
+            </Container>
             <Dialog
                 open={isDialogOpen}
                 onClose={closeDialog}

@@ -18,6 +18,10 @@ const HistoryModelSchema = new Schema({
         type: String,
         required: true,
     },
+    questionId: {
+        type: Schema.Types.ObjectId,
+        required: true,
+    }
 });
 
 export default mongoose.model("HistoryModel", HistoryModelSchema);
