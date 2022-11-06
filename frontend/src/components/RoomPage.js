@@ -19,7 +19,7 @@ import { fetchQuestion } from "./Question/api";
 import "./RoomPage.css"
 
 function RoomPage() {
-    const socket = io('http://localhost:8003');
+    const socket = io('https://collaboration-service-4crgpcigjq-uc.a.run.app');
     const matchsocket = io("wss://matching-service-au7tawfmmq-uc.a.run.app", { transports: ['websocket'] });
     const navigate = useNavigate();
 
