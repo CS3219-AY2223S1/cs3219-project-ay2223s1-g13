@@ -80,7 +80,7 @@ jobs:
       IMAGE_NAME: gcr.io/codeusquestion/zixin448/g13-codeus-question:latest
     defaults:
       run:
-        working-directory: "question-service"
+        working-directory: "question_service"
     steps:
       - name: Checkout
         uses: actions/checkout@v3
