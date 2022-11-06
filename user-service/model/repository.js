@@ -5,7 +5,6 @@ import 'dotenv/config'
 import mongoose from 'mongoose';
 
 let mongoDB = process.env.ENV == "PROD" ? process.env.DB_CLOUD_URI : process.env.DB_LOCAL_URI;
-
 mongoose.connect(mongoDB, { useNewUrlParser: true, useUnifiedTopology: true });
 
 let db = mongoose.connection;
@@ -21,7 +20,7 @@ export async function findUser(username) {
 
 
 export async function deleteUser(username) {
-  return UserModel.find({username: username}).remove().exec()
+  return UserModel.find({ username: username }).remove().exec()
 }
 
 export async function changePassword(username, newPassword) {

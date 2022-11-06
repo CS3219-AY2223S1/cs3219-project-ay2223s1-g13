@@ -1,0 +1,44 @@
+.navbar {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    box-shadow: 0px 1px 10px 1px var(--gray);
+}
+a {
+    text-decoration: none;
+    color: black;
+    transition: 0.2s;
+}
+a:hover {
+    text-decoration: none;
+    color: rgb(73, 71, 71);
+    transform: scale(1.02);
+}
+div > a {
+    margin-right: 2vw;
+    font-weight: bold;
+}
+
+.underLine2 {
+    color: rgb(112, 108, 108);
+    transition: 10s;
+    display: inline-block;
+    position: relative;
+}
+.underLine2:after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: #d83838;
+    transform-origin: bottom right;
+    transition: transform 0.25s ease-in-out;
+}
+.underLine2:hover:after {
+    transform: scaleX(0.9);
+    transform-origin: bottom left;
+}

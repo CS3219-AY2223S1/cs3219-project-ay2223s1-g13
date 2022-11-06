@@ -10,7 +10,10 @@ let UserModelSchema = new Schema({
     },
     password: {
         type: String,
-        required: true,
+        required: true
+    },
+    token: {
+        type: String
     }
 })
 
