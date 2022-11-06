@@ -1,4 +1,4 @@
-import { createHistory, getHistories } from "./repository";
+import { createHistory, getHistories } from "./repository.js";
 
 export async function ormCreateHistory(username, matchedUsername, difficulty, question) {
     try {
