@@ -76,12 +76,13 @@ function RoomPage() {
         const usernames = room_id.split("_");
         const difficulty = sessionStorage.getItem("difficulty");
         const questionName = question.title;
-
+        const questionId = question.id;
         await axios.post(URL_HISTORY_SVC, {
             username: usernames[0], 
             matchedUsername: usernames[1],
             difficulty,
-            question: questionName
+            question: questionName,
+            questionId
         })
 
     }
