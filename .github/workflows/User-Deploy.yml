@@ -106,8 +106,7 @@ jobs:
       - name: Deploy Docker image
         run: gcloud run deploy question-service --image $IMAGE_NAME --region us-central1 --platform managed --allow-unauthenticated
 
-
-  deploy-question:
+  deploy-collaboration:
     runs-on: ubuntu-latest
     environment: collaboration-service
     env:
