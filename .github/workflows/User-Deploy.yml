@@ -44,7 +44,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: matching-service
     env:
-      IMAGE_NAME: cr.io/codeusmatching/zixin448/g13-codeus-matching:latest
+      IMAGE_NAME: gcr.io/codeusmatching/zixin448/g13-codeus-matching:latest
     defaults:
       run:
         working-directory: "matching-service"
