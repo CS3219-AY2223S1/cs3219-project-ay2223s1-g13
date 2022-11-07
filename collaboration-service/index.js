@@ -36,6 +36,10 @@ io.on("connection", (socket) => {
         socket.to(params.roomId).emit('receive other question', params.question);
     })
 
+    socket.on('sendmessage', (params) => {
+        socket.to(params.roomId).emit('receivemessage', {sender: params.sender, message: params.message});
+    })
+
     socket.on('exit', (params) => {
         socket.to(params.roomId).emit('partner exit');
     })
