@@ -131,6 +131,20 @@ function RoomPage() {
         )
     }
 
+    const handleNewUserMessage = (newMessage) => {
+        socket.emit('sendmessage', { 
+            roomId: sessionStorage.getItem("roomId"), 
+            sender: sessionStorage.getItem("username"),
+            message: newMessage 
+        });
+    }
+
+    socket.on("receivemessage", (params) => {
+        if (params.sender !== sessionStorage.getItem("username")) {
+            addResponseMessage(params.message);
+        }
+    })
+
     return (
         <Box>
             <IconButton onClick={handleExit}>
