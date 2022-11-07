@@ -34,8 +34,9 @@ export async function createMatch(params) {
                 console.log(`Found a match ${match.userOne} with socketId ${match.socketIdOne} for difficulty ${match.difficulty} for user ${userOne}`)
 
                 // add to same room
+                const questionId = await getQuestionId(difficulty)
                 const roomName = getRoomName(userOne, match.userOne);
-                const addUserToRoom = await addToRoom(socketIdOne, match.socketIdOne, roomName);
+                const addUserToRoom = await addToRoom(socketIdOne, match.socketIdOne, roomName, questionId);
                 if (addUserToRoom) {
                     console.log(`Successfully add ${userOne} and ${match.userOne} to room!`);
                 } else {
@@ -55,32 +56,20 @@ export async function createMatch(params) {
     }
 }
 
-// async function findMatch(params) {
-//     try {
-//         const { userOne, difficulty, socketId, createdAt } = req.body;
-//         if (userOne && difficulty && socketId && createdAt) {
-//             const validMatch = await _findJoinableMatches(req.body);
-
-//             if (validMatch) {
-//                 //join room for user and match
-//                 return res.status(201).json({ message: "Found a match" });
-//             } else {
-//                 return res.status(400).json({ message: "Could not find a match!" });
-//             }
-//         } else {
-//             return res.status(400).json({ message: "Missing args" })
-//         }
-//     } catch (err) {
-//         return res.status(500).json({ message: "Server error when finding match!" })
-//     }
-// }
+export async function getQuestionId(difficulty) {
+    const question_url = process.env.QUESTION_SVC || "https://question-service-sg7kdn2zna-uc.a.run.app";
+    const questionId = await fetch(question_url+"/api/question?difficulty="+difficulty)
+                        .then(response => response.json())
+                        .then(response => response.question[0]._id);
+    return questionId;
+}
 
 function getRoomName(userOne, userTwo) {
     const roomname = userOne + "_" + userTwo;
     return roomname;
 }
 
-async function addToRoom(userOneSocketId, userTwoSocketId, roomName) {
+async function addToRoom(userOneSocketId, userTwoSocketId, roomName, questionId) {
     const userOne = users.filter(user => user.socketId == userOneSocketId);
     const userTwo = users.filter(user => user.socketId == userTwoSocketId);
     const socketOne = userOne[0]["socket"];
@@ -88,8 +77,8 @@ async function addToRoom(userOneSocketId, userTwoSocketId, roomName) {
     socketOne.join(roomName);
     socketTwo.join(roomName);
     // emit event to userone and userTwo
-    io.to(userOneSocketId).emit('matchSuccess', { roomId: roomName })
-    io.to(userTwoSocketId).emit('matchSuccess', { roomId: roomName })
+    io.to(userOneSocketId).emit('matchSuccess', { roomId: roomName, questionId: questionId })
+    io.to(userTwoSocketId).emit('matchSuccess', { roomId: roomName, questionId: questionId })
     return io.sockets.adapter.rooms.get(roomName).size == 2;
 }
 

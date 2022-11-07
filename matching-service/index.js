@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { createMatch, getAllMatch, deleteMatch } from "./controller/match-controller.js";
+import { createMatch, getAllMatch, deleteMatch, getQuestionId } from "./controller/match-controller.js";
 import moment from "moment";
 
 const PORT = 8001;
