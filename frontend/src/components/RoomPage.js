@@ -17,6 +17,8 @@ import { Box } from "@mui/system";
 import { fetchQuestion } from "./Question/api";
 
 import "./RoomPage.css"
+import axios from "axios";
+import { URL_HISTORY_SVC } from "../configs";
 
 function RoomPage() {
     const socket = io('https://collaboration-service-4crgpcigjq-uc.a.run.app');
@@ -60,6 +62,7 @@ function RoomPage() {
         setIsBSet(true);
 
         if (isASet && isBSet) {
+            updateHistory(questionA)
             if (questionA.id > questionB.id) {
                 setQuestion(questionA);
             } else {
@@ -67,6 +70,22 @@ function RoomPage() {
             }
         }
     }, [questionA, questionB])
+
+    const updateHistory = async (question) => {
+        const room_id = sessionStorage.getItem("roomId");
+        const usernames = room_id.split("_");
+        const difficulty = sessionStorage.getItem("difficulty");
+        const questionName = question.title;
+        const questionId = question.id;
+        await axios.post(URL_HISTORY_SVC, {
+            username: usernames[0], 
+            matchedUsername: usernames[1],
+            difficulty,
+            question: questionName,
+            questionId
+        })
+
+    }
 
     const receiveQuestion = () => {
         socket.on("receive other question", (data) => {
