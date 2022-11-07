@@ -186,6 +186,7 @@ function HomePage() {
             setDialogTitle('Matched')
             setDialogMsg("You have found a match!")
             sessionStorage.setItem("roomId", args[0].roomId)
+            sessionStorage.setItem("questionId", args[0].questionId)
             sessionStorage.setItem("difficulty", selectedDifficulty)
         })
     }
