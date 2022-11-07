@@ -28,11 +28,8 @@ function RoomPage() {
     const [isFirstConnect, setIsFirstConnect] = useState(true);
     const [exitDialogOpen, setExitDialogOpen] = useState(false);
     const [partnerExitedDialogOpen, setPartnerExitedDialogOpen] = useState(false);
-    const [questionA, setQuestionA] = useState({});
-    const [questionB, setQuestionB] = useState({});
-    const [isASet, setIsASet] = useState(false);
-    const [isBSet, setIsBSet] = useState(false);
-    const [question, setQuestion] = useState({});
+    const [questions, setQuestions] = useState([]);
+    const [chosenQuestion, setChosenQuestion] = useState(0);
 
     useEffect(() => {
         if (isFirstConnect) {
@@ -42,13 +39,14 @@ function RoomPage() {
     }, [isFirstConnect, socket]);
 
     useEffect(() => {
-        const _fetchQuestion = async (id) => {
-            const res = await fetchQuestion(id);
-            setQuestion(res);
+        const _fetchQuestions = async (ids) => {
+            const firstQuestion = await fetchQuestion(ids[0]);
+            const secondQuestion = await fetchQuestion(ids[1]);
+            setQuestions([firstQuestion, secondQuestion]);
         };
 
-        const id = sessionStorage.getItem("questionId");
-        _fetchQuestion(id);
+        const ids = sessionStorage.getItem("questionIds").split(",");
+        _fetchQuestions(ids);
 
        
     }, [])
@@ -76,19 +74,6 @@ function RoomPage() {
 
     }
 
-    const receiveQuestion = () => {
-        socket.on("receive other question", (data) => {
-            setQuestionB(data);
-        })
-        if (questionB !== {}) {
-            setIsBSet(true)
-        }
-    }
-
-    const exchangeQuestion = () => {
-        socket.emit("exchange question", { roomId: sessionStorage.getItem("roomId"), question: questionA });
-    }
-
     socket.on("partner exit", () => {
         setPartnerExitedDialogOpen(true);
     });
@@ -110,6 +95,26 @@ function RoomPage() {
         matchsocket.emit('removematch', { user: sessionStorage.getItem("username") });
     }
 
+    const displayQuestions = () => {
+        return (
+            <div>
+                <div style={{display: "flex", justifyContent: "space-around", alignItems:"flex-end"}}>
+                    <div className={`question_selector  ${chosenQuestion == 0 ? "question_selector_selected":""}`} 
+                        onClick={() => setChosenQuestion(0)}
+                    >
+                        # 1
+                    </div>
+                    <div className={`question_selector ${chosenQuestion == 1 ? "question_selector_selected":""}`} 
+                        onClick={() => setChosenQuestion(1)}
+                    >
+                        # 2
+                    </div>
+                </div>
+                <Question {...questions[chosenQuestion]} />
+            </div>
+        )
+    }
+
     return (
         <Box>
             <IconButton onClick={() => setExitDialogOpen(true)}>
@@ -117,7 +122,9 @@ function RoomPage() {
                 <Typography variant='h5'>Exit</Typography>
             </IconButton>
             <Stack pt={2}>
-                <Question {...question} />
+                {   questions.length > 1 && 
+                    displayQuestions()
+                }
                 <CodeEditor room_id={sessionStorage.getItem("roomId")} ></CodeEditor>
             </Stack>
 

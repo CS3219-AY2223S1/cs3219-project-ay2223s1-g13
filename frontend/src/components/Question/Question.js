@@ -16,7 +16,7 @@ function Question({ title, body }) {
                 <Section
                     // title={selectedQuestion.title}
                     title={title}
-                    width={"98%"}
+                    width={"97.5%"}
                     // subTitle={selectedQuestion.difficulty}
                     subTitle={difficulty}
                     subTitleColor={
