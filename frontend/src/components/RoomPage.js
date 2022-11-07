@@ -5,6 +5,7 @@ import {
     Grid,
     IconButton,
     Stack,
+    TextField,
     Typography
 } from "@mui/material";
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
@@ -19,6 +20,10 @@ import { fetchQuestion } from "./Question/api";
 import "./RoomPage.css"
 import axios from "axios";
 import { URL_HISTORY_SVC } from "../configs";
+
+import { Widget, addResponseMessage, dropMessages, isWidgetOpened, toggleWidget, renderCustomComponent } from 'react-chat-widget';
+
+import 'react-chat-widget/lib/styles.css';
 
 function RoomPage() {
     const socket = io('https://collaboration-service-4crgpcigjq-uc.a.run.app');
@@ -91,7 +96,6 @@ function RoomPage() {
             question: questionName,
             questionId
         })
-
     }
 
     const receiveQuestion = () => {
@@ -109,17 +113,29 @@ function RoomPage() {
 
     socket.on("partner exit", () => {
         setPartnerExitedDialogOpen(true);
+        if (isWidgetOpened()) {
+            toggleWidget();
+        }
     });
+
+    const handleExit = () => {
+        if (isWidgetOpened()) {
+            toggleWidget();
+        }
+        setExitDialogOpen(true);
+    }
 
     const handleFirstExit = () => {
         socket.emit("exit", { roomId: sessionStorage.getItem("roomId") });
         removeMatch();
+        dropMessages();
         sessionStorage.removeItem('roomId');
         navigate('/home');
     }
 
     const handleSecondExit = () => {
         removeMatch();
+        dropMessages();
         sessionStorage.removeItem('roomId');
         navigate('/home');
     }
@@ -128,15 +144,29 @@ function RoomPage() {
         matchsocket.emit('removematch', { user: sessionStorage.getItem("username") });
     }
 
+    const handleNewUserMessage = (newMessage) => {
+        socket.emit('sendmessage', { 
+            roomId: sessionStorage.getItem("roomId"), 
+            sender: sessionStorage.getItem("username"),
+            message: newMessage 
+        });
+    }
+
+    socket.on("receivemessage", (params) => {
+        if (params.sender !== sessionStorage.getItem("username")) {
+            addResponseMessage(params.message);
+        }
+    })
+
     return (
         <Box>
-            <IconButton onClick={() => setExitDialogOpen(true)}>
+            <IconButton onClick={handleExit}>
                 <ArrowBackIosIcon />
                 <Typography variant='h5'>Exit</Typography>
             </IconButton>
             <Stack pt={2}>
                 <Question {...question} />
-
+                
                 <CodeEditor room_id={sessionStorage.getItem("roomId")} style={{ width: 500 }}></CodeEditor>
             </Stack>
 
@@ -160,6 +190,13 @@ function RoomPage() {
                     </Stack>
                 </DialogContent>
             </Dialog>
+
+            <Widget 
+                handleNewUserMessage={handleNewUserMessage}
+                title="Chat"
+                subtitle="Discuss the question here!"
+                emojis={true}
+            />
         </Box>
     );
 }
