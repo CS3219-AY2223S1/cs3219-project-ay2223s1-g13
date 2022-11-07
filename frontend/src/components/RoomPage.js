@@ -42,34 +42,16 @@ function RoomPage() {
     }, [isFirstConnect, socket]);
 
     useEffect(() => {
-        const _fetchQuestion = async (difficulty) => {
-            const res = await fetchQuestion(difficulty);
-            return res;
+        const _fetchQuestion = async (id) => {
+            const res = await fetchQuestion(id);
+            setQuestion(res);
         };
 
-        if (!isASet) {
-            _fetchQuestion(sessionStorage.getItem("difficulty")).then((ques) => {
-                setQuestionA(ques)
-                socket.emit("exchange question", { roomId: sessionStorage.getItem("roomId"), question: ques });
-            })
-        }
-        setIsASet(true);
+        const id = sessionStorage.getItem("questionId");
+        _fetchQuestion(id);
 
-        if (!isBSet) {
-            exchangeQuestion();
-            receiveQuestion();
-        }
-        setIsBSet(true);
-
-        if (isASet && isBSet) {
-            updateHistory(questionA)
-            if (questionA.id > questionB.id) {
-                setQuestion(questionA);
-            } else {
-                setQuestion(questionB);
-            }
-        }
-    }, [questionA, questionB])
+       
+    }, [])
 
     const updateHistory = async (question) => {
         const room_id = sessionStorage.getItem("roomId");
@@ -136,8 +118,7 @@ function RoomPage() {
             </IconButton>
             <Stack pt={2}>
                 <Question {...question} />
-
-                <CodeEditor room_id={sessionStorage.getItem("roomId")} style={{ width: 500 }}></CodeEditor>
+                <CodeEditor room_id={sessionStorage.getItem("roomId")} ></CodeEditor>
             </Stack>
 
             <Dialog open={exitDialogOpen} onClose={() => setExitDialogOpen(false)}>

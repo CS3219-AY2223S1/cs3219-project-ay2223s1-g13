@@ -1,4 +1,4 @@
-import { createQuestion, findQuestion } from "./repository.js"
+import { createQuestion, findQuestion, findQuestionId } from "./repository.js"
 
 export async function ormCreateQuestion(title, body, difficulty) {
     try {
@@ -16,6 +16,16 @@ export async function ormCreateQuestion(title, body, difficulty) {
 export async function ormFindQuestion(difficulty) {
     try {
         const question = await findQuestion(difficulty)
+        return question;
+    } catch (err) {
+        console.log("ERROR: Database error");
+        return { err };
+    }
+}
+
+export async function ormFindQuestionById(id) {
+    try {
+        const question = await findQuestionId(id)
         return question;
     } catch (err) {
         console.log("ERROR: Database error");

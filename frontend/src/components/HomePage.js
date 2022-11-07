@@ -25,6 +25,7 @@ import { URL_USER_SVC, URL_CHECK_TOKEN, URL_CHANGE_PASSWORD, URL_HISTORY_SVC } f
 import { STATUS_OK, difficulties } from "../constants";
 
 import "./HomePage.css"
+import Section from "./common/Section/Section";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -109,10 +110,9 @@ function HomePage() {
         })
         const histories = res.data.history
         setHistories(histories);
-        const difficultiesSolved = histories.map(history => history.difficulty);
-        const easySolved = (difficultiesSolved.filter(difficulty => difficulty==="Easy").filter(onlyUnique)).length;
-        const mediumSolved = (difficultiesSolved.filter(difficulty => difficulty ==="Medium").filter(onlyUnique)).length;
-        const hardSolved = (difficultiesSolved.filter(difficulty => difficulty ==="Hard").filter(onlyUnique)).length;
+        const easySolved = (histories.filter(history => history.difficulty==="Easy").map((history) => history.question).filter(onlyUnique)).length;
+        const mediumSolved = (histories.filter(history => history.difficulty ==="Medium").map((history) => history.question).filter(onlyUnique)).length;
+        const hardSolved = (histories.filter(history => history.difficulty ==="Hard").map((history) => history.question).filter(onlyUnique)).length;
         setQuestionsSolved({easy: easySolved, medium: mediumSolved, hard: hardSolved})
     }
 
@@ -186,6 +186,7 @@ function HomePage() {
             setDialogTitle('Matched')
             setDialogMsg("You have found a match!")
             sessionStorage.setItem("roomId", args[0].roomId)
+            sessionStorage.setItem("questionId", args[0].questionId)
             sessionStorage.setItem("difficulty", selectedDifficulty)
         })
     }
@@ -246,9 +247,18 @@ function HomePage() {
         const borderColor = difficulty == "Easy" ? ("var(--green)") : (difficulty == "Medium" ? "var(--yellow)": "red")
         return (
             <div className="history_row" style={{border: `0.25rem solid ${borderColor}`}}>
-                <div>Practiced with: {matchedUsername}</div>
-                <div>Level: {difficulty}</div>
-                <div>Question: {question}</div>
+                <div className="history_section">
+                    <div className="history_label">With:</div>
+                    <div className="history_value">{matchedUsername}</div>
+                </div>
+                <div className="history_section">
+                    <div className="history_label">Level:</div>
+                    <div className="history_value">{difficulty}</div>
+                </div>
+                <div className="history_section">
+                    <div className="history_label">Question:</div>
+                    <div className="history_value">{question}</div>
+                </div>
             </div>
         )
     }
@@ -312,29 +322,24 @@ function HomePage() {
             <Container maxWidth="md" component="main">
                 <Grid container justifyContent="center" spacing={1}>
                     {difficulties.map((difficulty) => {
-                        return <Button onClick={() => { setSelectedDifficultyAvail(true); setSelectedDifficulty(difficulty); }} size="large" key={difficulty}>
+                        return <div className={`difficulty_button difficulty_button_${difficulty}`} 
+                                    onClick={() => { setSelectedDifficultyAvail(true); setSelectedDifficulty(difficulty); }} 
+                                    size="large" 
+                                    key={difficulty}
+                                >
                             {difficulty}
-                        </Button>
+                        </div>
                     })}
                 </Grid>
             </Container>
             <Container disableGutters maxWidth="md" component="main" sx={{ pt: 8, pb: 6 }}>
-                <Typography
-                    component="h1"
-                    variant="h2"
-                    align="center"
-                    color="text.primary"
-                    gutterBottom
-                >
-                    Your Previous Preparations
-                </Typography>
-                <Typography variant="h5" align="center" color="text.secondary" component="p">
+                <Section title={"Previous Attempts"} width={"100%"}>
                     <div>
                         {histories.map((history) => {
                             return displayHistory(history);
                         })}
                     </div>
-                </Typography>
+                </Section>
             </Container>
             <Dialog
                 open={isDialogOpen}
