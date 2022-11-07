@@ -24,6 +24,8 @@ import { io } from "socket.io-client";
 import { URL_USER_SVC, URL_CHECK_TOKEN, URL_CHANGE_PASSWORD, URL_HISTORY_SVC } from "../configs";
 import { STATUS_OK, difficulties } from "../constants";
 
+import "./HomePage.css"
+
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -50,6 +52,8 @@ function HomePage() {
     const [waitingDifficulty, setWaitingDifficulty] = useState("");
     const [selectedDifficultyAvail, setSelectedDifficultyAvail] = useState(false);
     const [questionsSolved, setQuestionsSolved] = useState({easy: 0, medium: 0, hard: 0})
+    const [histories, setHistories] = useState([])
+
     const navigate = useNavigate()
 
     const [timeLeft, setTimeLeft] = useState(10)
@@ -104,12 +108,11 @@ function HomePage() {
             }
         })
         const histories = res.data.history
-        console.log(histories)
+        setHistories(histories);
         const difficultiesSolved = histories.map(history => history.difficulty);
         const easySolved = (difficultiesSolved.filter(difficulty => difficulty==="Easy").filter(onlyUnique)).length;
         const mediumSolved = (difficultiesSolved.filter(difficulty => difficulty ==="Medium").filter(onlyUnique)).length;
         const hardSolved = (difficultiesSolved.filter(difficulty => difficulty ==="Hard").filter(onlyUnique)).length;
-        console.log(easySolved)
         setQuestionsSolved({easy: easySolved, medium: mediumSolved, hard: hardSolved})
     }
 
@@ -211,29 +214,41 @@ function HomePage() {
         return (
             <div style={{display: "flex"}}>
                 <div style={{paddingRight: "0.5vw"}}>
-                    <div>Prepared: </div>
+                    <div>Solved: </div>
                 </div>
-                <div style={{display: "flex", alignItems: "center", paddingRight: "0.5vw"}}>
-                    <div style={{width: "1vw", height: "1vw", background: "var(--green)", borderRadius: "99%"}}>
+                <div style={{display: "flex", alignItems: "center", paddingRight: "0.75vw"}}>
+                    <div style={{width: "0.75vw", height: "0.75vw", background: "var(--green)", borderRadius: "99%"}}>
                     </div>
-                    <div>
+                    <div style={{paddingLeft: "0.25vw"}}>
                         {questionsSolved.easy}
                     </div>
                 </div>  
-                <div style={{display: "flex", alignItems: "center", paddingRight: "0.5vw"}}>
-                    <div style={{width: "1vw", height: "1vw", background: "var(--yellow)",  borderRadius: "99%"}}>
+                <div style={{display: "flex", alignItems: "center", paddingRight: "0.75vw"}}>
+                    <div style={{width: "0.75vw", height: "0.75vw",  background: "var(--yellow)",  borderRadius: "99%"}}>
                     </div>
-                    <div>
+                    <div style={{paddingLeft: "0.25vw"}}>
                         {questionsSolved.medium}
                     </div>
                 </div>  
                 <div style={{display: "flex", alignItems: "center"}}>
-                    <div style={{width: "1vw", height: "1vw", background: "red",  borderRadius: "99%"}}>
+                    <div style={{width: "0.75vw", height: "0.75vw",  background: "red",  borderRadius: "99%"}}>
                     </div>
-                    <div>
+                    <div style={{paddingLeft: "0.25vw"}}>
                         {questionsSolved.hard}
                     </div>
                 </div>  
+            </div>
+        )
+    }
+
+    const displayHistory = (history) => {
+        const {matchedUsername, difficulty, question} = history;
+        const borderColor = difficulty == "Easy" ? ("var(--green)") : (difficulty == "Medium" ? "var(--yellow)": "red")
+        return (
+            <div className="history_row" style={{border: `0.25rem solid ${borderColor}`}}>
+                <div>Practiced with: {matchedUsername}</div>
+                <div>Level: {difficulty}</div>
+                <div>Question: {question}</div>
             </div>
         )
     }
@@ -303,7 +318,7 @@ function HomePage() {
                     })}
                 </Grid>
             </Container>
-            <Container disableGutters maxWidth="sm" component="main" sx={{ pt: 8, pb: 6 }}>
+            <Container disableGutters maxWidth="md" component="main" sx={{ pt: 8, pb: 6 }}>
                 <Typography
                     component="h1"
                     variant="h2"
@@ -311,11 +326,14 @@ function HomePage() {
                     color="text.primary"
                     gutterBottom
                 >
-                    Select Your Difficulty
+                    Your Previous Preparations
                 </Typography>
                 <Typography variant="h5" align="center" color="text.secondary" component="p">
-                    Match with someone online and get start coding! If there are no available opponents,
-                    we will let you know within 30 seconds.
+                    <div>
+                        {histories.map((history) => {
+                            return displayHistory(history);
+                        })}
+                    </div>
                 </Typography>
             </Container>
             <Dialog
