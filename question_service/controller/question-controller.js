@@ -54,7 +54,7 @@ export async function findQuestionById(req, res) {
     try {
         const { id } = req.query;
         if (id) {
-            const question = await _findQuestionById(difficulty);
+            const question = await _findQuestionById(id);
             return res
                 .status(202)
                 .json({ message: "Found a question", question: question });
@@ -63,7 +63,7 @@ export async function findQuestionById(req, res) {
                 message: "Provide Id of the question",
             });
         }
-    } catch {
+    } catch(err) {
         return res
             .status(500)
             .json({ message: "Server error when finding a question!" });
