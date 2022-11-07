@@ -21,7 +21,7 @@ import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { io } from "socket.io-client";
 
-import { URL_USER_SVC, URL_CHECK_TOKEN, URL_CHANGE_PASSWORD } from "../configs";
+import { URL_USER_SVC, URL_CHECK_TOKEN, URL_CHANGE_PASSWORD, URL_HISTORY_SVC } from "../configs";
 import { STATUS_OK, difficulties } from "../constants";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -49,6 +49,7 @@ function HomePage() {
     const [selectedDifficulty, setSelectedDifficulty] = useState("");
     const [waitingDifficulty, setWaitingDifficulty] = useState("");
     const [selectedDifficultyAvail, setSelectedDifficultyAvail] = useState(false);
+    const [questionsSolved, setQuestionsSolved] = useState({easy: 0, medium: 0, hard: 0})
     const navigate = useNavigate()
 
     const [timeLeft, setTimeLeft] = useState(10)
@@ -84,11 +85,33 @@ function HomePage() {
             setIsConnected(false);
         });
 
+        fetchQuestionsSolved();
+
         return () => {
             socket.off('connect');
             socket.off('disconnect');
         };
     }, []);
+
+    const onlyUnique = (value, index, self) => {
+        return self.indexOf(value) === index;
+    }
+
+    const fetchQuestionsSolved = async () => {
+        const res = await axios.get(URL_HISTORY_SVC, {
+            params: { 
+                username: sessionStorage.getItem("username") 
+            }
+        })
+        const histories = res.data.history
+        console.log(histories)
+        const difficultiesSolved = histories.map(history => history.difficulty);
+        const easySolved = (difficultiesSolved.filter(difficulty => difficulty==="Easy").filter(onlyUnique)).length;
+        const mediumSolved = (difficultiesSolved.filter(difficulty => difficulty ==="Medium").filter(onlyUnique)).length;
+        const hardSolved = (difficultiesSolved.filter(difficulty => difficulty ==="Hard").filter(onlyUnique)).length;
+        console.log(easySolved)
+        setQuestionsSolved({easy: easySolved, medium: mediumSolved, hard: hardSolved})
+    }
 
     useEffect(() => {
         if (selectedDifficultyAvail) {
@@ -184,6 +207,37 @@ function HomePage() {
         navigate('/room');
     });
 
+    const displayQuestionsSolved = () => {
+        return (
+            <div style={{display: "flex"}}>
+                <div style={{paddingRight: "0.5vw"}}>
+                    <div>Prepared: </div>
+                </div>
+                <div style={{display: "flex", alignItems: "center", paddingRight: "0.5vw"}}>
+                    <div style={{width: "1vw", height: "1vw", background: "var(--green)", borderRadius: "99%"}}>
+                    </div>
+                    <div>
+                        {questionsSolved.easy}
+                    </div>
+                </div>  
+                <div style={{display: "flex", alignItems: "center", paddingRight: "0.5vw"}}>
+                    <div style={{width: "1vw", height: "1vw", background: "var(--yellow)",  borderRadius: "99%"}}>
+                    </div>
+                    <div>
+                        {questionsSolved.medium}
+                    </div>
+                </div>  
+                <div style={{display: "flex", alignItems: "center"}}>
+                    <div style={{width: "1vw", height: "1vw", background: "red",  borderRadius: "99%"}}>
+                    </div>
+                    <div>
+                        {questionsSolved.hard}
+                    </div>
+                </div>  
+            </div>
+        )
+    }
+
     return (
         <React.Fragment>
             <AppBar
@@ -192,6 +246,7 @@ function HomePage() {
                 sx={{ borderBottom: (theme) => `1px solid ${theme.palette.divider}` }}>
                 <Toolbar sx={{ flexWrap: 'wrap' }}>
                     <Typography variant="h6" color="inherit" noWrap sx={{ flexGrow: 1 }}>Welcome Back, {sessionStorage.getItem("username")}</Typography>
+                    {displayQuestionsSolved()}
                     <nav>
                         <Link
                             variant="button"
@@ -247,6 +302,21 @@ function HomePage() {
                         </Button>
                     })}
                 </Grid>
+            </Container>
+            <Container disableGutters maxWidth="sm" component="main" sx={{ pt: 8, pb: 6 }}>
+                <Typography
+                    component="h1"
+                    variant="h2"
+                    align="center"
+                    color="text.primary"
+                    gutterBottom
+                >
+                    Select Your Difficulty
+                </Typography>
+                <Typography variant="h5" align="center" color="text.secondary" component="p">
+                    Match with someone online and get start coding! If there are no available opponents,
+                    we will let you know within 30 seconds.
+                </Typography>
             </Container>
             <Dialog
                 open={isDialogOpen}
