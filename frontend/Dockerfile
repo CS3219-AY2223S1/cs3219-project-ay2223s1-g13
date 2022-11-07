@@ -8,7 +8,7 @@ FROM node:lts-alpine as builder
 # CMD [ "npm", "start" ]
 
 COPY package.json ./
-RUN npm install
+RUN npm install --legacy-peer-deps
 RUN mkdir /app-ui
 RUN mv ./node_modules ./app-ui
 WORKDIR /app-ui
