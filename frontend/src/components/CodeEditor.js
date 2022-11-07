@@ -3,7 +3,7 @@ import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import * as Y from 'yjs';
 import { QuillBinding } from 'y-quill';
-import { WebsocketProvider } from "y-websocket";
+import { WebrtcProvider } from 'y-webrtc';
 
 const CodeEditor = (props) => {
     let reactQuillRef = null;
@@ -14,7 +14,7 @@ const CodeEditor = (props) => {
         const ydoc = new Y.Doc()
         const ytext = ydoc.getText('quill')
         const binding = new QuillBinding(ytext, quillRef)
-        const provider = new WebsocketProvider('ws://127.0.01:8003', props.room_id, ydoc)
+        const provider = new WebrtcProvider(props.room_id, ydoc)
     }, [])
 
     const modules = {

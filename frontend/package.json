@@ -20,7 +20,6 @@
     "web-vitals": "^2.1.4",
     "y-quill": "^0.1.5",
     "y-webrtc": "^10.2.3",
-    "y-websocket": "^1.4.5",
     "yjs": "^13.5.42"
   },
   "scripts": {
