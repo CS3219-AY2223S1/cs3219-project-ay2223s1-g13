@@ -136,8 +136,7 @@ function RoomPage() {
             </IconButton>
             <Stack pt={2}>
                 <Question {...question} />
-
-                <CodeEditor room_id={sessionStorage.getItem("roomId")} style={{ width: 500 }}></CodeEditor>
+                <CodeEditor room_id={sessionStorage.getItem("roomId")} ></CodeEditor>
             </Stack>
 
             <Dialog open={exitDialogOpen} onClose={() => setExitDialogOpen(false)}>
