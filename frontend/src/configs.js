@@ -1,6 +1,6 @@
 const URI_USER_SVC = process.env.URI_USER_SVC || 'https://user-service-e2rvjs4unq-uc.a.run.app'
 const URI_QUESTION_SVC = process.env.URI_QUESTION_SVC || 'https://question-service-sg7kdn2zna-uc.a.run.app'
-const URI_HISTORY_SVC = process.env.URI_HISTORY_SVC || "http://localhost:8005"
+const URI_HISTORY_SVC = process.env.URI_HISTORY_SVC || "https://history-service-e4js2cqizq-uc.a.run.app"
 
 
 const PREFIX_USER_SVC = '/api/user'
