@@ -84,6 +84,13 @@ function RoomPage() {
             question: questionName,
             questionId
         })
+        await axios.post(URL_HISTORY_SVC, {
+            username: usernames[1], 
+            matchedUsername: usernames[0],
+            difficulty,
+            question: questionName,
+            questionId
+        })
 
     }
 
