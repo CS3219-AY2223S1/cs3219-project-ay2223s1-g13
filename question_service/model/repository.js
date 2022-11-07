@@ -23,3 +23,7 @@ export async function findQuestion(difficulty) {
         { $sample: { size: 1 } },
     ]);
 }
+
+export async function findQuestionId(id) {
+    return QuestionModel.findById(id);
+}

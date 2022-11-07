@@ -1,6 +1,7 @@
 import {
     ormCreateQuestion as _createQuestion,
     ormFindQuestion as _findQuestion,
+    ormFindQuestionById as _findQuestionById,
 } from "../model/question-orm.js";
 
 export async function createQuestion(req, res) {
@@ -40,6 +41,26 @@ export async function findQuestion(req, res) {
         } else {
             return res.status(400).json({
                 message: "Enter the difficulty level for the problem",
+            });
+        }
+    } catch {
+        return res
+            .status(500)
+            .json({ message: "Server error when finding a question!" });
+    }
+}
+
+export async function findQuestionById(req, res) {
+    try {
+        const { id } = req.query;
+        if (id) {
+            const question = await _findQuestionById(difficulty);
+            return res
+                .status(202)
+                .json({ message: "Found a question", question: question });
+        } else {
+            return res.status(400).json({
+                message: "Provide Id of the question",
             });
         }
     } catch {
