@@ -21,8 +21,8 @@ import axios from "axios";
 import { URL_HISTORY_SVC } from "../configs";
 
 function RoomPage() {
-    const socket = io('http://localhost:8003');
-    const matchsocket = io("ws://localhost:8001", { transports: ['websocket'] });
+    const socket = io('https://collaboration-service-4crgpcigjq-uc.a.run.app');
+    const matchsocket = io("wss://matching-service-au7tawfmmq-uc.a.run.app", { transports: ['websocket'] });
     const navigate = useNavigate();
 
     const [isFirstConnect, setIsFirstConnect] = useState(true);
@@ -129,7 +129,7 @@ function RoomPage() {
             </IconButton>
             <Stack pt={2}>
                 <Question {...question} />
-                
+
                 <CodeEditor room_id={sessionStorage.getItem("roomId")} style={{ width: 500 }}></CodeEditor>
             </Stack>
 

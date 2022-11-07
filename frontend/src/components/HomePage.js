@@ -28,7 +28,7 @@ const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
 
-const socket = io("ws://localhost:8001", { transports: ['websocket'] })
+const socket = io("wss://matching-service-au7tawfmmq-uc.a.run.app", { transports: ['websocket'] })
 
 function HomePage() {
     const [isDialogOpen, setIsDialogOpen] = useState(false)
