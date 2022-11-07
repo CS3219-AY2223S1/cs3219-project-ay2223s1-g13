@@ -20,7 +20,7 @@ import "./RoomPage.css"
 
 function RoomPage() {
     const socket = io('http://localhost:8003');
-    const matchsocket = io("ws://localhost:8001", { transports: ['websocket'] });
+    const matchsocket = io("wss://matching-service-au7tawfmmq-uc.a.run.app", { transports: ['websocket'] });
     const navigate = useNavigate();
 
     const [isFirstConnect, setIsFirstConnect] = useState(true);
