@@ -2,7 +2,7 @@ import express from "express";
 import cors from "cors";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import { createMatch, getAllMatch, deleteMatch } from "./controller/match-controller.js";
+import { createMatch, getAllMatch, deleteMatch, getQuestionId } from "./controller/match-controller.js";
 import moment from "moment";
 
 const PORT = 8001;
@@ -25,7 +25,7 @@ app.get("/", (req, res) => {
 export const io = new Server(httpServer, {
     /* options */
     cors: {
-        origin: "http://localhost:3000",
+        origin: "https://frontend-66acladbaq-uc.a.run.app",
         methods: ["GET", "POST"],
     },
 });

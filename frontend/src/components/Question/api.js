@@ -1,14 +1,12 @@
 import axios from "axios";
-import { URL_QUESTION_SVC } from "../../configs";
+import { URL_GET_ID_QUESTION } from "../../configs";
 
-export const fetchQuestion = async (difficulty) => {
-    const res = await axios.get(URL_QUESTION_SVC, {
-        params: { difficulty: difficulty },
-    });
+export const fetchQuestion = async (id) => {
+    const res = await axios.get(URL_GET_ID_QUESTION+`?id=${id}`);
     const filtered = {
-        title: res.data.question[0].title,
-        body: res.data.question[0].body,
-        id: res.data.question[0]._id
+        title: res.data.question.title,
+        body: res.data.question.body,
+        id: res.data.question._id
     };
     return filtered;
 };

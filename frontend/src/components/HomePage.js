@@ -24,6 +24,9 @@ import { io } from "socket.io-client";
 import { URL_USER_SVC, URL_CHECK_TOKEN, URL_CHANGE_PASSWORD, URL_HISTORY_SVC } from "../configs";
 import { STATUS_OK, difficulties } from "../constants";
 
+import "./HomePage.css"
+import Section from "./common/Section/Section";
+
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
 });
@@ -50,6 +53,8 @@ function HomePage() {
     const [waitingDifficulty, setWaitingDifficulty] = useState("");
     const [selectedDifficultyAvail, setSelectedDifficultyAvail] = useState(false);
     const [questionsSolved, setQuestionsSolved] = useState({easy: 0, medium: 0, hard: 0})
+    const [histories, setHistories] = useState([])
+
     const navigate = useNavigate()
 
     const [timeLeft, setTimeLeft] = useState(10)
@@ -104,12 +109,10 @@ function HomePage() {
             }
         })
         const histories = res.data.history
-        console.log(histories)
-        const difficultiesSolved = histories.map(history => history.difficulty);
-        const easySolved = (difficultiesSolved.filter(difficulty => difficulty==="Easy").filter(onlyUnique)).length;
-        const mediumSolved = (difficultiesSolved.filter(difficulty => difficulty ==="Medium").filter(onlyUnique)).length;
-        const hardSolved = (difficultiesSolved.filter(difficulty => difficulty ==="Hard").filter(onlyUnique)).length;
-        console.log(easySolved)
+        setHistories(histories);
+        const easySolved = (histories.filter(history => history.difficulty==="Easy").map((history) => history.question).filter(onlyUnique)).length;
+        const mediumSolved = (histories.filter(history => history.difficulty ==="Medium").map((history) => history.question).filter(onlyUnique)).length;
+        const hardSolved = (histories.filter(history => history.difficulty ==="Hard").map((history) => history.question).filter(onlyUnique)).length;
         setQuestionsSolved({easy: easySolved, medium: mediumSolved, hard: hardSolved})
     }
 
@@ -183,6 +186,7 @@ function HomePage() {
             setDialogTitle('Matched')
             setDialogMsg("You have found a match!")
             sessionStorage.setItem("roomId", args[0].roomId)
+            sessionStorage.setItem("questionId", args[0].questionId)
             sessionStorage.setItem("difficulty", selectedDifficulty)
         })
     }
@@ -211,29 +215,50 @@ function HomePage() {
         return (
             <div style={{display: "flex"}}>
                 <div style={{paddingRight: "0.5vw"}}>
-                    <div>Prepared: </div>
+                    <div>Solved: </div>
                 </div>
-                <div style={{display: "flex", alignItems: "center", paddingRight: "0.5vw"}}>
-                    <div style={{width: "1vw", height: "1vw", background: "var(--green)", borderRadius: "99%"}}>
+                <div style={{display: "flex", alignItems: "center", paddingRight: "0.75vw"}}>
+                    <div style={{width: "0.75vw", height: "0.75vw", background: "var(--green)", borderRadius: "99%"}}>
                     </div>
-                    <div>
+                    <div style={{paddingLeft: "0.25vw"}}>
                         {questionsSolved.easy}
                     </div>
                 </div>  
-                <div style={{display: "flex", alignItems: "center", paddingRight: "0.5vw"}}>
-                    <div style={{width: "1vw", height: "1vw", background: "var(--yellow)",  borderRadius: "99%"}}>
+                <div style={{display: "flex", alignItems: "center", paddingRight: "0.75vw"}}>
+                    <div style={{width: "0.75vw", height: "0.75vw",  background: "var(--yellow)",  borderRadius: "99%"}}>
                     </div>
-                    <div>
+                    <div style={{paddingLeft: "0.25vw"}}>
                         {questionsSolved.medium}
                     </div>
                 </div>  
                 <div style={{display: "flex", alignItems: "center"}}>
-                    <div style={{width: "1vw", height: "1vw", background: "red",  borderRadius: "99%"}}>
+                    <div style={{width: "0.75vw", height: "0.75vw",  background: "red",  borderRadius: "99%"}}>
                     </div>
-                    <div>
+                    <div style={{paddingLeft: "0.25vw"}}>
                         {questionsSolved.hard}
                     </div>
                 </div>  
+            </div>
+        )
+    }
+
+    const displayHistory = (history) => {
+        const {matchedUsername, difficulty, question} = history;
+        const borderColor = difficulty == "Easy" ? ("var(--green)") : (difficulty == "Medium" ? "var(--yellow)": "red")
+        return (
+            <div className="history_row" style={{border: `0.25rem solid ${borderColor}`}}>
+                <div className="history_section">
+                    <div className="history_label">With:</div>
+                    <div className="history_value">{matchedUsername}</div>
+                </div>
+                <div className="history_section">
+                    <div className="history_label">Level:</div>
+                    <div className="history_value">{difficulty}</div>
+                </div>
+                <div className="history_section">
+                    <div className="history_label">Question:</div>
+                    <div className="history_value">{question}</div>
+                </div>
             </div>
         )
     }
@@ -297,26 +322,24 @@ function HomePage() {
             <Container maxWidth="md" component="main">
                 <Grid container justifyContent="center" spacing={1}>
                     {difficulties.map((difficulty) => {
-                        return <Button onClick={() => { setSelectedDifficultyAvail(true); setSelectedDifficulty(difficulty); }} size="large" key={difficulty}>
+                        return <div className={`difficulty_button difficulty_button_${difficulty}`} 
+                                    onClick={() => { setSelectedDifficultyAvail(true); setSelectedDifficulty(difficulty); }} 
+                                    size="large" 
+                                    key={difficulty}
+                                >
                             {difficulty}
-                        </Button>
+                        </div>
                     })}
                 </Grid>
             </Container>
-            <Container disableGutters maxWidth="sm" component="main" sx={{ pt: 8, pb: 6 }}>
-                <Typography
-                    component="h1"
-                    variant="h2"
-                    align="center"
-                    color="text.primary"
-                    gutterBottom
-                >
-                    Select Your Difficulty
-                </Typography>
-                <Typography variant="h5" align="center" color="text.secondary" component="p">
-                    Match with someone online and get start coding! If there are no available opponents,
-                    we will let you know within 30 seconds.
-                </Typography>
+            <Container disableGutters maxWidth="md" component="main" sx={{ pt: 8, pb: 6 }}>
+                <Section title={"Previous Attempts"} width={"100%"}>
+                    <div>
+                        {histories.map((history) => {
+                            return displayHistory(history);
+                        })}
+                    </div>
+                </Section>
             </Container>
             <Dialog
                 open={isDialogOpen}
