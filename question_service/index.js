@@ -8,12 +8,12 @@ app.use(express.json())
 app.use(cors()) // config cors so that front-end can use
 app.options('*', cors())
 // import { createUser, loginUser, deleteUser, changePassword, authenticateToken } from './controller/user-controller.js';
-import { createQuestion, findQuestion, findQuestionById } from './controller/question-controller.js';
+import { createQuestion, findQuestions, findQuestionById } from './controller/question-controller.js';
 
 const router = express.Router()
 
 // Controller will contain all the User-defined Routes
-router.get('/', findQuestion)
+router.get('/', findQuestions)
 router.post('/', createQuestion)
 router.get('/id', findQuestionById)
 
