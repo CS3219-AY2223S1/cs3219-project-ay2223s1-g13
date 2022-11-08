@@ -26,6 +26,7 @@ import { STATUS_OK, difficulties } from "../constants";
 
 import "./HomePage.css"
 import Section from "./common/Section/Section";
+import { fetchQuestion } from "./Question/api";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -155,6 +156,10 @@ function HomePage() {
         if (res && res.status === STATUS_OK) {
             setDeleteDialogOpen(false)
             setDeleteSuccessDialogOpen(true)
+
+            // delete history for the user
+            const username = sessionStorage.getItem("username");
+            await axios.delete(`${URL_HISTORY_SVC}/?username=${username}`)
         }
     }
 
@@ -180,7 +185,7 @@ function HomePage() {
         setWaitingDifficulty(selectedDifficulty)
         setWaitingDialog(true)
         startTimer()
-        socket.on('matchSuccess', (...args) => {
+        socket.on('matchSuccess', async (...args) => {
             setWaitingDialog(false)
             setMatchedDialog(true)
             setDialogTitle('Matched')
@@ -188,6 +193,34 @@ function HomePage() {
             sessionStorage.setItem("roomId", args[0].roomId)
             sessionStorage.setItem("questionIds", args[0].questionIds)
             sessionStorage.setItem("difficulty", selectedDifficulty)
+        })
+    }
+
+    const getQuestions = async (ids) => {
+        const firstQuestion = await fetchQuestion(ids[0]);
+        const secondQuestion = await fetchQuestion(ids[1]);
+        return [firstQuestion,secondQuestion]
+    }
+
+    const updateHistory = async (question) => {
+        const room_id = sessionStorage.getItem("roomId");
+        const usernames = room_id.split("_");
+        const difficulty = sessionStorage.getItem("difficulty");
+        const questionName = question.title;
+        const questionId = question.id;
+        await axios.post(URL_HISTORY_SVC, {
+            username: usernames[0], 
+            matchedUsername: usernames[1],
+            difficulty,
+            question: questionName,
+            questionId
+        })
+        await axios.post(URL_HISTORY_SVC, {
+            username: usernames[1], 
+            matchedUsername: usernames[0],
+            difficulty,
+            question: questionName,
+            questionId
         })
     }
 
@@ -202,8 +235,14 @@ function HomePage() {
         socket.emit('removematch', { user: sessionStorage.getItem("username") });
     }
 
-    const handleStart = () => {
+    const handleStart = async () => {
         socket.emit('start', { roomId: sessionStorage.getItem("roomId") });
+        const ids = sessionStorage.getItem("questionIds").split(",");
+        const questions = await getQuestions(ids);
+            console.log(questions)
+            questions.forEach((question) => {
+                updateHistory(question);
+        })
         navigate('/room');
     };
 
