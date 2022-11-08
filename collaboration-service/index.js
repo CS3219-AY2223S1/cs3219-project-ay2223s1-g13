@@ -43,4 +43,8 @@ io.on("connection", (socket) => {
     socket.on('exit', (params) => {
         socket.to(params.roomId).emit('partner exit');
     })
+
+    socket.on('end', () => {
+        socket.disconnect();
+    })
 });

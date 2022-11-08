@@ -52,8 +52,6 @@ function RoomPage() {
 
         const ids = sessionStorage.getItem("questionIds").split(",");
         _fetchQuestions(ids);
-
-       
     }, [])
 
     const updateHistory = async (question) => {
@@ -94,6 +92,7 @@ function RoomPage() {
 
     const handleFirstExit = () => {
         socket.emit("exit", { roomId: sessionStorage.getItem("roomId") });
+        socket.emit("end");
         removeMatch();
         dropMessages();
         sessionStorage.removeItem('roomId');
@@ -103,6 +102,7 @@ function RoomPage() {
     const handleSecondExit = () => {
         removeMatch();
         dropMessages();
+        socket.emit("end");
         sessionStorage.removeItem('roomId');
         navigate('/home');
     }
