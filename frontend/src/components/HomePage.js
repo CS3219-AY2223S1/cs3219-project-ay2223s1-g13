@@ -52,6 +52,7 @@ function HomePage() {
     const [selectedDifficultyAvail, setSelectedDifficultyAvail] = useState(false);
     const [questionsSolved, setQuestionsSolved] = useState({easy: 0, medium: 0, hard: 0})
     const [histories, setHistories] = useState([])
+    const [matched, setMatched] = useState(0);
 
     const navigate = useNavigate()
 
@@ -124,10 +125,12 @@ function HomePage() {
                 sessionStorage.setItem("difficulty", selectedDifficulty)
                 const ids = args[0].questionIds;
                 const questions = await getQuestions(ids);
-                console.log(questions)
-                questions.forEach((question) => {
-                    updateHistory(question);
-                })
+                if(matched==0){
+                    questions.forEach((question) => {
+                        updateHistory(question);
+                    })
+                    setMatched(matched => matched + 1);
+                }
             })
         }
 
