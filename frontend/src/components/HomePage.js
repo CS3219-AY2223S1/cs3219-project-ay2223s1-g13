@@ -156,6 +156,10 @@ function HomePage() {
         if (res && res.status === STATUS_OK) {
             setDeleteDialogOpen(false)
             setDeleteSuccessDialogOpen(true)
+
+            // delete history for the user
+            const username = sessionStorage.getItem("username");
+            await axios.delete(`${URL_HISTORY_SVC}/?username=${username}`)
         }
     }
 
