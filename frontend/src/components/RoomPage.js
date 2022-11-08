@@ -8,7 +8,6 @@ import {
 } from "@mui/material";
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
 import Question from "./Question/Question";
-import CodeEditor from "./CodeEditor";
 import io from 'socket.io-client';
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
@@ -18,8 +17,13 @@ import { fetchQuestion } from "./Question/api";
 import "./RoomPage.css"
 
 import { Widget, addResponseMessage, dropMessages, isWidgetOpened, toggleWidget } from 'react-chat-widget';
-
 import 'react-chat-widget/lib/styles.css';
+
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import * as Y from 'yjs';
+import { QuillBinding } from 'y-quill';
+import { WebrtcProvider } from 'y-webrtc';
 
 function RoomPage() {
     const socket = io("http://localhost:8003");
@@ -32,6 +36,10 @@ function RoomPage() {
     const [partnerExitedDialogOpen, setPartnerExitedDialogOpen] = useState(false);
     const [questions, setQuestions] = useState([]);
     const [chosenQuestion, setChosenQuestion] = useState(0);
+
+    let reactQuillRef = null;
+    const provider = React.useRef(null);
+    const quillRef = React.useRef(null);
 
     useEffect(() => {
         if (isFirstConnect) {
@@ -81,6 +89,7 @@ function RoomPage() {
         removeMatch();
         dropMessages();
         socket.emit("end");
+        provider.current.destroy();
         sessionStorage.removeItem('roomId');
         sessionStorage.removeItem('questionIds');
         sessionStorage.removeItem('difficulty');
@@ -124,6 +133,25 @@ function RoomPage() {
         }
     })
 
+    React.useEffect(() => {
+        quillRef.current = reactQuillRef.getEditor();
+        const ydoc = new Y.Doc()
+        const ytext = ydoc.getText('quill')
+        new QuillBinding(ytext, quillRef.current)
+        provider.current = new WebrtcProvider(sessionStorage.getItem("roomId"), ydoc)
+    }, [reactQuillRef, provider])
+
+    const editorModules = {
+        toolbar: [
+            [{ size: [] }],
+            ['bold', 'italic', 'underline', 'strike',],
+            [
+                { indent: '-1' },
+                { indent: '+1' },
+            ],
+        ]
+    }
+
     return (
         <Box>
             <IconButton onClick={handleExit}>
@@ -134,7 +162,7 @@ function RoomPage() {
                 {   questions.length > 1 && 
                     displayQuestions()
                 }
-                <CodeEditor room_id={sessionStorage.getItem("roomId")} ></CodeEditor>
+                <ReactQuill ref={e => { reactQuillRef = e }} theme={'snow'} modules={editorModules} />
             </Stack>
 
             <Dialog open={exitDialogOpen} onClose={() => setExitDialogOpen(false)}>
