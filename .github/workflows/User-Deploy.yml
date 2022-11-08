@@ -7,6 +7,25 @@ on:
     branches: [main]
 
 jobs:
+  test-question:
+    runs-on: ubuntu-latest
+    defaults:
+        run:
+            working-directory: "question_service"
+
+    strategy:
+        matrix:
+            node-version: [15.x]
+
+    steps:
+        - uses: actions/checkout@v3
+        - name: Use Node.js ${{ matrix.node-version }}
+          uses: actions/setup-node@v3
+          with:
+              node-version: ${{ matrix.node-version }}
+        - run: npm ci
+        - run: npm test
+
   deploy-user:
     runs-on: ubuntu-latest
     environment: user-service
