@@ -12,7 +12,7 @@ export async function ormCreateQuestion(title, body, difficulty) {
         newQuestion.save((err) => {
             if (err) console.log(err);
         });
-        return true;
+        return newQuestion;
     } catch (err) {
         console.log("ERROR: Could not create new question");
         return { err };

@@ -17,6 +17,7 @@ export async function createQuestion(req, res) {
             } else {
                 return res.status(201).json({
                     message: `Created the question ${title} succesfully!`,
+                    id: resp._id
                 });
             }
         } else {

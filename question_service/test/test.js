@@ -14,7 +14,7 @@ const validQuestions = [
         difficulty: "Easy",
     },
     {
-        title: "Test Another Valid",
+        title: "Test Another Valid3",
         body: "This is only a problem to test",
         difficulty: "Easy",
     },
@@ -26,9 +26,10 @@ const invalidQuestion = {
 };
 
 describe("Question", () => {
+    let id = "";
     describe("POST /", () => {
-        beforeEach((done) => {
-            QuestionModel.remove({}, (err) => {
+        afterEach((done) => {
+            QuestionModel.deleteOne({ _id: id }, (err) => {
                 done();
             });
         });
@@ -46,6 +47,7 @@ describe("Question", () => {
                         .eql(
                             `Created the question ${questionToAdd.title} succesfully!`
                         );
+                    id = res.body.id;
                     done();
                 });
         });
@@ -68,13 +70,15 @@ describe("Question", () => {
     });
 
     describe("GET /id", () => {
-        beforeEach((done) => {
-            QuestionModel.remove({}, (err) => {
+        let id = "";
+        after((done) => {
+            QuestionModel.deleteOne({ _id: id }, () => {
                 done();
             });
         });
         it("should get the question added", (done) => {
-            const question = new QuestionModel(validQuestions[0]);
+            const question = new QuestionModel(validQuestions[1]);
+            id = question._id;
             question.save((err, question) => {
                 chai.request(app)
                     .get("/api/question/id?id=" + question.id)
@@ -94,12 +98,6 @@ describe("Question", () => {
     });
 
     describe("GET /", () => {
-        before((done) => {
-            const questions = validQuestions;
-            QuestionModel.create(questions, (err) => {
-                done();
-            });
-        });
         it("should get 2 questions with given difficulty", (done) => {
             const difficulty = "Easy";
             chai.request(app)
@@ -124,13 +122,8 @@ describe("Question", () => {
     });
 
     describe("DELETE /", () => {
-        before((done) => {
-            QuestionModel.remove({}, (err) => {
-                done();
-            });
-        });
         it("delete a task", (done) => {
-            const question = new QuestionModel(validQuestions[0]);
+            const question = new QuestionModel(validQuestions[1]);
             question.save((err, question) => {
                 chai.request(app)
                     .delete("/api/question/id?id=" + question.id)
