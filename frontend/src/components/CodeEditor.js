@@ -4,6 +4,7 @@ import 'react-quill/dist/quill.snow.css';
 import * as Y from 'yjs';
 import { QuillBinding } from 'y-quill';
 import { WebrtcProvider } from 'y-webrtc';
+import "./CodeEditor.css"
 
 const CodeEditor = (props) => {
     let reactQuillRef = null;
