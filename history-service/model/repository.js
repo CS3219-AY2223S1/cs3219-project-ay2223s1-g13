@@ -20,3 +20,7 @@ export async function createHistory(params) {
 export async function getHistories(username) {
     return HistoryModel.find({ username: username });
 }
+
+export async function deleteHistories(username) {
+    return HistoryModel.deleteMany({ username: username });
+}

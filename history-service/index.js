@@ -7,12 +7,13 @@ app.use(express.json())
 app.use(cors())
 app.options('*', cors())
 
-import { createHistory, getHistories } from "./controller/history-controller.js";
+import { createHistory, deleteHistories, getHistories } from "./controller/history-controller.js";
 
 const router = express.Router()
 
 router.get('/', getHistories)
 router.post('/', createHistory)
+router.delete('/', deleteHistories)
 
 app.use('/api/history', router).all((_, res) => {
     res.setHeader('content-type', 'application/json')
