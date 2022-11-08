@@ -7,6 +7,7 @@ import NavBar from "./common/Navbar/Navbar";
 import axios from "axios";
 import { STATUS_OK } from "../constants";
 import { URL_CHECK_TOKEN } from "../configs";
+import TypyingAnimation from "./common/TypingAnimated/TypingAnimation";
 
 const HomePage = () => {
     const navigate = useNavigate();
@@ -33,7 +34,7 @@ const HomePage = () => {
                     style={{
                         display: "flex",
                         paddingBottom: "5%",
-                        justifyContent: "space-around",
+                        justifyContent: "space-between",
                         backgroundColor: "white",
                     }}
                     className="Top_Area_Responsive"
@@ -47,9 +48,9 @@ const HomePage = () => {
                     >
                         <div
                             style={{
-                                marginTop: "5vh",
-                                fontSize: "50px",
-                                width: "35vw",
+                                marginTop: "10vh",
+                                fontSize: "3.5rem",
+                                width: "45vw",
                                 cursor: "pointer",
                             }}
                         >
@@ -70,13 +71,13 @@ const HomePage = () => {
                                     fontWeight: "100",
                                 }}
                             >
-                                Practice Live Coding
+                                <TypyingAnimation strings={["Code with peers", "Learn from them", "Repeat"]}/>
                             </span>
                             <div style={{}}>
                                 <Typography
                                     style={{
                                         width: "45vw",
-                                        fontSize: "30px",
+                                        fontSize: "2rem",
                                         margin: "auto",
                                         fontWeight: "lighter",
                                     }}
