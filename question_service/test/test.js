@@ -33,7 +33,7 @@ describe("Question", () => {
                 done();
             });
         });
-        it("should create the task", (done) => {
+        it("should create the question", (done) => {
             const questionToAdd = validQuestions[0];
             chai.request(app)
                 .post("/api/question")
@@ -52,7 +52,7 @@ describe("Question", () => {
                 });
         });
 
-        it("error for creating invalid task", (done) => {
+        it("error for creating invalid question", (done) => {
             const questionToAdd = invalidQuestion;
             chai.request(app)
                 .post("/api/question")
