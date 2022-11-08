@@ -141,7 +141,7 @@ function RoomPage() {
                 <DialogContent>
                     <Stack display='flex' alignItems='center' spacing={2}>
                         <Typography variant='body1'>Are you sure you want to exit?</Typography>
-                        <Stack spacing={1}>
+                        <Stack>
                             <Button variant='contained' onClick={handleFirstExit} color='error'>Exit</Button>
                             <Button onClick={() => setExitDialogOpen(false)} color="inherit">Cancel</Button>
                         </Stack>

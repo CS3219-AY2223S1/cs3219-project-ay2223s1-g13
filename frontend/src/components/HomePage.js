@@ -16,7 +16,7 @@ import {
     Toolbar,
     Typography
 } from "@mui/material";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { io } from "socket.io-client";
@@ -56,20 +56,7 @@ function HomePage() {
     const navigate = useNavigate()
 
     const [timeLeft, setTimeLeft] = useState(10)
-    var timer
-    const startTimer = () => {
-        setTimeLeft(30)
-        timer = setInterval(() => {
-            setTimeLeft((remaining) => {
-                if (remaining > 0) {
-                    return remaining - 1
-                } else {
-                    endMatching()
-                    return 0
-                }
-            });
-        }, 1000);
-    }
+    const timer = useRef(null)
 
     useEffect(() => {
         // Update the document title using the browser API
@@ -113,11 +100,43 @@ function HomePage() {
     }
 
     useEffect(() => {
+        const startMatching = () => {
+            let userDetails = {
+                "userOne": sessionStorage.getItem("username"),
+                "difficulty": selectedDifficulty
+            }
+            socket.emit('match', userDetails);
+            setWaitingDifficulty(selectedDifficulty)
+            setWaitingDialog(true)
+            startTimer()
+            socket.on('matchSuccess', async (...args) => {
+                setWaitingDialog(false)
+                setMatchedDialog(true)
+                sessionStorage.setItem("roomId", args[0].roomId)
+                sessionStorage.setItem("questionIds", args[0].questionIds)
+                sessionStorage.setItem("difficulty", selectedDifficulty)
+            })
+        }
+
+        const startTimer = () => {
+            setTimeLeft(30)
+            timer.current = setInterval(() => {
+                setTimeLeft((remaining) => {
+                    if (remaining > 0) {
+                        return remaining - 1
+                    } else {
+                        endMatching()
+                        return 0
+                    }
+                });
+            }, 1000);
+        }
+
         if (selectedDifficultyAvail) {
             startMatching();
             setSelectedDifficulty(false);
         }
-    }, [selectedDifficulty]);
+    }, [selectedDifficultyAvail, selectedDifficulty]);
 
     const checkLoggedIn = async () => {
         await axios.post(URL_CHECK_TOKEN, { token: sessionStorage.getItem("accessToken") })
@@ -160,25 +179,6 @@ function HomePage() {
         }
     }
 
-    const startMatching = () => {
-        // setSelectedDifficulty(difficulty);
-        let userDetails = {
-            "userOne": sessionStorage.getItem("username"),
-            "difficulty": selectedDifficulty
-        }
-        socket.emit('match', userDetails);
-        setWaitingDifficulty(selectedDifficulty)
-        setWaitingDialog(true)
-        startTimer()
-        socket.on('matchSuccess', async (...args) => {
-            setWaitingDialog(false)
-            setMatchedDialog(true)
-            sessionStorage.setItem("roomId", args[0].roomId)
-            sessionStorage.setItem("questionIds", args[0].questionIds)
-            sessionStorage.setItem("difficulty", selectedDifficulty)
-        })
-    }
-
     const getQuestions = async (ids) => {
         const firstQuestion = await fetchQuestion(ids[0]);
         const secondQuestion = await fetchQuestion(ids[1]);
@@ -210,7 +210,7 @@ function HomePage() {
     const endMatching = () => {
         setWaitingDialog(false)
         setNoMatchDialog(true)
-        clearInterval(timer)
+        clearInterval(timer.current)
         removeOverdueMatch();
     }
 
@@ -428,9 +428,9 @@ function HomePage() {
                             <Typography variant="h4">Finding a Match...</Typography>
                             <Typography variant="h6">Selected Difficulty: {waitingDifficulty}</Typography>
                         </Stack>
-                        <LinearProgress variant="determinate" value={(30 - timeLeft) / 30 * 100} />
+                        <LinearProgress variant="determinate" value={(30 - timeLeft) / 30 * 100} color="error"/>
                         <Typography variant="h6">{timeLeft} seconds left</Typography>
-                        <Button onClick={() => { setTimeLeft(0); endMatching() }}>Stop</Button>
+                        <Button color="error" onClick={() => { setTimeLeft(0); endMatching() }}>Stop</Button>
                     </Stack>
                 </DialogContent>
             </Dialog>
@@ -440,7 +440,7 @@ function HomePage() {
                     <Stack spacing={1} p={1} alignItems="center" justifyContent="center">
                         <Typography variant="h5">No Match Found</Typography>
                         <Typography variant="h6">Select another difficulty or try again later!</Typography>
-                        <Button onClick={() => { setNoMatchDialog(false); removeOverdueMatch(); }}>Close</Button>
+                        <Button onClick={() => { setNoMatchDialog(false); removeOverdueMatch(); }} color="error">Close</Button>
                     </Stack>
                 </DialogContent>
             </Dialog>
