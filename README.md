@@ -39,7 +39,7 @@ Ensure that frontend directs to `localhost:8005` for history-service APIs.
 
 ## Matching Service
 Ensure that frontend directs to `localhost:8001` for matching-service APIs. 
-
+Change the url for io connection to `localhost:3000` to connect to frontend locally
 1. Change directory to user-service by running `cd matching-service`
 2. Ensure the dependencies are downloaded locally `npm install` 
 3. Start the user-service by running `npm run start` 
@@ -53,7 +53,8 @@ Ensure that frontend directs to `localhost:8002` for question-service APIs.
 
 ## Frontend Service
 Ensure that the URLs in frontend calls `localhost` instead of the deployed URL. 
+Frontend runs locally on `localhost:3000`
 1. Change directory to frontend by running `cd frontend` 
-2. Ensure dependencies are downloaded locally `npm install`
+2. Ensure dependencies are downloaded locally `npm install --legacy-peer-deps`
 3. Start frontend by running `npm run start`
-4. The default browser will open with the application opened
+4. The default browser will open when the application starts running
