@@ -27,3 +27,7 @@ export async function findQuestions(difficulty) {
 export async function findQuestionId(id) {
     return QuestionModel.findById(id);
 }
+
+export async function deleteQuestion(id) {
+    return QuestionModel.deleteOne({ _id: id });
+}

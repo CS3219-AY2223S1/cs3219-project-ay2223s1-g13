@@ -2,6 +2,7 @@ import {
     ormCreateQuestion as _createQuestion,
     ormFindQuestions as _findQuestion,
     ormFindQuestionById as _findQuestionById,
+    ormDeleteQuestionById as _deleteQuestionById,
 } from "../model/question-orm.js";
 
 export async function createQuestion(req, res) {
@@ -63,9 +64,34 @@ export async function findQuestionById(req, res) {
                 message: "Provide Id of the question",
             });
         }
-    } catch(err) {
+    } catch (err) {
         return res
             .status(500)
             .json({ message: "Server error when finding a question!" });
     }
+}
+
+export async function deleteQuestionById(req, res) {
+    try {
+        const { id } = req.query;
+        if(id) {
+            const question = await _findQuestionById(id);
+            if (!question) {
+                return res.status(406).json({ message: "Question does not exist" });
+            }
+
+            const resp = await _deleteQuestionById(id);
+            if (resp.err) {
+                return res
+                    .status(400)
+                    .json({ message: "Could not delete the Question!" });
+            } else {
+                return res.status(200).json({
+                    message: `Deleted Question ${id} successfully!`,
+                });
+            }
+        } else {
+            return res.status(400).json({ message: "Question id missing!" });
+        }
+    } catch {}
 }
