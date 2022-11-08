@@ -62,7 +62,9 @@ Ensure that frontend directs to `localhost:8002` for question-service APIs.
 
 ## Frontend Service
 Ensure that the URLs in frontend calls `localhost` instead of the deployed URL. 
+
 Change matching service to `localhost:8001` in frontend directory
+
 Change collaboration service `localhost:8003` in frontend directory
 
 Frontend runs locally on `localhost:3000`
