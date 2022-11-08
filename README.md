@@ -34,7 +34,6 @@ Ensure that frontend directs to `localhost:8000` for user-service APIs.
 3. Start the user-service by running `npm run start` 
 
 ## Collaboration Service
-Ensure that frontend directs to `localhost:8003` for collaboration-service APIs. 
 Change the url for io connection to `localhost:3000` to connect to frontend locally
 
 1. Change directory to user-service by running `cd collaboration-service`
@@ -49,7 +48,6 @@ Ensure that frontend directs to `localhost:8005` for history-service APIs.
 3. Start the user-service by running `npm run start` 
 
 ## Matching Service
-Ensure that frontend directs to `localhost:8001` for matching-service APIs. 
 Change the url for io connection to `localhost:3000` to connect to frontend locally
 1. Change directory to user-service by running `cd matching-service`
 2. Ensure the dependencies are downloaded locally `npm install` 
@@ -64,6 +62,9 @@ Ensure that frontend directs to `localhost:8002` for question-service APIs.
 
 ## Frontend Service
 Ensure that the URLs in frontend calls `localhost` instead of the deployed URL. 
+Change matching service to `localhost:8001` in frontend directory
+Change collaboration service `localhost:8003` in frontend directory
+
 Frontend runs locally on `localhost:3000`
 1. Change directory to frontend by running `cd frontend` 
 2. Ensure dependencies are downloaded locally `npm install --legacy-peer-deps`
