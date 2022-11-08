@@ -16,13 +16,13 @@ export async function createQuestion(req, res) {
                     .json({ message: "Could not create a new question" });
             } else {
                 return res.status(201).json({
-                    message: `Create the question ${title} succesfully!`,
+                    message: `Created the question ${title} succesfully!`,
                 });
             }
         } else {
             return res
                 .status(400)
-                .json({ message: "Incomplete question format! " });
+                .json({ message: "Incomplete question format!" });
         }
     } catch (err) {
         return res
@@ -37,7 +37,7 @@ export async function findQuestions(req, res) {
         if (difficulty) {
             const questions = await _findQuestion(difficulty);
             return res
-                .status(202)
+                .status(200)
                 .json({ message: "Found a question", questions: questions });
         } else {
             return res.status(400).json({
@@ -57,7 +57,7 @@ export async function findQuestionById(req, res) {
         if (id) {
             const question = await _findQuestionById(id);
             return res
-                .status(202)
+                .status(200)
                 .json({ message: "Found a question", question: question });
         } else {
             return res.status(400).json({
@@ -74,10 +74,12 @@ export async function findQuestionById(req, res) {
 export async function deleteQuestionById(req, res) {
     try {
         const { id } = req.query;
-        if(id) {
+        if (id) {
             const question = await _findQuestionById(id);
             if (!question) {
-                return res.status(406).json({ message: "Question does not exist" });
+                return res
+                    .status(406)
+                    .json({ message: "Question does not exist" });
             }
 
             const resp = await _deleteQuestionById(id);

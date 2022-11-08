@@ -8,7 +8,7 @@ app.use(express.json())
 app.use(cors()) // config cors so that front-end can use
 app.options('*', cors())
 // import { createUser, loginUser, deleteUser, changePassword, authenticateToken } from './controller/user-controller.js';
-import { createQuestion, findQuestions, findQuestionById } from './controller/question-controller.js';
+import { createQuestion, findQuestions, findQuestionById, deleteQuestionById } from './controller/question-controller.js';
 
 const router = express.Router()
 
@@ -16,6 +16,8 @@ const router = express.Router()
 router.get('/', findQuestions)
 router.post('/', createQuestion)
 router.get('/id', findQuestionById)
+router.delete('/id', deleteQuestionById)
+
 
 app.use('/api/question', router).all((_, res) => {
     res.setHeader('content-type', 'application/json')
@@ -24,3 +26,5 @@ app.use('/api/question', router).all((_, res) => {
 
 
 app.listen(8002, () => console.log('question-service listening on port 8002'));
+
+export default app;
