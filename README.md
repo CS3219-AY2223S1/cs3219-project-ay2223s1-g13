@@ -8,6 +8,16 @@ This project is an adaptation of the project PeerPrep that has been completed in
 
 The project is currently deployed [here](https://frontend-66acladbaq-uc.a.run.app). All APIs are also deployed, and able to be accessed through the frontend from the link. 
 
+We have also provided the links for each service for users to test the backend APIs
+
+| Service               | Link                                                  |
+| -----------           | -----------                                           |
+| user-service          | https://user-service-e2rvjs4unq-uc.a.run.app          |
+| collaboration-service | https://question-service-sg7kdn2zna-uc.a.run.app      |
+| history-service       | https://history-service-e4js2cqizq-uc.a.run.app/      |
+| matching-service      | https://matching-service-au7tawfmmq-uc.a.run.app/     |
+| question-service      | https://question-service-sg7kdn2zna-uc.a.run.app/     |
+
 # Running Project Locally
 
 ## Prerequisites before starting
