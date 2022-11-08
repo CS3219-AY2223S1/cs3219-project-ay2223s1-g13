@@ -1,0 +1,19 @@
+.ql-editor {
+    height: 500px;
+    max-height: 500px;
+    font-family: Courier, monospace;
+    font-size: 12pt;
+    counter-reset: line;
+    padding-left: 0;
+    overflow: auto;
+}
+
+.ql-editor p:before {
+    counter-increment: line;
+    content: counter(line);
+    display: inline-block;
+    border-right: 1px solid #ddd;
+    padding: 0 0.5em;
+    margin-right: 0.5em;
+    color: #888;
+}
