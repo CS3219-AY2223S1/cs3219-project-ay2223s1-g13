@@ -13,18 +13,20 @@ const HomePage = () => {
     const navigate = useNavigate();
 
     useEffect(() => {
-        checkLoggedIn()
-      });
-    
-      const checkLoggedIn = async () => {
+        checkLoggedIn();
+    });
+
+    const checkLoggedIn = async () => {
         if (sessionStorage.getItem("accessToken")) {
-            const res = await axios.post(URL_CHECK_TOKEN, { token: sessionStorage.getItem("accessToken") });
+            const res = await axios.post(URL_CHECK_TOKEN, {
+                token: sessionStorage.getItem("accessToken"),
+            });
 
             if (res.status === STATUS_OK) {
-            navigate('/home')
+                navigate("/home");
             }
         }
-      }
+    };
 
     return (
         <>
@@ -71,7 +73,13 @@ const HomePage = () => {
                                     fontWeight: "100",
                                 }}
                             >
-                                <TypyingAnimation strings={["Code with peers", "Learn from them", "Repeat"]}/>
+                                <TypyingAnimation
+                                    strings={[
+                                        "Code with peers",
+                                        "Learn from them",
+                                        "Repeat",
+                                    ]}
+                                />
                             </span>
                             <div style={{}}>
                                 <Typography
@@ -85,8 +93,14 @@ const HomePage = () => {
                                     color="initial"
                                 >
                                     Our aim is to provide a platform for
-                                    practicing live coding with a fellow peer
-                                    and getting the hang of a tech interview
+                                    practicing{" "}
+                                    <span className="highlighted_text">
+                                        live coding{" "}
+                                    </span>
+                                    with a fellow peer and getting the hang of a{" "}
+                                    <span className="highlighted_text">
+                                        tech interview
+                                    </span>
                                     <br />
                                     <Button
                                         variant="contained"

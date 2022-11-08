@@ -47,3 +47,9 @@
     transform: scaleX(0.9);
     transform-origin: bottom left;
 }
+
+.highlighted_text {
+    color: #D63031;
+    font-weight: bold;
+    text-shadow: 1px 1px 0px #222;
+}
