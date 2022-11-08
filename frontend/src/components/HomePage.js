@@ -121,6 +121,12 @@ function HomePage() {
                 sessionStorage.setItem("roomId", args[0].roomId)
                 sessionStorage.setItem("questionIds", args[0].questionIds)
                 sessionStorage.setItem("difficulty", selectedDifficulty)
+                const ids = args[0].questionIds;
+                const questions = await getQuestions(ids);
+                console.log(questions)
+                questions.forEach((question) => {
+                    updateHistory(question);
+                })
             })
         }
 
@@ -189,20 +195,14 @@ function HomePage() {
 
     const updateHistory = async (question) => {
         const room_id = sessionStorage.getItem("roomId");
+        const cur_username = sessionStorage.getItem("username");
         const usernames = room_id.split("_");
         const difficulty = sessionStorage.getItem("difficulty");
         const questionName = question.title;
         const questionId = question.id;
         await axios.post(URL_HISTORY_SVC, {
-            username: usernames[0], 
-            matchedUsername: usernames[1],
-            difficulty,
-            question: questionName,
-            questionId
-        })
-        await axios.post(URL_HISTORY_SVC, {
-            username: usernames[1], 
-            matchedUsername: usernames[0],
+            username: cur_username === usernames[0] ? usernames[0] : usernames[1], 
+            matchedUsername: cur_username === usernames[0] ? usernames[1] : usernames[0],
             difficulty,
             question: questionName,
             questionId
@@ -222,12 +222,6 @@ function HomePage() {
 
     const handleStart = async () => {
         socket.emit('start', { roomId: sessionStorage.getItem("roomId") });
-        const ids = sessionStorage.getItem("questionIds").split(",");
-        const questions = await getQuestions(ids);
-            console.log(questions)
-            questions.forEach((question) => {
-                updateHistory(question);
-        })
         navigate('/room');
     };
 
