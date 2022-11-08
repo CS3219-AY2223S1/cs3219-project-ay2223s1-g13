@@ -67,19 +67,23 @@ function RoomPage() {
 
     const handleFirstExit = () => {
         socket.emit("exit", { roomId: sessionStorage.getItem("roomId") });
-        socket.emit("end");
-        removeMatch();
-        dropMessages();
-        sessionStorage.removeItem('roomId');
+        cleanUp();
         navigate('/home');
     }
 
     const handleSecondExit = () => {
         removeMatch();
+        cleanUp();
+        navigate('/home');
+    }
+
+    const cleanUp = () => {
+        removeMatch();
         dropMessages();
         socket.emit("end");
         sessionStorage.removeItem('roomId');
-        navigate('/home');
+        sessionStorage.removeItem('questionIds');
+        sessionStorage.removeItem('difficulty');
     }
 
     const removeMatch = () => {

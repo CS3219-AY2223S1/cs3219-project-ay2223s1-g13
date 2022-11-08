@@ -8,15 +8,15 @@ import "./CodeEditor.css"
 
 const CodeEditor = (props) => {
     let reactQuillRef = null;
-    let quillRef = null;
+    const quillRef = React.useRef(null);
 
     React.useEffect(() => {
-        quillRef = reactQuillRef.getEditor();
+        quillRef.current = reactQuillRef.getEditor();
         const ydoc = new Y.Doc()
         const ytext = ydoc.getText('quill')
-        const binding = new QuillBinding(ytext, quillRef)
+        const binding = new QuillBinding(ytext, quillRef.current)
         const provider = new WebrtcProvider(props.room_id, ydoc)
-    }, [])
+    }, [props.room_id, reactQuillRef])
 
     const modules = {
         toolbar: [
