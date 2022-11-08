@@ -78,6 +78,21 @@ describe("History ", () => {
                     done();
                 });
         });
+
+        it("error getting not existing history", (done) => {
+            const username = "nope123"
+            chai.request(app)
+            .get("/api/history")
+            .query({ username: username })
+            .end((_, res) => {
+                res.should.have.status(406);
+                res.body.should.have.property("message");
+                res.body.should.have
+                    .property("message")
+                    .eql(`History does not exist for ${username}`);
+                done();
+            });
+        })
     });
 
     describe("DELETE /", () => {
@@ -91,6 +106,21 @@ describe("History ", () => {
                 res.body.should.have
                     .property("message")
                     .eql(`Deleted history for user ${validHistory.username} succesfully`);
+                done();
+            });
+        })
+
+        it("error deleting not existing history", (done) => {
+            const username = "nope123"
+            chai.request(app)
+            .delete("/api/history")
+            .query({ username: username })
+            .end((_, res) => {
+                res.should.have.status(406);
+                res.body.should.have.property("message");
+                res.body.should.have
+                    .property("message")
+                    .eql(`History does not exist for ${username}`);
                 done();
             });
         })

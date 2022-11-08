@@ -17,6 +17,10 @@ export async function createHistory(params) {
     return new HistoryModel(params);
 }
 
+export async function getHistoryOne(username) {
+    return HistoryModel.findOne({ username: username });
+}
+
 export async function getHistories(username) {
     return HistoryModel.find({ username: username });
 }

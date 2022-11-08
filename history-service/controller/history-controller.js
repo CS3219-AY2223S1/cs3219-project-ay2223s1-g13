@@ -2,6 +2,7 @@ import {
     ormCreateHistory as _createHistory,
     ormGetHistories as _getHistories,
     ormDeleteHistories as _deleteHistories,
+    ormGetHistoryOne as _getHistoryOne,
 } from "../model/history-orm.js";
 
 export async function createHistory(req, res) {
@@ -47,6 +48,13 @@ export async function getHistories(req, res) {
     try {
         const { username } = req.query;
         if (username) {
+            const history = await _getHistoryOne(username);
+            if (!history) {
+                return res
+                    .status(406)
+                    .json({ message: `History does not exist for ${username}` });
+            }
+
             const histories = await _getHistories(username);
             return res.status(202).json({
                 message: `Found histories for ${username}`,
@@ -68,6 +76,13 @@ export async function deleteHistories(req, res) {
     try {
         const { username } = req.query;
         if (username) {
+            const history = await _getHistoryOne(username);
+            if (!history) {
+                return res
+                    .status(406)
+                    .json({ message: `History does not exist for ${username}` });
+            }
+
             const resp = await _deleteHistories(username);
             if (resp.err) {
                 return res
@@ -77,9 +92,9 @@ export async function deleteHistories(req, res) {
                 console.log(
                     `History for user ${username} is deleted succesfully`
                 );
-                return res
-                    .status(200)
-                    .json({ message: `Deleted history for user ${username} succesfully` });
+                return res.status(200).json({
+                    message: `Deleted history for user ${username} succesfully`,
+                });
             }
         } else {
             return res.status(400).json({ message: "Username missing!" });
