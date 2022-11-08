@@ -16,7 +16,7 @@ import {
     Toolbar,
     Typography
 } from "@mui/material";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { io } from "socket.io-client";
@@ -35,16 +35,13 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 const socket = io("wss://matching-service-au7tawfmmq-uc.a.run.app", { transports: ['websocket'] })
 
 function HomePage() {
-    const [isDialogOpen, setIsDialogOpen] = useState(false)
-    const [dialogTitle, setDialogTitle] = useState("")
-    const [dialogMsg, setDialogMsg] = useState("")
-
     const [password, setPassword] = useState("")
     const [newPassword, setNewPassword] = useState("")
     const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
     const [isWrongPasswordDialogOpen, setWrongPasswordDialogOpen] = useState(false)
     const [isDeleteSuccessDialogOpen, setDeleteSuccessDialogOpen] = useState(false)
     const [isChangePasswordDialogOpen, setChangePasswordDialogOpen] = useState(false)
+    const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false)
     const [isChangeSuccessOpen, setChangeSuccessOpen] = useState(false)
     const [isConnected, setIsConnected] = useState(socket.connected);
     const [isWaitingDialog, setWaitingDialog] = useState(false)
@@ -59,25 +56,16 @@ function HomePage() {
     const navigate = useNavigate()
 
     const [timeLeft, setTimeLeft] = useState(10)
-    var timer
-    const startTimer = () => {
-        setTimeLeft(30)
-        timer = setInterval(() => {
-            setTimeLeft((remaining) => {
-                if (remaining > 0) {
-                    return remaining - 1
-                } else {
-                    endMatching()
-                    return 0
-                }
-            });
-        }, 1000);
-    }
-
-    const closeDialog = () => setIsDialogOpen(false)
+    const timer = useRef(null)
 
     useEffect(() => {
         // Update the document title using the browser API
+        const checkLoggedIn = async () => {
+            await axios.post(URL_CHECK_TOKEN, { token: sessionStorage.getItem("accessToken") })
+                .catch((err) => {
+                    navigate('/signin');
+                })
+        }
         checkLoggedIn()
         setSelectedDifficultyAvail(false)
     });
@@ -97,7 +85,7 @@ function HomePage() {
             socket.off('connect');
             socket.off('disconnect');
         };
-    }, []);
+    });
 
     const onlyUnique = (value, index, self) => {
         return self.indexOf(value) === index;
@@ -118,28 +106,53 @@ function HomePage() {
     }
 
     useEffect(() => {
+        const startMatching = () => {
+            let userDetails = {
+                "userOne": sessionStorage.getItem("username"),
+                "difficulty": selectedDifficulty
+            }
+            socket.emit('match', userDetails);
+            setWaitingDifficulty(selectedDifficulty)
+            setWaitingDialog(true)
+            startTimer()
+            socket.on('matchSuccess', async (...args) => {
+                setWaitingDialog(false)
+                setMatchedDialog(true)
+                clearInterval(timer.current)
+                sessionStorage.setItem("roomId", args[0].roomId)
+                sessionStorage.setItem("questionIds", args[0].questionIds)
+                sessionStorage.setItem("difficulty", selectedDifficulty)
+                const ids = args[0].questionIds;
+                const questions = await getQuestions(ids);
+                console.log(questions)
+                questions.forEach((question) => {
+                    updateHistory(question);
+                })
+            })
+        }
+
+        const startTimer = () => {
+            setTimeLeft(30)
+            timer.current = setInterval(() => {
+                setTimeLeft((remaining) => {
+                    if (remaining > 0) {
+                        return remaining - 1
+                    } else {
+                        setWaitingDialog(false)
+                        setNoMatchDialog(true)
+                        clearInterval(timer.current)
+                        socket.emit('removematch', { user: sessionStorage.getItem("username") });
+                        return 0
+                    }
+                });
+            }, 1000);
+        }
+
         if (selectedDifficultyAvail) {
             startMatching();
             setSelectedDifficulty(false);
         }
-    }, [selectedDifficulty]);
-
-    const setConfirmDialog = (msg) => {
-        setIsDialogOpen(true)
-        setDialogTitle('Warning')
-        setDialogMsg(msg)
-    }
-
-    const checkLoggedIn = async () => {
-        await axios.post(URL_CHECK_TOKEN, { token: sessionStorage.getItem("accessToken") })
-            .catch((err) => {
-                navigate('/signin');
-            })
-    }
-
-    const confirmLogout = async () => {
-        setConfirmDialog("You sure you want log out?")
-    }
+    }, [selectedDifficultyAvail, selectedDifficulty]);
 
     const logoutUser = () => {
         sessionStorage.removeItem("accessToken")
@@ -175,27 +188,6 @@ function HomePage() {
         }
     }
 
-    const startMatching = () => {
-        // setSelectedDifficulty(difficulty);
-        let userDetails = {
-            "userOne": sessionStorage.getItem("username"),
-            "difficulty": selectedDifficulty
-        }
-        socket.emit('match', userDetails);
-        setWaitingDifficulty(selectedDifficulty)
-        setWaitingDialog(true)
-        startTimer()
-        socket.on('matchSuccess', async (...args) => {
-            setWaitingDialog(false)
-            setMatchedDialog(true)
-            setDialogTitle('Matched')
-            setDialogMsg("You have found a match!")
-            sessionStorage.setItem("roomId", args[0].roomId)
-            sessionStorage.setItem("questionIds", args[0].questionIds)
-            sessionStorage.setItem("difficulty", selectedDifficulty)
-        })
-    }
-
     const getQuestions = async (ids) => {
         const firstQuestion = await fetchQuestion(ids[0]);
         const secondQuestion = await fetchQuestion(ids[1]);
@@ -204,30 +196,24 @@ function HomePage() {
 
     const updateHistory = async (question) => {
         const room_id = sessionStorage.getItem("roomId");
+        const cur_username = sessionStorage.getItem("username");
         const usernames = room_id.split("_");
         const difficulty = sessionStorage.getItem("difficulty");
         const questionName = question.title;
         const questionId = question.id;
         await axios.post(URL_HISTORY_SVC, {
-            username: usernames[0], 
-            matchedUsername: usernames[1],
-            difficulty,
-            question: questionName,
-            questionId
-        })
-        await axios.post(URL_HISTORY_SVC, {
-            username: usernames[1], 
-            matchedUsername: usernames[0],
+            username: cur_username === usernames[0] ? usernames[0] : usernames[1], 
+            matchedUsername: cur_username === usernames[0] ? usernames[1] : usernames[0],
             difficulty,
             question: questionName,
             questionId
         })
     }
-
+    
     const endMatching = () => {
         setWaitingDialog(false)
         setNoMatchDialog(true)
-        clearInterval(timer)
+        clearInterval(timer.current)
         removeOverdueMatch();
     }
 
@@ -237,12 +223,6 @@ function HomePage() {
 
     const handleStart = async () => {
         socket.emit('start', { roomId: sessionStorage.getItem("roomId") });
-        const ids = sessionStorage.getItem("questionIds").split(",");
-        const questions = await getQuestions(ids);
-            console.log(questions)
-            questions.forEach((question) => {
-                updateHistory(question);
-        })
         navigate('/room');
     };
 
@@ -283,7 +263,7 @@ function HomePage() {
 
     const displayHistory = (history) => {
         const {matchedUsername, difficulty, question} = history;
-        const borderColor = difficulty == "Easy" ? ("var(--green)") : (difficulty == "Medium" ? "var(--yellow)": "red")
+        const borderColor = difficulty === "Easy" ? ("var(--green)") : (difficulty === "Medium" ? "var(--yellow)": "red")
         return (
             <div className="history_row" style={{border: `0.25rem solid ${borderColor}`}}>
                 <div className="history_section">
@@ -335,7 +315,7 @@ function HomePage() {
                             color="text.primary"
                             href="#"
                             sx={{ my: 1, mx: 1.5 }}
-                            onClick={confirmLogout}
+                            onClick={() => setIsLogoutDialogOpen(true)}
                         >
                             Logout
                         </Link>
@@ -380,60 +360,61 @@ function HomePage() {
                     </div>
                 </Section>
             </Container>
-            <Dialog
-                open={isDialogOpen}
-                onClose={closeDialog}
-                TransitionComponent={Transition}
-            >
-                <DialogTitle>{dialogTitle}</DialogTitle>
+
+            <Dialog open={isLogoutDialogOpen} onClose={() => setIsLogoutDialogOpen(false)} TransitionComponent={Transition}>
                 <DialogContent>
-                    <DialogContentText>{dialogMsg}</DialogContentText>
+                    <Stack spacing={1}>
+                        <Typography variant="h6">Confirm to log out?</Typography>
+                        <Button color="error" onClick={logoutUser}>Log Out</Button>
+                    </Stack>
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={logoutUser}>Sure ahhh!</Button>
-                </DialogActions>
             </Dialog>
 
             <Dialog open={isDeleteDialogOpen} onClose={() => setDeleteDialogOpen(false)} TransitionComponent={Transition}>
                 <DialogContent>
-                    <Typography variant="body1">Please enter your password to confirm deleting account</Typography>
-                    <TextField variant="standard" type="password" onChange={e => setPassword(e.target.value)} />
+                    <Stack spacing={2}>
+                        <Typography variant="body1">Please enter your password to confirm deleting account</Typography>
+                        <TextField variant="standard" type="password" onChange={e => setPassword(e.target.value)} />
+                        <Button variant="contained" color="error" onClick={handleDelete}>Confirm</Button>
+                    </Stack>                        
                 </DialogContent>
-                <DialogActions>
-                    <Button variant="contained" color="warning" onClick={handleDelete}>Confirm</Button>
-                </DialogActions>
             </Dialog>
 
             <Dialog open={isWrongPasswordDialogOpen} onClose={() => setWrongPasswordDialogOpen(false)} TransitionComponent={Transition}>
-                <DialogTitle>Wrong Password</DialogTitle>
                 <DialogActions>
-                    <Button onClick={() => setWrongPasswordDialogOpen(false)}>Close</Button>
+                    <Stack spacing={1} p={1}>
+                        <Typography variant="h6">Wrong Password</Typography>
+                        <Button color="error" onClick={() => setWrongPasswordDialogOpen(false)}>Close</Button>
+                    </Stack>
                 </DialogActions>
             </Dialog>
 
             <Dialog open={isDeleteSuccessDialogOpen} onClose={() => setDeleteSuccessDialogOpen(false)} TransitionComponent={Transition}>
                 <DialogActions>
-                    <Typography variant="body1">{sessionStorage.getItem("username")} is succesfully deleted!</Typography>
-                    <Button onClick={logoutUser}>Exit</Button>
+                    <Stack spacing={1} p={1}>
+                        <Typography variant="h6">Succesfully deleted {sessionStorage.getItem("username")}</Typography>
+                        <Button color="error" onClick={logoutUser}>Close</Button>
+                    </Stack>
                 </DialogActions>
             </Dialog>
 
             <Dialog open={isChangePasswordDialogOpen} onClose={() => setChangePasswordDialogOpen(false)} TransitionComponent={Transition}>
                 <DialogContent>
-                    <Stack>
+                    <Stack spacing={1} p={1} alignItems="center" justifyContent="center">
+                        <Typography variant="h5">Change Password</Typography>
                         <TextField label="Old Password" variant="standard" type="password" onChange={e => setPassword(e.target.value)} />
                         <TextField label="New Password" variant="standard" type="password" onChange={e => setNewPassword(e.target.value)} />
+                        <Button sx={{width: '50%'}} variant="contained" color="error" onClick={handleChange}>Confirm</Button>
                     </Stack>
                 </DialogContent>
-                <DialogActions>
-                    <Button variant="contained" color="warning" onClick={handleChange}>Confirm</Button>
-                </DialogActions>
             </Dialog>
 
             <Dialog open={isChangeSuccessOpen} onClose={() => setChangeSuccessOpen(false)} TransitionComponent={Transition}>
                 <DialogActions>
-                    <Typography variant="body1">{sessionStorage.getItem("username")}'s password is succesfully changed!</Typography>
-                    <Button onClick={() => setChangeSuccessOpen(false)}>Close</Button>
+                    <Stack spacing={2} p={1} alignItems="center" justifyContent="center">
+                        <Typography variant="h6">Password is successfully changed!</Typography>
+                        <Button sx={{width: '40%'}} color="error" onClick={() => setChangeSuccessOpen(false)}>Close</Button>
+                    </Stack>
                 </DialogActions>
             </Dialog>
 
@@ -444,9 +425,9 @@ function HomePage() {
                             <Typography variant="h4">Finding a Match...</Typography>
                             <Typography variant="h6">Selected Difficulty: {waitingDifficulty}</Typography>
                         </Stack>
-                        <LinearProgress variant="determinate" value={(30 - timeLeft) / 30 * 100} />
+                        <LinearProgress variant="determinate" value={(30 - timeLeft) / 30 * 100} color="error"/>
                         <Typography variant="h6">{timeLeft} seconds left</Typography>
-                        <Button onClick={() => { setTimeLeft(0); endMatching() }}>Stop</Button>
+                        <Button color="error" onClick={() => { setTimeLeft(0); endMatching() }}>Stop</Button>
                     </Stack>
                 </DialogContent>
             </Dialog>
@@ -456,7 +437,7 @@ function HomePage() {
                     <Stack spacing={1} p={1} alignItems="center" justifyContent="center">
                         <Typography variant="h5">No Match Found</Typography>
                         <Typography variant="h6">Select another difficulty or try again later!</Typography>
-                        <Button onClick={() => { setNoMatchDialog(false); removeOverdueMatch(); }}>Close</Button>
+                        <Button onClick={() => { setNoMatchDialog(false); removeOverdueMatch(); }} color="error">Close</Button>
                     </Stack>
                 </DialogContent>
             </Dialog>
@@ -464,10 +445,10 @@ function HomePage() {
             <Dialog open={isMatchedDialog} onClose={(e, r) => { if (r !== "backdropClick") { navigate('/room') } }} TransitionComponent={Transition}>
                 <DialogTitle>Yay🎉</DialogTitle>
                 <DialogContent>
-                    <DialogContentText>{dialogMsg}</DialogContentText>
+                    <DialogContentText>You got a match!</DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleStart}>Start</Button>
+                    <Button color="error" onClick={handleStart}>Start</Button>
                 </DialogActions>
             </Dialog>
         </React.Fragment>
