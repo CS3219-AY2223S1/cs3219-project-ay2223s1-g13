@@ -98,7 +98,7 @@ function SignInPage() {
             alignItems: 'center',
           }}
         >
-          <Typography component="h1" variant="h5">
+          <Typography component="h1" variant="h5" onClick={() => navigate('/')}>
             Sign In
           </Typography>
           <Box sx={{ mt: 1 }}>
@@ -130,6 +130,7 @@ function SignInPage() {
               type="submit"
               fullWidth
               variant="contained"
+              color="error"
               sx={{ mt: 3, mb: 2 }} onClick={handleLogin}
             >
               Sign In

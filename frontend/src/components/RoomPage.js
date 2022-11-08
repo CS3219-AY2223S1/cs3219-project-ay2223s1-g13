@@ -2,10 +2,8 @@ import {
     Button,
     Dialog,
     DialogContent,
-    Grid,
     IconButton,
     Stack,
-    TextField,
     Typography
 } from "@mui/material";
 import ArrowBackIosIcon from '@mui/icons-material/ArrowBackIos';
@@ -18,15 +16,14 @@ import { Box } from "@mui/system";
 import { fetchQuestion } from "./Question/api";
 
 import "./RoomPage.css"
-import axios from "axios";
-import { URL_HISTORY_SVC } from "../configs";
 
-import { Widget, addResponseMessage, dropMessages, isWidgetOpened, toggleWidget, renderCustomComponent } from 'react-chat-widget';
+import { Widget, addResponseMessage, dropMessages, isWidgetOpened, toggleWidget } from 'react-chat-widget';
 
 import 'react-chat-widget/lib/styles.css';
 
 function RoomPage() {
-    const socket = io('https://collaboration-service-4crgpcigjq-uc.a.run.app');
+    const socket = io("http://localhost:8003");
+    //const socket = io('https://collaboration-service-4crgpcigjq-uc.a.run.app');
     const matchsocket = io("wss://matching-service-au7tawfmmq-uc.a.run.app", { transports: ['websocket'] });
     const navigate = useNavigate();
 
@@ -53,28 +50,6 @@ function RoomPage() {
         const ids = sessionStorage.getItem("questionIds").split(",");
         _fetchQuestions(ids);
     }, [])
-
-    const updateHistory = async (question) => {
-        const room_id = sessionStorage.getItem("roomId");
-        const usernames = room_id.split("_");
-        const difficulty = sessionStorage.getItem("difficulty");
-        const questionName = question.title;
-        const questionId = question.id;
-        await axios.post(URL_HISTORY_SVC, {
-            username: usernames[0], 
-            matchedUsername: usernames[1],
-            difficulty,
-            question: questionName,
-            questionId
-        })
-        await axios.post(URL_HISTORY_SVC, {
-            username: usernames[1], 
-            matchedUsername: usernames[0],
-            difficulty,
-            question: questionName,
-            questionId
-        })
-    }
 
     socket.on("partner exit", () => {
         setPartnerExitedDialogOpen(true);
@@ -115,12 +90,12 @@ function RoomPage() {
         return (
             <div>
                 <div style={{display: "flex", justifyContent: "space-around", alignItems:"flex-end"}}>
-                    <div className={`question_selector  ${chosenQuestion == 0 ? "question_selector_selected":""}`} 
+                    <div className={`question_selector  ${chosenQuestion === 0 ? "question_selector_selected":""}`} 
                         onClick={() => setChosenQuestion(0)}
                     >
                         # 1
                     </div>
-                    <div className={`question_selector ${chosenQuestion == 1 ? "question_selector_selected":""}`} 
+                    <div className={`question_selector ${chosenQuestion === 1 ? "question_selector_selected":""}`} 
                         onClick={() => setChosenQuestion(1)}
                     >
                         # 2
@@ -162,9 +137,9 @@ function RoomPage() {
                 <DialogContent>
                     <Stack display='flex' alignItems='center' spacing={2}>
                         <Typography variant='body1'>Are you sure you want to exit?</Typography>
-                        <Stack direction='row' spacing={3}>
-                            <Button variant='contained' onClick={() => setExitDialogOpen(false)}>Cancel</Button>
+                        <Stack spacing={1}>
                             <Button variant='contained' onClick={handleFirstExit} color='error'>Exit</Button>
+                            <Button onClick={() => setExitDialogOpen(false)} color="inherit">Cancel</Button>
                         </Stack>
                     </Stack>
                 </DialogContent>
@@ -174,7 +149,7 @@ function RoomPage() {
                 <DialogContent>
                     <Stack display='flex' alignItems='center' spacing={2}>
                         <Typography variant='body1'>The other user has exited!</Typography>
-                        <Button variant='contained' onClick={handleSecondExit}>Exit</Button>
+                        <Button color="error" variant='contained' onClick={handleSecondExit}>Exit</Button>
                     </Stack>
                 </DialogContent>
             </Dialog>

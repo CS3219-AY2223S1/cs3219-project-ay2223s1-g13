@@ -8,24 +8,18 @@ import {
     DialogTitle,
     TextField,
     Typography, 
-    FormControlLabel,
-    Checkbox,
     Container,
     Grid,
     Link,
-    CssBaseline,
-    Avatar,
-    Icon, 
-    PageviewIcon
+    CssBaseline
 } from "@mui/material";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import axios from "axios";
 
-import { URL_USER_SVC, URL_LOGIN_SVC, URL_CHECK_TOKEN } from "../configs";
-import { STATUS_CODE_CONFLICT, STATUS_CODE_CREATED, STATUS_OK, STATUS_BAD_REQUEST, STATUS_CODE_NOT_ACCEPTABLE, STATUS_INVALID_TOKEN } from "../constants";
+import { URL_USER_SVC} from "../configs";
+import { STATUS_CODE_CONFLICT, STATUS_CODE_CREATED } from "../constants";
 import { useNavigate } from "react-router-dom";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import Image from '../resources/background.jpeg';
 
 function SignUpPage() {
     const navigate = useNavigate();
@@ -64,7 +58,7 @@ function SignUpPage() {
     const handleSignUp = async () => {
         if (username === "" || password === "" || confirmPassword === "") {
             setErrorDialog("All fields are required!")
-        } else if (password != confirmPassword) {
+        } else if (password !== confirmPassword) {
             openDifferentPasswordDialog()
         } else { 
 
@@ -95,7 +89,7 @@ function SignUpPage() {
               alignItems: 'center',
             }}
           >  
-            <Typography component="h1" variant="h5">
+            <Typography component="h1" variant="h5" onClick={() => navigate("/")}>
               Create New Account
             </Typography>
             <Box sx={{ mt: 1 }}>
@@ -137,6 +131,7 @@ function SignUpPage() {
                 type="submit"
                 fullWidth
                 variant="contained"
+                color="error"
                 sx={{ mt: 3, mb: 2 }} onClick={handleSignUp}
               >
                 Sign Up
@@ -179,6 +174,5 @@ function SignUpPage() {
       </ThemeProvider>
     )
 }
-
 
 export default SignUpPage;

@@ -35,16 +35,13 @@ const Transition = React.forwardRef(function Transition(props, ref) {
 const socket = io("wss://matching-service-au7tawfmmq-uc.a.run.app", { transports: ['websocket'] })
 
 function HomePage() {
-    const [isDialogOpen, setIsDialogOpen] = useState(false)
-    const [dialogTitle, setDialogTitle] = useState("")
-    const [dialogMsg, setDialogMsg] = useState("")
-
     const [password, setPassword] = useState("")
     const [newPassword, setNewPassword] = useState("")
     const [isDeleteDialogOpen, setDeleteDialogOpen] = useState(false)
     const [isWrongPasswordDialogOpen, setWrongPasswordDialogOpen] = useState(false)
     const [isDeleteSuccessDialogOpen, setDeleteSuccessDialogOpen] = useState(false)
     const [isChangePasswordDialogOpen, setChangePasswordDialogOpen] = useState(false)
+    const [isLogoutDialogOpen, setIsLogoutDialogOpen] = useState(false)
     const [isChangeSuccessOpen, setChangeSuccessOpen] = useState(false)
     const [isConnected, setIsConnected] = useState(socket.connected);
     const [isWaitingDialog, setWaitingDialog] = useState(false)
@@ -73,8 +70,6 @@ function HomePage() {
             });
         }, 1000);
     }
-
-    const closeDialog = () => setIsDialogOpen(false)
 
     useEffect(() => {
         // Update the document title using the browser API
@@ -124,21 +119,11 @@ function HomePage() {
         }
     }, [selectedDifficulty]);
 
-    const setConfirmDialog = (msg) => {
-        setIsDialogOpen(true)
-        setDialogTitle('Warning')
-        setDialogMsg(msg)
-    }
-
     const checkLoggedIn = async () => {
         await axios.post(URL_CHECK_TOKEN, { token: sessionStorage.getItem("accessToken") })
             .catch((err) => {
                 navigate('/signin');
             })
-    }
-
-    const confirmLogout = async () => {
-        setConfirmDialog("You sure you want log out?")
     }
 
     const logoutUser = () => {
@@ -188,8 +173,6 @@ function HomePage() {
         socket.on('matchSuccess', async (...args) => {
             setWaitingDialog(false)
             setMatchedDialog(true)
-            setDialogTitle('Matched')
-            setDialogMsg("You have found a match!")
             sessionStorage.setItem("roomId", args[0].roomId)
             sessionStorage.setItem("questionIds", args[0].questionIds)
             sessionStorage.setItem("difficulty", selectedDifficulty)
@@ -283,7 +266,7 @@ function HomePage() {
 
     const displayHistory = (history) => {
         const {matchedUsername, difficulty, question} = history;
-        const borderColor = difficulty == "Easy" ? ("var(--green)") : (difficulty == "Medium" ? "var(--yellow)": "red")
+        const borderColor = difficulty === "Easy" ? ("var(--green)") : (difficulty === "Medium" ? "var(--yellow)": "red")
         return (
             <div className="history_row" style={{border: `0.25rem solid ${borderColor}`}}>
                 <div className="history_section">
@@ -335,7 +318,7 @@ function HomePage() {
                             color="text.primary"
                             href="#"
                             sx={{ my: 1, mx: 1.5 }}
-                            onClick={confirmLogout}
+                            onClick={() => setIsLogoutDialogOpen(true)}
                         >
                             Logout
                         </Link>
@@ -380,60 +363,61 @@ function HomePage() {
                     </div>
                 </Section>
             </Container>
-            <Dialog
-                open={isDialogOpen}
-                onClose={closeDialog}
-                TransitionComponent={Transition}
-            >
-                <DialogTitle>{dialogTitle}</DialogTitle>
+
+            <Dialog open={isLogoutDialogOpen} onClose={() => setIsLogoutDialogOpen(false)} TransitionComponent={Transition}>
                 <DialogContent>
-                    <DialogContentText>{dialogMsg}</DialogContentText>
+                    <Stack spacing={1}>
+                        <Typography variant="h6">Confirm to log out?</Typography>
+                        <Button color="error" onClick={logoutUser}>Log Out</Button>
+                    </Stack>
                 </DialogContent>
-                <DialogActions>
-                    <Button onClick={logoutUser}>Sure ahhh!</Button>
-                </DialogActions>
             </Dialog>
 
             <Dialog open={isDeleteDialogOpen} onClose={() => setDeleteDialogOpen(false)} TransitionComponent={Transition}>
                 <DialogContent>
-                    <Typography variant="body1">Please enter your password to confirm deleting account</Typography>
-                    <TextField variant="standard" type="password" onChange={e => setPassword(e.target.value)} />
+                    <Stack spacing={2}>
+                        <Typography variant="body1">Please enter your password to confirm deleting account</Typography>
+                        <TextField variant="standard" type="password" onChange={e => setPassword(e.target.value)} />
+                        <Button variant="contained" color="error" onClick={handleDelete}>Confirm</Button>
+                    </Stack>                        
                 </DialogContent>
-                <DialogActions>
-                    <Button variant="contained" color="warning" onClick={handleDelete}>Confirm</Button>
-                </DialogActions>
             </Dialog>
 
             <Dialog open={isWrongPasswordDialogOpen} onClose={() => setWrongPasswordDialogOpen(false)} TransitionComponent={Transition}>
-                <DialogTitle>Wrong Password</DialogTitle>
                 <DialogActions>
-                    <Button onClick={() => setWrongPasswordDialogOpen(false)}>Close</Button>
+                    <Stack spacing={1} p={1}>
+                        <Typography variant="h6">Wrong Password</Typography>
+                        <Button color="error" onClick={() => setWrongPasswordDialogOpen(false)}>Close</Button>
+                    </Stack>
                 </DialogActions>
             </Dialog>
 
             <Dialog open={isDeleteSuccessDialogOpen} onClose={() => setDeleteSuccessDialogOpen(false)} TransitionComponent={Transition}>
                 <DialogActions>
-                    <Typography variant="body1">{sessionStorage.getItem("username")} is succesfully deleted!</Typography>
-                    <Button onClick={logoutUser}>Exit</Button>
+                    <Stack spacing={1} p={1}>
+                        <Typography variant="h6">Succesfully deleted {sessionStorage.getItem("username")}</Typography>
+                        <Button color="error" onClick={logoutUser}>Close</Button>
+                    </Stack>
                 </DialogActions>
             </Dialog>
 
             <Dialog open={isChangePasswordDialogOpen} onClose={() => setChangePasswordDialogOpen(false)} TransitionComponent={Transition}>
                 <DialogContent>
-                    <Stack>
+                    <Stack spacing={1} p={1} alignItems="center" justifyContent="center">
+                        <Typography variant="h5">Change Password</Typography>
                         <TextField label="Old Password" variant="standard" type="password" onChange={e => setPassword(e.target.value)} />
                         <TextField label="New Password" variant="standard" type="password" onChange={e => setNewPassword(e.target.value)} />
+                        <Button sx={{width: '50%'}} variant="contained" color="error" onClick={handleChange}>Confirm</Button>
                     </Stack>
                 </DialogContent>
-                <DialogActions>
-                    <Button variant="contained" color="warning" onClick={handleChange}>Confirm</Button>
-                </DialogActions>
             </Dialog>
 
             <Dialog open={isChangeSuccessOpen} onClose={() => setChangeSuccessOpen(false)} TransitionComponent={Transition}>
                 <DialogActions>
-                    <Typography variant="body1">{sessionStorage.getItem("username")}'s password is succesfully changed!</Typography>
-                    <Button onClick={() => setChangeSuccessOpen(false)}>Close</Button>
+                    <Stack spacing={2} p={1} alignItems="center" justifyContent="center">
+                        <Typography variant="h6">Password is successfully changed!</Typography>
+                        <Button sx={{width: '40%'}} color="error" onClick={() => setChangeSuccessOpen(false)}>Close</Button>
+                    </Stack>
                 </DialogActions>
             </Dialog>
 
@@ -464,10 +448,10 @@ function HomePage() {
             <Dialog open={isMatchedDialog} onClose={(e, r) => { if (r !== "backdropClick") { navigate('/room') } }} TransitionComponent={Transition}>
                 <DialogTitle>Yay🎉</DialogTitle>
                 <DialogContent>
-                    <DialogContentText>{dialogMsg}</DialogContentText>
+                    <DialogContentText>You got a match!</DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button onClick={handleStart}>Start</Button>
+                    <Button color="error" onClick={handleStart}>Start</Button>
                 </DialogActions>
             </Dialog>
         </React.Fragment>
