@@ -1,6 +1,6 @@
 import {
     ormCreateQuestion as _createQuestion,
-    ormFindQuestion as _findQuestion,
+    ormFindQuestions as _findQuestion,
     ormFindQuestionById as _findQuestionById,
 } from "../model/question-orm.js";
 
@@ -30,14 +30,14 @@ export async function createQuestion(req, res) {
     }
 }
 
-export async function findQuestion(req, res) {
+export async function findQuestions(req, res) {
     try {
         const { difficulty } = req.query;
         if (difficulty) {
-            const question = await _findQuestion(difficulty);
+            const questions = await _findQuestion(difficulty);
             return res
                 .status(202)
-                .json({ message: "Found a question", question: question });
+                .json({ message: "Found a question", questions: questions });
         } else {
             return res.status(400).json({
                 message: "Enter the difficulty level for the problem",

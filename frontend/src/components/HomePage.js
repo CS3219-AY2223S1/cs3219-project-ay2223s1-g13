@@ -108,7 +108,7 @@ function HomePage() {
                 username: sessionStorage.getItem("username") 
             }
         })
-        const histories = res.data.history
+        const histories = res.data.history.reverse()
         setHistories(histories);
         const easySolved = (histories.filter(history => history.difficulty==="Easy").map((history) => history.question).filter(onlyUnique)).length;
         const mediumSolved = (histories.filter(history => history.difficulty ==="Medium").map((history) => history.question).filter(onlyUnique)).length;
@@ -186,7 +186,7 @@ function HomePage() {
             setDialogTitle('Matched')
             setDialogMsg("You have found a match!")
             sessionStorage.setItem("roomId", args[0].roomId)
-            sessionStorage.setItem("questionId", args[0].questionId)
+            sessionStorage.setItem("questionIds", args[0].questionIds)
             sessionStorage.setItem("difficulty", selectedDifficulty)
         })
     }

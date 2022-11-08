@@ -34,9 +34,9 @@ export async function createMatch(params) {
                 console.log(`Found a match ${match.userOne} with socketId ${match.socketIdOne} for difficulty ${match.difficulty} for user ${userOne}`)
 
                 // add to same room
-                const questionId = await getQuestionId(difficulty)
+                const questionIds = await getQuestionIds(difficulty)
                 const roomName = getRoomName(userOne, match.userOne);
-                const addUserToRoom = await addToRoom(socketIdOne, match.socketIdOne, roomName, questionId);
+                const addUserToRoom = await addToRoom(socketIdOne, match.socketIdOne, roomName, questionIds);
                 if (addUserToRoom) {
                     console.log(`Successfully add ${userOne} and ${match.userOne} to room!`);
                 } else {
@@ -56,12 +56,14 @@ export async function createMatch(params) {
     }
 }
 
-export async function getQuestionId(difficulty) {
+export async function getQuestionIds(difficulty) {
     const question_url = process.env.QUESTION_SVC || "https://question-service-sg7kdn2zna-uc.a.run.app";
-    const questionId = await fetch(question_url+"/api/question?difficulty="+difficulty)
+    const questions = await fetch(question_url+"/api/question?difficulty="+difficulty)
                         .then(response => response.json())
-                        .then(response => response.question[0]._id);
-    return questionId;
+                        .then(response => response.questions)
+                    
+    const questionIds = questions.map(question => question._id);
+    return questionIds;
 }
 
 function getRoomName(userOne, userTwo) {
@@ -69,7 +71,7 @@ function getRoomName(userOne, userTwo) {
     return roomname;
 }
 
-async function addToRoom(userOneSocketId, userTwoSocketId, roomName, questionId) {
+async function addToRoom(userOneSocketId, userTwoSocketId, roomName, questionIds) {
     const userOne = users.filter(user => user.socketId == userOneSocketId);
     const userTwo = users.filter(user => user.socketId == userTwoSocketId);
     const socketOne = userOne[0]["socket"];
@@ -77,8 +79,8 @@ async function addToRoom(userOneSocketId, userTwoSocketId, roomName, questionId)
     socketOne.join(roomName);
     socketTwo.join(roomName);
     // emit event to userone and userTwo
-    io.to(userOneSocketId).emit('matchSuccess', { roomId: roomName, questionId: questionId })
-    io.to(userTwoSocketId).emit('matchSuccess', { roomId: roomName, questionId: questionId })
+    io.to(userOneSocketId).emit('matchSuccess', { roomId: roomName, questionIds: questionIds })
+    io.to(userTwoSocketId).emit('matchSuccess', { roomId: roomName, questionIds: questionIds })
     return io.sockets.adapter.rooms.get(roomName).size == 2;
 }
 

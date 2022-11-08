@@ -17,10 +17,10 @@ export async function createQuestion(params) {
     return new QuestionModel(params);
 }
 
-export async function findQuestion(difficulty) {
+export async function findQuestions(difficulty) {
     return QuestionModel.aggregate([
         { $match: { difficulty: difficulty } },
-        { $sample: { size: 1 } },
+        { $sample: { size: 2 } },
     ]);
 }
 
