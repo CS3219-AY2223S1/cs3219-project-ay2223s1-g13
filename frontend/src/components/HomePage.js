@@ -118,6 +118,7 @@ function HomePage() {
             socket.on('matchSuccess', async (...args) => {
                 setWaitingDialog(false)
                 setMatchedDialog(true)
+                clearInterval(timer.current)
                 sessionStorage.setItem("roomId", args[0].roomId)
                 sessionStorage.setItem("questionIds", args[0].questionIds)
                 sessionStorage.setItem("difficulty", selectedDifficulty)
