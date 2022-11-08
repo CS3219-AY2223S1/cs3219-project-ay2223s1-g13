@@ -60,6 +60,12 @@ function HomePage() {
 
     useEffect(() => {
         // Update the document title using the browser API
+        const checkLoggedIn = async () => {
+            await axios.post(URL_CHECK_TOKEN, { token: sessionStorage.getItem("accessToken") })
+                .catch((err) => {
+                    navigate('/signin');
+                })
+        }
         checkLoggedIn()
         setSelectedDifficultyAvail(false)
     });
@@ -79,7 +85,7 @@ function HomePage() {
             socket.off('connect');
             socket.off('disconnect');
         };
-    }, []);
+    });
 
     const onlyUnique = (value, index, self) => {
         return self.indexOf(value) === index;
@@ -125,7 +131,10 @@ function HomePage() {
                     if (remaining > 0) {
                         return remaining - 1
                     } else {
-                        endMatching()
+                        setWaitingDialog(false)
+                        setNoMatchDialog(true)
+                        clearInterval(timer.current)
+                        socket.emit('removematch', { user: sessionStorage.getItem("username") });
                         return 0
                     }
                 });
@@ -137,13 +146,6 @@ function HomePage() {
             setSelectedDifficulty(false);
         }
     }, [selectedDifficultyAvail, selectedDifficulty]);
-
-    const checkLoggedIn = async () => {
-        await axios.post(URL_CHECK_TOKEN, { token: sessionStorage.getItem("accessToken") })
-            .catch((err) => {
-                navigate('/signin');
-            })
-    }
 
     const logoutUser = () => {
         sessionStorage.removeItem("accessToken")
@@ -206,7 +208,7 @@ function HomePage() {
             questionId
         })
     }
-
+    
     const endMatching = () => {
         setWaitingDialog(false)
         setNoMatchDialog(true)
