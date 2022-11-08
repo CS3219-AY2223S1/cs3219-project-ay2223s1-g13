@@ -25,6 +25,7 @@ Ensure that frontend directs to `localhost:8000` for user-service APIs.
 
 ## Collaboration Service
 Ensure that frontend directs to `localhost:8003` for collaboration-service APIs. 
+Change the url for io connection to `localhost:3000` to connect to frontend locally
 
 1. Change directory to user-service by running `cd collaboration-service`
 2. Ensure the dependencies are downloaded locally `npm install` 
