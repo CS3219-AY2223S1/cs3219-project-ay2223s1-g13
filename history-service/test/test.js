@@ -23,11 +23,6 @@ const invalidHistory = {
 };
 describe("History ", () => {
     describe("POST /", () => {
-        after((done) => {
-            HistoryModel.deleteMany({username: validHistory.username}, (err) => {
-                done();
-            })
-        })
         it("should create the history", (done) => {
             const historyToAdd = validHistory;
             chai.request(app)
@@ -65,15 +60,16 @@ describe("History ", () => {
 
     describe("GET /", () => {
         it("should retrieve history for the user", (done) => {
+            const username = "testsrj1"
             chai.request(app)
                 .get("/api/history")
-                .query({ username: validHistory.username })
+                .query({ username: username })
                 .end((_, res) => {
                     res.should.have.status(202);
                     res.body.should.have.property("message");
                     res.body.should.have
                         .property("message")
-                        .eql(`Found histories for ${validHistory.username}`);
+                        .eql(`Found histories for ${username}`);
                     res.body.should.have.property("history");
                     done();
                 });
