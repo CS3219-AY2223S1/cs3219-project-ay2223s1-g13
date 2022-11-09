@@ -226,15 +226,16 @@ function HomePage() {
 
     const handleStart = async () => {
         socket.emit('start', { roomId: sessionStorage.getItem("roomId") });
+        setIsButtonDisabled(true);
         const ids = sessionStorage.getItem("questionIds").split(",");
         const questions = await getQuestions(ids);
         if(matched==0) {
             questions.forEach((question) => {
                 updateHistory(question);
             })
-            setIsButtonDisabled(true);
             setMatched(matched => matched + 1);
         }
+
         navigate('/room');
     };
 
@@ -461,7 +462,7 @@ function HomePage() {
                     <DialogContentText>You got a match!</DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button disabled={isButtonDisabled} color="error" onClick={handleStart}>Start</Button>
+                    <Button className={`${isButtonDisabled}`} disabled={isButtonDisabled} color="error" onClick={handleStart}>Start</Button>
                 </DialogActions>
             </Dialog>
         </React.Fragment>
