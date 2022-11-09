@@ -1,4 +1,4 @@
-import { createHistory, getHistories, deleteHistories } from "./repository.js";
+import { createHistory, getHistories, deleteHistories, getHistoryOne } from "./repository.js";
 
 export async function ormCreateHistory(
     username,
@@ -21,6 +21,16 @@ export async function ormCreateHistory(
         return true;
     } catch (err) {
         console.log("ERROR: Could not create new history");
+        return { err };
+    }
+}
+
+export async function ormGetHistoryOne(username) {
+    try {
+        const history = await getHistoryOne(username);
+        return history
+    } catch (err) {
+        console.log("ERROR: Database error");
         return { err };
     }
 }
