@@ -27,6 +27,7 @@ import { STATUS_OK, difficulties } from "../constants";
 import "./HomePage.css"
 import Section from "./common/Section/Section";
 import { fetchQuestion } from "./Question/api";
+import { HistoryEduSharp } from "@mui/icons-material";
 
 const Transition = React.forwardRef(function Transition(props, ref) {
     return <Slide direction="up" ref={ref} {...props} />;
@@ -366,13 +367,15 @@ function HomePage() {
                 </Grid>
             </Container>
             <Container disableGutters maxWidth="md" component="main" sx={{ pt: 8, pb: 6 }}>
-                <Section title={"Previous Attempts"} width={"100%"}>
-                    <div>
-                        {histories.map((history) => {
-                            return displayHistory(history);
-                        })}
-                    </div>
-                </Section>
+                { histories.length > 0 && 
+                    <Section title={"Previous Attempts"} width={"100%"}>
+                        <div>
+                            {histories.map((history) => {
+                                return displayHistory(history);
+                            })}
+                        </div>
+                    </Section> 
+                }
             </Container>
 
             <Dialog open={isLogoutDialogOpen} onClose={() => setIsLogoutDialogOpen(false)} TransitionComponent={Transition}>
