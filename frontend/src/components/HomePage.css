@@ -1,0 +1,48 @@
+.history_row {
+    display: flex;
+    justify-content: space-between;
+    padding: 2rem;
+    border-radius: 2rem;
+    margin: 0.5rem;
+}
+
+.history_section {
+    display: flex;
+    width: 33%;
+    font-size: 1.25rem;
+}
+
+.history_label {
+    font-weight: 300;
+    padding-right: 0.25rem;
+}
+
+.difficulty_button {
+    width: 10vw;
+    display: flex;
+    justify-content: center;
+    padding: 1rem;
+    margin: 1rem;
+    font-size: 2rem;
+    transition: box-shadow 0.5s;
+    border-radius: 10px ;
+}
+
+.difficulty_button:hover{
+    cursor: pointer;
+    box-shadow: 5px 5px 5px gray;
+}
+
+.difficulty_button_Easy {
+    background-color: var(--green);
+}
+
+.difficulty_button_Medium {
+    background-color: var(--yellow);
+}
+
+.difficulty_button_Hard {
+    background-color: red;
+}
+
+

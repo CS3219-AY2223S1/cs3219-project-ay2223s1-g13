@@ -1,0 +1,244 @@
+name: Deploy
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-question:
+    runs-on: ubuntu-latest
+    defaults:
+        run:
+            working-directory: "question_service"
+
+    strategy:
+        matrix:
+            node-version: [15.x]
+
+    steps:
+        - uses: actions/checkout@v3
+        - name: Use Node.js ${{ matrix.node-version }}
+          uses: actions/setup-node@v3
+          with:
+              node-version: ${{ matrix.node-version }}
+        - run: npm ci
+        - run: npm test
+
+  test-history:
+    runs-on: ubuntu-latest
+    defaults:
+        run:
+            working-directory: "history-service"
+
+    strategy:
+        matrix:
+            node-version: [15.x]
+
+    steps:
+        - uses: actions/checkout@v3
+        - name: Use Node.js ${{ matrix.node-version }}
+          uses: actions/setup-node@v3
+          with:
+              node-version: ${{ matrix.node-version }}
+        - run: npm ci
+        - run: npm test
+
+  deploy-user:
+    runs-on: ubuntu-latest
+    environment: user-service
+    env:
+      IMAGE_NAME: gcr.io/codeus-367813/zixin448/g13-codeus-user:latest
+    defaults:
+      run:
+        working-directory: "user-service"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Google Auth
+        id: auth
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: ${{secrets.GCP_CREDENTIALS}}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+
+      - name: Authorise Docker push
+        run: gcloud auth configure-docker gcr.io
+
+      - name: Build Docker image
+        run: docker build . -t $IMAGE_NAME
+
+      - name: Push Docker image
+        run: docker push $IMAGE_NAME
+
+      - name: Deploy Docker image
+        run: gcloud run deploy user-service --image $IMAGE_NAME --region us-central1 --platform managed --allow-unauthenticated
+
+  deploy-matching:
+    runs-on: ubuntu-latest
+    environment: matching-service
+    env:
+      IMAGE_NAME: gcr.io/codeusmatching/zixin448/g13-codeus-matching:latest
+    defaults:
+      run:
+        working-directory: "matching-service"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Google Auth
+        id: auth
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: ${{secrets.GCP_CREDENTIALS}}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+
+      - name: Authorise Docker push
+        run: gcloud auth configure-docker gcr.io
+
+      - name: Build Docker image
+        run: docker build . -t $IMAGE_NAME
+
+      - name: Push Docker image
+        run: docker push $IMAGE_NAME
+
+      - name: Deploy Docker image
+        run: gcloud run deploy matching-service --image $IMAGE_NAME --region us-central1 --platform managed --allow-unauthenticated
+
+  deploy-question:
+    runs-on: ubuntu-latest
+    environment: question-service
+    env:
+      IMAGE_NAME: gcr.io/codeusquestion/zixin448/g13-codeus-question:latest
+    defaults:
+      run:
+        working-directory: "question_service"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Google Auth
+        id: auth
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: ${{secrets.GCP_CREDENTIALS}}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+
+      - name: Authorise Docker push
+        run: gcloud auth configure-docker gcr.io
+
+      - name: Build Docker image
+        run: docker build . -t $IMAGE_NAME
+
+      - name: Push Docker image
+        run: docker push $IMAGE_NAME
+
+      - name: Deploy Docker image
+        run: gcloud run deploy question-service --image $IMAGE_NAME --region us-central1 --platform managed --allow-unauthenticated
+
+  deploy-collaboration:
+    runs-on: ubuntu-latest
+    environment: collaboration-service
+    env:
+      IMAGE_NAME: gcr.io/codeuscollaboration/zixin448/g13-codeus-collaboration:latest
+    defaults:
+      run:
+        working-directory: "collaboration-service"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Google Auth
+        id: auth
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: ${{secrets.GCP_CREDENTIALS}}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+
+      - name: Authorise Docker push
+        run: gcloud auth configure-docker gcr.io
+
+      - name: Build Docker image
+        run: docker build . -t $IMAGE_NAME
+
+      - name: Push Docker image
+        run: docker push $IMAGE_NAME
+
+      - name: Deploy Docker image
+        run: gcloud run deploy collaboration-service --image $IMAGE_NAME --region us-central1 --platform managed --allow-unauthenticated
+
+  deploy-history:
+    runs-on: ubuntu-latest
+    environment: history-service
+    env:
+      IMAGE_NAME: gcr.io/codeushistory/zixin448/g13-codeus-history
+    defaults:
+      run:
+        working-directory: "history-service"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Google Auth
+        id: auth
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: ${{secrets.GCP_CREDENTIALS}}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+
+      - name: Authorise Docker push
+        run: gcloud auth configure-docker gcr.io
+
+      - name: Build Docker image
+        run: docker build . -t $IMAGE_NAME
+
+      - name: Push Docker image
+        run: docker push $IMAGE_NAME
+
+      - name: Deploy Docker image
+        run: gcloud run deploy history-service --image $IMAGE_NAME --region us-central1 --platform managed --allow-unauthenticated
+
+  deploy-frontend:
+    runs-on: ubuntu-latest
+    environment: frontend
+    env:
+      IMAGE_NAME: gcr.io/codeusfrontend/zixin448/g13-codeus-frontend
+    defaults:
+      run:
+        working-directory: "frontend"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Google Auth
+        id: auth
+        uses: google-github-actions/auth@v0
+        with:
+          credentials_json: ${{secrets.GCP_CREDENTIALS}}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v0
+
+      - name: Authorise Docker push
+        run: gcloud auth configure-docker gcr.io
+
+      - name: Build Docker image
+        run: docker build . -t $IMAGE_NAME
+
+      - name: Push Docker image
+        run: docker push $IMAGE_NAME
+
+      - name: Deploy Docker image
+        run: gcloud run deploy frontend --image $IMAGE_NAME --region us-central1 --platform managed --allow-unauthenticated

@@ -1,0 +1,55 @@
+@media only screen and (max-width: 1024px) {
+    .Top_Area_Responsive {
+        display: flex;
+        flex-wrap: wrap;
+    }
+    .Top_Area_Text_Left_Responsive {
+        justify-content: center;
+        text-align: center;
+        font-size: 1.5rem;
+        margin-bottom: 5vh;
+        margin-left: 25vw;
+        display: flex;
+        flex-wrap: wrap;
+    }
+}
+
+.underLine {
+    transition: 10s;
+    display: inline-block;
+    position: relative;
+    cursor: pointer;
+}
+.underLine1 {
+    color: rgb(112, 108, 108);
+    transition: 10s;
+    display: inline-block;
+    position: relative;
+}
+.underLine:after,
+.underLine1:after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    transform: scaleX(0);
+    height: 2px;
+    bottom: 0;
+    left: 0;
+    background-color: #646464;
+    transform-origin: bottom right;
+    transition: transform 0.75s ease-in-out;
+}
+.underLine:hover:after {
+    transform: scaleX(1);
+    /* transform-origin: bottom left; */
+}
+.underLine1:hover:after {
+    transform: scaleX(0.9);
+    transform-origin: bottom left;
+}
+
+.highlighted_text {
+    color: #D63031;
+    font-weight: bold;
+    text-shadow: 1px 1px 0px #222;
+}

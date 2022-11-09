@@ -1,0 +1,23 @@
+.section_container {
+    height: 100%;
+    padding: 1rem;
+    margin-bottom: 5vh;
+    box-shadow: 0 1px 20px 0 rgb(69 90 100 / 8%);
+}
+
+.section_title {
+    font-size: 2rem;
+    font-weight: 400;
+    margin-bottom: 0.5rem;
+}
+
+.section_body {
+    margin-top: 0.5rem;
+    border-top: 1px solid var(--gray);
+}
+
+.section_subtitle_button {
+    padding: 0.1rem 0.5rem;
+    border-radius: 5rem;
+    color: white;
+}
