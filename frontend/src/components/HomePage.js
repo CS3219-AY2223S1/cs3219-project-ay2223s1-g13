@@ -53,6 +53,7 @@ function HomePage() {
     const [questionsSolved, setQuestionsSolved] = useState({easy: 0, medium: 0, hard: 0})
     const [histories, setHistories] = useState([])
     const [matched, setMatched] = useState(0);
+    const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
     const navigate = useNavigate()
 
@@ -123,14 +124,6 @@ function HomePage() {
                 sessionStorage.setItem("roomId", args[0].roomId)
                 sessionStorage.setItem("questionIds", args[0].questionIds)
                 sessionStorage.setItem("difficulty", selectedDifficulty)
-                const ids = args[0].questionIds;
-                const questions = await getQuestions(ids);
-                if(matched==0){
-                    questions.forEach((question) => {
-                        updateHistory(question);
-                    })
-                    setMatched(matched => matched + 1);
-                }
             })
         }
 
@@ -199,14 +192,21 @@ function HomePage() {
 
     const updateHistory = async (question) => {
         const room_id = sessionStorage.getItem("roomId");
-        const cur_username = sessionStorage.getItem("username");
         const usernames = room_id.split("_");
         const difficulty = sessionStorage.getItem("difficulty");
         const questionName = question.title;
         const questionId = question.id;
         await axios.post(URL_HISTORY_SVC, {
-            username: cur_username === usernames[0] ? usernames[0] : usernames[1], 
-            matchedUsername: cur_username === usernames[0] ? usernames[1] : usernames[0],
+            username: usernames[0], 
+            matchedUsername: usernames[1],
+            difficulty,
+            question: questionName,
+            questionId
+        })
+
+        await axios.post(URL_HISTORY_SVC, {
+            username: usernames[1], 
+            matchedUsername: usernames[0],
             difficulty,
             question: questionName,
             questionId
@@ -226,10 +226,20 @@ function HomePage() {
 
     const handleStart = async () => {
         socket.emit('start', { roomId: sessionStorage.getItem("roomId") });
+        const ids = sessionStorage.getItem("questionIds").split(",");
+        const questions = await getQuestions(ids);
+        if(matched==0) {
+            questions.forEach((question) => {
+                updateHistory(question);
+            })
+            setIsButtonDisabled(true);
+            setMatched(matched => matched + 1);
+        }
         navigate('/room');
     };
 
     socket.on("partner start", () => {
+        setIsButtonDisabled(true);
         navigate('/room');
     });
 
@@ -451,7 +461,7 @@ function HomePage() {
                     <DialogContentText>You got a match!</DialogContentText>
                 </DialogContent>
                 <DialogActions>
-                    <Button color="error" onClick={handleStart}>Start</Button>
+                    <Button disabled={isButtonDisabled} color="error" onClick={handleStart}>Start</Button>
                 </DialogActions>
             </Dialog>
         </React.Fragment>
